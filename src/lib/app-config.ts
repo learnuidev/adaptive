@@ -7,10 +7,10 @@ const appConfigSchema = z.object({
 });
 
 export const appConfig = appConfigSchema.parse({
-  cognitoUserPoolId: import.meta.env.AWS_COGNITO_USERPOOL_ID || "",
-  cognitoClientId: import.meta.env.AWS_COGNITO_WEBCLIENT_ID || "",
-  graphqlEndpoint: import.meta.env.AWS_APPSYNC_GRAPHQL_ENDPOINT || "",
-  graphqlRegion: import.meta.env.AWS_REGION || "",
+  cognitoUserPoolId: import.meta.env.VITE_AWS_COGNITO_USERPOOL_ID || "",
+  cognitoClientId: import.meta.env.VITE_AWS_COGNITO_WEBCLIENT_ID || "",
+  graphqlEndpoint: import.meta.env.VITE_AWS_APPSYNC_GRAPHQL_ENDPOINT || "",
+  graphqlRegion: import.meta.env.VITE_AWS_REGION || "",
 });
 
 // Export the type inferred from the schema
