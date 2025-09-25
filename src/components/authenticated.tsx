@@ -1,15 +1,23 @@
 import { useIsAuthenticatedQuery } from "@/modules/auth/use-is-authenticated.query";
+import { LoginForm } from "@/components/auth/LoginForm";
 
 export const Authenticated = ({ children }: { children: React.ReactNode }) => {
-  const { data } = useIsAuthenticatedQuery();
+  const { data, isLoading } = useIsAuthenticatedQuery();
 
-  if (!data) {
+  if (isLoading) {
     return (
-      <div>
-        <div> Login...</div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="w-8 h-8 bg-primary rounded-lg animate-pulse mx-auto mb-2"></div>
+          <div className="text-sm text-muted-foreground">Loading...</div>
+        </div>
       </div>
     );
   }
 
-  return <div> {children}</div>;
+  if (!data) {
+    return <LoginForm />;
+  }
+
+  return <>{children}</>;
 };
