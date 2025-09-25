@@ -12,6 +12,13 @@ import { AppSidebar } from "@/components/sidebar/AppSidebar";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import Dashboard from "./pages/Dashboard";
 import FeatureFlags from "./pages/FeatureFlags";
+import Analytics from "./pages/Analytics";
+import Users from "./pages/Users";
+import Performance from "./pages/Performance";
+import Events from "./pages/Events";
+import Goals from "./pages/Goals";
+import Insights from "./pages/Insights";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import { Authenticated } from "./components/authenticated";
 
@@ -42,13 +49,13 @@ const App = () => (
                     <Routes>
                       <Route path="/" element={<Dashboard />} />
                       <Route path="/feature-flags" element={<FeatureFlags />} />
-                      <Route path="/analytics" element={<Dashboard />} />
-                      <Route path="/users" element={<Dashboard />} />
-                      <Route path="/performance" element={<Dashboard />} />
-                      <Route path="/events" element={<Dashboard />} />
-                      <Route path="/goals" element={<Dashboard />} />
-                      <Route path="/insights" element={<Dashboard />} />
-                      <Route path="/settings" element={<Dashboard />} />
+                      <Route path="/analytics" element={<Analytics />} />
+                      <Route path="/users" element={<Users />} />
+                      <Route path="/performance" element={<Performance />} />
+                      <Route path="/events" element={<Events />} />
+                      <Route path="/goals" element={<Goals />} />
+                      <Route path="/insights" element={<Insights />} />
+                      <Route path="/settings" element={<Settings />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>

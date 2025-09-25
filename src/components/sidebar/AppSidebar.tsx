@@ -9,7 +9,8 @@ import {
   Zap,
   Activity,
   Target,
-  Palette
+  Palette,
+  LogOut
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -31,6 +32,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { useSignOutMutation } from "@/modules/auth/use-signout-mutation";
+import { useToast } from "@/hooks/use-toast";
 
 const mainItems = [
   { title: "Dashboard", url: "/", icon: Home },
@@ -50,8 +53,26 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
   const { theme, setTheme } = useTheme();
+  const { toast } = useToast();
+  const signOutMutation = useSignOutMutation();
   const currentPath = location.pathname;
   const collapsed = state === 'collapsed';
+
+  const handleSignOut = async () => {
+    try {
+      await signOutMutation.mutateAsync();
+      toast({
+        title: "Signed out successfully",
+        description: "You have been logged out of your account.",
+      });
+    } catch (error) {
+      toast({
+        title: "Sign out failed",
+        description: "There was an error signing you out. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const isActive = (path: string) => currentPath === path;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
@@ -67,13 +88,13 @@ export function AppSidebar() {
       <SidebarContent className="p-4">
         {/* Logo */}
         <div className="flex items-center gap-3 mb-8 px-2">
-          <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center shadow-emerald">
+          <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center shadow-emerald flex-shrink-0">
             <Zap className="w-4 h-4 text-white" />
           </div>
           {!collapsed && (
-            <div>
-              <h1 className="font-bold text-lg text-sidebar-foreground">Adaptive</h1>
-              <p className="text-xs text-muted-foreground">Analytics Platform</p>
+            <div className="min-w-0">
+              <h1 className="font-bold text-lg text-sidebar-foreground truncate">Adaptive</h1>
+              <p className="text-xs text-muted-foreground truncate">Analytics Platform</p>
             </div>
           )}
         </div>
@@ -164,6 +185,17 @@ export function AppSidebar() {
               {!collapsed && <span className="font-medium">Settings</span>}
             </NavLink>
           </SidebarMenuButton>
+
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="w-full justify-start text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+            onClick={handleSignOut}
+            disabled={signOutMutation.isPending}
+          >
+            <LogOut className="w-4 h-4" />
+            {!collapsed && <span className="font-medium ml-2">Sign Out</span>}
+          </Button>
         </div>
       </SidebarContent>
     </Sidebar>
