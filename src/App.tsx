@@ -3,24 +3,54 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/sidebar/AppSidebar";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import Dashboard from "./pages/Dashboard";
+import FeatureFlags from "./pages/FeatureFlags";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <ThemeProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <SidebarProvider defaultOpen={true}>
+            <div className="min-h-screen flex w-full bg-background">
+              <AppSidebar />
+              <SidebarInset className="flex-1">
+                <header className="h-12 flex items-center border-b border-border/50 bg-card/50 backdrop-blur-sm px-4">
+                  <SidebarTrigger className="mr-2" />
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                    <span className="text-xs text-muted-foreground">Live</span>
+                  </div>
+                </header>
+                <main className="flex-1">
+                  <Routes>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/feature-flags" element={<FeatureFlags />} />
+                    <Route path="/analytics" element={<Dashboard />} />
+                    <Route path="/users" element={<Dashboard />} />
+                    <Route path="/performance" element={<Dashboard />} />
+                    <Route path="/events" element={<Dashboard />} />
+                    <Route path="/goals" element={<Dashboard />} />
+                    <Route path="/insights" element={<Dashboard />} />
+                    <Route path="/settings" element={<Dashboard />} />
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </main>
+              </SidebarInset>
+            </div>
+          </SidebarProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
