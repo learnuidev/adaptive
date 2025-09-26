@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from "react";
 
-import { adaptive, IAdaptive, IAdaptiveInput } from "adaptive-engine";
+import { adaptive, IAdaptive, IAdaptiveInput } from "adaptive.fyi";
 
 export const AdaptiveContext = createContext<IAdaptive | undefined>(undefined);
 
