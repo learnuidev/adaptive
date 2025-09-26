@@ -1,6 +1,6 @@
 import { getAmplifyIsAuthenticated } from "@/lib/aws-smplify/amplify-auth";
 import { useQuery } from "@tanstack/react-query";
-import { getCurrentUser } from "aws-amplify/auth";
+import { fetchUserAttributes } from "aws-amplify/auth";
 
 export const getAuthUserQueryKey = `auth-user`;
 
@@ -9,7 +9,7 @@ export const useGetAuthUserQuery = () => {
     queryKey: [getAuthUserQueryKey],
 
     queryFn: () => {
-      return getCurrentUser();
+      return fetchUserAttributes();
     },
   });
 };
