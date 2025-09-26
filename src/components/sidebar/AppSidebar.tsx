@@ -96,7 +96,7 @@ export function AppSidebar() {
           {!collapsed && (
             <div className="min-w-0">
               <h1 className="font-bold text-lg text-sidebar-foreground truncate">
-                Adaptive
+                adaptive.fyi
               </h1>
               <p className="text-xs text-muted-foreground truncate">
                 Analytics Platform

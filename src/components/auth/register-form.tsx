@@ -90,7 +90,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <div className="w-4 h-4 bg-primary-foreground rounded-sm"></div>
               </div>
-              <CardTitle className="text-2xl font-semibold">Adaptive</CardTitle>
+              <CardTitle className="text-2xl font-semibold">
+                adaptive.fyi
+              </CardTitle>
             </div>
             <CardDescription className="text-muted-foreground">
               Confirm Registration
@@ -157,7 +159,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <div className="w-4 h-4 bg-primary-foreground rounded-sm"></div>
             </div>
-            <CardTitle className="text-2xl font-semibold">Adaptive</CardTitle>
+            <CardTitle className="text-2xl font-semibold">
+              adaptive.fyi
+            </CardTitle>
           </div>
           <CardDescription className="text-muted-foreground">
             Register for a new account

@@ -1,6 +1,6 @@
-# Welcome to Adaptive
+# Welcome to adaptive.fyi
 
-Adaptive is an analytics app from the future
+adaptive.fyi is an analytics app from the future
 
 ## Key Features
 
