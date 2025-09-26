@@ -1,5 +1,6 @@
 import { useIsAuthenticatedQuery } from "@/modules/auth/use-is-authenticated.query";
-import { LoginForm } from "@/components/auth/LoginForm";
+import { LoginForm } from "@/components/auth/login-form";
+import { AuthForm } from "./auth/auth-form";
 
 export const Authenticated = ({ children }: { children: React.ReactNode }) => {
   const { data, isLoading } = useIsAuthenticatedQuery();
@@ -16,7 +17,7 @@ export const Authenticated = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!data) {
-    return <LoginForm />;
+    return <AuthForm />;
   }
 
   return <>{children}</>;

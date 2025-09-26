@@ -3,11 +3,23 @@ import { useLoginMutation } from "@/modules/auth/use-login-mutation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 
-export const LoginForm = () => {
+export const LoginForm = ({
+  isLogin,
+  setIsLogin,
+}: {
+  isLogin: boolean;
+  setIsLogin: (value: boolean) => void;
+}) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { toast } = useToast();
@@ -15,7 +27,7 @@ export const LoginForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       await loginMutation.mutateAsync({ email, password });
       toast({
@@ -71,8 +83,8 @@ export const LoginForm = () => {
                 disabled={loginMutation.isPending}
               />
             </div>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full"
               disabled={loginMutation.isPending}
             >
@@ -82,6 +94,16 @@ export const LoginForm = () => {
               Sign In
             </Button>
           </form>
+
+          <Button
+            variant="ghost"
+            className="w-full mt-4"
+            onClick={() => setIsLogin(!isLogin)}
+          >
+            {isLogin
+              ? "Don't have an account? Sign Up"
+              : "Already have an account? Sign In"}
+          </Button>
         </CardContent>
       </Card>
     </div>

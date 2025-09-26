@@ -10,14 +10,6 @@ const awsExports = {
       userPoolClientId: appConfig.cognitoClientId,
     },
   },
-
-  API: {
-    GraphQL: {
-      defaultAuthMode: "userPool",
-      endpoint: appConfig.graphqlEndpoint,
-      region: appConfig.graphqlRegion,
-    },
-  },
 } as const;
 
 Amplify.configure(awsExports);
