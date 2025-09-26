@@ -1,10 +1,8 @@
-// import { IAdaptiveInput } from "./adaptive.types.ts";
-// import { adaptive, IAdaptive } from "./adaptive.ts";
 import React, { createContext, useContext } from "react";
 
-import { adaptive } from "adaptive-engine/dist/index";
+import { adaptive, IAdaptive, IAdaptiveInput } from "adaptive-engine";
 
-export const AdaptiveContext = createContext<any | undefined>(undefined);
+export const AdaptiveContext = createContext<IAdaptive | undefined>(undefined);
 
 export const useAdaptive = () => {
   const context = useContext(AdaptiveContext);
@@ -20,7 +18,7 @@ export const AdaptiveProvider = ({
   apiKey,
   apiUrl,
   identity,
-}: { children: React.ReactNode } & any) => {
+}: { children: React.ReactNode } & IAdaptiveInput) => {
   const selfHostedDataFast = adaptive({
     apiKey,
     apiUrl,
