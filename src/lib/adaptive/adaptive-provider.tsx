@@ -8,16 +8,19 @@ export const AdapiveProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { data: authUser } = useGetAuthUserQuery();
+  const { data: authUser, isLoading } = useGetAuthUserQuery();
 
-  console.log("AUTH USER", authUser);
+  if (isLoading) {
+    return;
+  }
+
   return (
     <_AdaptiveProvider
       domain={new URL(window.location.href)?.host || "*"}
       apiKey={adaptiveAppConfig.apiKey}
       apiUrl={adaptiveAppConfig.apiUrl}
       identity={{
-        email: "todo",
+        email: authUser?.email,
       }}
     >
       <AdapiveIdentityProvider>{children}</AdapiveIdentityProvider>
