@@ -1,6 +1,3 @@
-// import { useCurrentAuthUser } from "@/domain/auth/auth.queries";
-
-// import { useIsAuthenticatedQuery } from "@/modules/auth/use-is-authenticated.query";
 import { adaptiveAppConfig } from "./adaptive-app-config";
 import { AdaptiveProvider as _AdaptiveProvider } from "./adaptive-core-provider";
 
