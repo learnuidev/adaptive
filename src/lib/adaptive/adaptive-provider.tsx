@@ -1,9 +1,8 @@
 // import { useCurrentAuthUser } from "@/domain/auth/auth.queries";
 
-import { AdaptiveProvider as AdaptiveProviderApp } from "adaptive-engine/dist/index";
-
 // import { useIsAuthenticatedQuery } from "@/modules/auth/use-is-authenticated.query";
 import { adaptiveAppConfig } from "./adaptive-app-config";
+import { AdaptiveProvider as _AdaptiveProvider } from "./adaptive-core-provider";
 
 export const AdativeProvider = ({
   children,
@@ -11,7 +10,7 @@ export const AdativeProvider = ({
   children: React.ReactNode;
 }) => {
   return (
-    <AdaptiveProviderApp
+    <_AdaptiveProvider
       domain={new URL(window.location.href)?.host || "*"}
       apiKey={adaptiveAppConfig.apiKey}
       apiUrl={adaptiveAppConfig.apiUrl}
@@ -20,6 +19,6 @@ export const AdativeProvider = ({
       }}
     >
       {children}
-    </AdaptiveProviderApp>
+    </_AdaptiveProvider>
   );
 };
