@@ -9,6 +9,7 @@ import {
   signInWithRedirect as signInWithRedirectAmplify,
   signOut as signOutAmplify,
   signUp as signUpAmplify,
+  confirmSignUp as confirmSignUpAmplify,
   AuthError,
 } from "aws-amplify/auth";
 
@@ -69,6 +70,18 @@ export async function signUp(...input: Parameters<typeof signUpAmplify>) {
     return result;
   } catch (error) {
     console.error("Error during sign up:", error);
+    throw error;
+  }
+}
+
+export async function confirmSignUp(
+  ...input: Parameters<typeof confirmSignUpAmplify>
+) {
+  try {
+    const result = await confirmSignUpAmplify(...input);
+    return result;
+  } catch (error) {
+    console.error("Error during sign up confirmation:", error);
     throw error;
   }
 }

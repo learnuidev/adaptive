@@ -62,11 +62,7 @@ export const AuthForm: React.FC = () => {
 
   return (
     <div>
-      <RegisterForm
-        onSubmit={handleRegisterSubmit}
-        isLogin={isLogin}
-        setIsLogin={setIsLogin}
-      />
+      <RegisterForm isLogin={isLogin} setIsLogin={setIsLogin} />
 
       <Button
         variant="ghost"

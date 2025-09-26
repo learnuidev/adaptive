@@ -9,11 +9,17 @@ interface SignUpCredentials {
   lastName: string;
 }
 
-export const useSignUpMutation = () => {
+export const useRegisterMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ email, password }: SignUpCredentials) => {
+    mutationFn: async ({
+      email,
+      password,
+    }: {
+      email: string;
+      password: string;
+    }) => {
       return await signUp({
         username: email,
         password,
