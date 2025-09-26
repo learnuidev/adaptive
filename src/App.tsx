@@ -21,14 +21,14 @@ import Insights from "./pages/Insights";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import { Authenticated } from "./components/authenticated";
-import { AdativeProvider } from "./lib/adaptive/adaptive-provider";
+import { AdapiveProvider } from "./lib/adaptive/adaptive-provider";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <Authenticated>
-      <AdativeProvider>
+      <AdapiveProvider>
         <ThemeProvider>
           <TooltipProvider>
             <Toaster />
@@ -71,7 +71,7 @@ const App = () => (
             </BrowserRouter>
           </TooltipProvider>
         </ThemeProvider>
-      </AdativeProvider>
+      </AdapiveProvider>
     </Authenticated>
   </QueryClientProvider>
 );

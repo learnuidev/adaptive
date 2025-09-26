@@ -1,7 +1,8 @@
 import { adaptiveAppConfig } from "./adaptive-app-config";
 import { AdaptiveProvider as _AdaptiveProvider } from "./adaptive-core-provider";
+import { AdapiveIdentityProvider } from "./adaptive-identity-provider";
 
-export const AdativeProvider = ({
+export const AdapiveProvider = ({
   children,
 }: {
   children: React.ReactNode;
@@ -15,7 +16,7 @@ export const AdativeProvider = ({
         email: "todo",
       }}
     >
-      {children}
+      <AdapiveIdentityProvider>{children}</AdapiveIdentityProvider>
     </_AdaptiveProvider>
   );
 };
