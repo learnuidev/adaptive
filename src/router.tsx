@@ -29,10 +29,12 @@ const rootRoute = createRootRoute({
           <ThemeProvider>
             <TooltipProvider>
               <SidebarProvider>
-                <div className="flex h-screen w-full">
+                <div className="flex h-screen w-full bg-background">
                   <AppSidebar />
-                  <main className="flex-1 overflow-auto">
-                    <Outlet />
+                  <main className="flex-1 overflow-hidden">
+                    <div className="h-full overflow-auto">
+                      <Outlet />
+                    </div>
                     <Toaster />
                   </main>
                 </div>

@@ -12,7 +12,7 @@ import {
   Palette,
   LogOut,
 } from "lucide-react";
-import { Link, useLocation, useParams } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import {
   Sidebar,
   SidebarContent,
@@ -22,6 +22,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -72,7 +73,13 @@ export function AppSidebar() {
   const mainItems = getMainItems(credentialId);
   const toolsItems = getToolsItems(credentialId);
 
-  const isActive = (url: string) => location.pathname === url;
+  // Fixed active state logic - check if current path starts with the item path
+  const isActive = (url: string) => {
+    if (url === "/") {
+      return location.pathname === "/";
+    }
+    return location.pathname.startsWith(url.split('/')[1] ? `/${url.split('/')[1]}` : url);
+  };
 
   const handleSignOut = async () => {
     try {
@@ -119,11 +126,13 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <Link
                       to={item.url}
-                      className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
-                        isActive(item.url)
-                          ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                      }`}
+                      activeProps={{
+                        className: "bg-primary text-primary-foreground"
+                      }}
+                      inactiveProps={{
+                        className: "text-muted-foreground hover:text-foreground hover:bg-accent"
+                      }}
+                      className="flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200"
                     >
                       <item.icon className="w-5 h-5 flex-shrink-0" />
                       {!collapsed && <span className="font-medium">{item.title}</span>}
@@ -149,11 +158,13 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <Link
                       to={item.url}
-                      className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
-                        isActive(item.url)
-                          ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                      }`}
+                      activeProps={{
+                        className: "bg-primary text-primary-foreground"
+                      }}
+                      inactiveProps={{
+                        className: "text-muted-foreground hover:text-foreground hover:bg-accent"
+                      }}
+                      className="flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200"
                     >
                       <item.icon className="w-5 h-5 flex-shrink-0" />
                       {!collapsed && <span className="font-medium">{item.title}</span>}
@@ -166,7 +177,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         {/* Settings & Theme */}
-        <div className="mt-auto p-2 space-y-2">
+        <div className="mt-auto p-2 space-y-2 border-t">
           {!collapsed && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
