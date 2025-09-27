@@ -1,18 +1,21 @@
 import { useParams } from "@tanstack/react-router";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CredentialSelector } from "@/components/credentials/CredentialSelector";
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
 import { CodeBlock } from "@/components/ui/code-block";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
-import { Terminal, Book, ExternalLink } from "lucide-react";
+import { Terminal, Book, ExternalLink, Eye, EyeOff, Info } from "lucide-react";
 
 export default function Settings() {
   // Use strict: false to handle cases where params might not exist
   const params = useParams({ strict: false }) as { credentialId?: string };
   const credentialId = params?.credentialId;
   const { data: credentials } = useListUserCredentialsQuery();
+  const [showApiSecret, setShowApiSecret] = useState(false);
 
   if (!credentialId) {
     return <NoCredentialsMessage />;
@@ -89,7 +92,8 @@ function MyComponent() {
 }`;
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <TooltipProvider>
+      <div className="container mx-auto py-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Settings</h1>
         <CredentialSelector />
@@ -164,6 +168,37 @@ function MyComponent() {
                   {currentCredential?.urlEndpoint || 'Not configured'}
                 </code>
               </div>
+              <div className="md:col-span-2">
+                <div className="flex items-center gap-2 mb-2">
+                  <label className="text-sm font-medium text-muted-foreground">
+                    API Secret
+                  </label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>With this you can make API calls but do keep it secret</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <div className="flex items-center gap-2">
+                  <code className="block flex-1 p-2 bg-muted rounded text-sm font-mono">
+                    {showApiSecret 
+                      ? currentCredential?.apiSecret || 'Not configured'
+                      : '••••••••••••••••••••••••••••••••'
+                    }
+                  </code>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowApiSecret(!showApiSecret)}
+                    className="shrink-0"
+                  >
+                    {showApiSecret ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
             </div>
             
             <div className="flex gap-3">
@@ -211,5 +246,6 @@ function MyComponent() {
         </Card>
       </div>
     </div>
+    </TooltipProvider>
   );
 }
