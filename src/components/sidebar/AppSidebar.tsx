@@ -12,7 +12,7 @@ import {
   Palette,
   LogOut,
 } from "lucide-react";
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
   Sidebar,
   SidebarContent,
@@ -35,6 +35,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { useSignOutMutation } from "@/modules/auth/use-signout-mutation";
 import { useToast } from "@/hooks/use-toast";
+import { useCredentialStore } from "@/stores/credential-store";
+import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
 
 const getMainItems = (credentialId?: string) => [
   {
@@ -107,8 +109,11 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
+  const navigate = useNavigate();
   const signOutMutation = useSignOutMutation();
   const { toast } = useToast();
+  const { selectedCredentialId, setSelectedCredential } = useCredentialStore();
+  const { data: credentials } = useListUserCredentialsQuery();
 
   // Get credentialId from current route params (handle case where it might not exist)
   const getCredentialId = () => {
@@ -122,6 +127,39 @@ export function AppSidebar() {
   const credentialId = getCredentialId();
   const mainItems = getMainItems(credentialId);
   const toolsItems = getToolsItems(credentialId);
+
+  // Handle navigation with credential selection logic
+  const handleNavigation = (url: string | null, requiresCredential: boolean) => {
+    if (!url) return;
+    
+    // If it's the credentials page, navigate directly
+    if (url === "/") {
+      navigate({ to: "/" });
+      return;
+    }
+
+    // If it requires a credential but we don't have one in the URL
+    if (requiresCredential && !credentialId) {
+      let targetCredentialId = selectedCredentialId;
+      
+      // If no stored credential, use the first available credential
+      if (!targetCredentialId && credentials && credentials.length > 0) {
+        targetCredentialId = credentials[0].id;
+        setSelectedCredential(targetCredentialId);
+      }
+      
+      if (targetCredentialId) {
+        const newUrl = url.replace(/\/[^\/]+$/, `/${targetCredentialId}`);
+        navigate({ to: newUrl as any });
+      }
+    } else {
+      navigate({ to: url as any });
+      // If we're navigating to a page with a credential, store it
+      if (requiresCredential && credentialId) {
+        setSelectedCredential(credentialId);
+      }
+    }
+  };
 
   // Precise active state detection
   const isActive = (url: string | null) => {
@@ -160,17 +198,20 @@ export function AppSidebar() {
     return (
       <SidebarMenuItem key={item.title}>
         <SidebarMenuButton asChild>
-          <Link
-            to={item.url}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
+          <button
+            onClick={() => handleNavigation(item.url, item.requiresCredential)}
+            disabled={item.requiresCredential && !item.url}
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 w-full text-left ${
               isActive(item.url)
                 ? "bg-accent text-primary-foreground hover:text-primary-foreground"
-                : "text-muted-foreground hover:bg-accent hover:text-primary-foreground"
+                : item.requiresCredential && !item.url
+                ? "text-muted-foreground/50 cursor-not-allowed"
+                : "text-muted-foreground hover:bg-accent hover:text-primary-foreground cursor-pointer"
             }`}
           >
             <item.icon className="w-5 h-5 flex-shrink-0" />
             {!collapsed && <span className="font-medium">{item.title}</span>}
-          </Link>
+          </button>
         </SidebarMenuButton>
       </SidebarMenuItem>
     );

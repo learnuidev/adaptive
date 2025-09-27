@@ -16,6 +16,7 @@ import { CredentialSuccessDialog } from "@/components/credentials/CredentialSucc
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
 import { useNavigate } from "@tanstack/react-router";
 import { formatDistanceToNow } from "date-fns";
+import { useCredentialStore } from "@/stores/credential-store";
 
 export default function CredentialsList() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -28,6 +29,12 @@ export default function CredentialsList() {
   } | null>(null);
   const { data: credentials, isLoading } = useListUserCredentialsQuery();
   const navigate = useNavigate();
+  const { setSelectedCredential } = useCredentialStore();
+
+  const handleCredentialClick = (credentialId: string) => {
+    setSelectedCredential(credentialId);
+    navigate({ to: `/dashboard/${credentialId}` });
+  };
 
   const handleCredentialAdded = (credential: {
     id: string;
@@ -43,6 +50,7 @@ export default function CredentialsList() {
   const handleSuccessContinue = () => {
     setIsSuccessDialogOpen(false);
     if (newCredential) {
+      setSelectedCredential(newCredential.id);
       navigate({ to: `/dashboard/${newCredential.id}` });
     }
     setNewCredential(null);
@@ -115,7 +123,7 @@ export default function CredentialsList() {
             <Card
               key={credential.id}
               className="p-6 hover:shadow-lg transition-all duration-200 cursor-pointer bg-card/50 border-border/50"
-              onClick={() => navigate({ to: `/dashboard/${credential.id}` })}
+              onClick={() => handleCredentialClick(credential.id)}
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
