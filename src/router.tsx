@@ -36,7 +36,7 @@ const rootRoute = createRootRoute({
               <SidebarProvider>
                 <div className="flex h-screen w-full bg-background">
                   <AppSidebar />
-                  <main className="flex-1 overflow-hidden">
+                  <main className="flex-1 flex flex-col">
                     <header className="flex h-12 items-center border-b bg-background px-4">
                       <SidebarTrigger />
                     </header>
