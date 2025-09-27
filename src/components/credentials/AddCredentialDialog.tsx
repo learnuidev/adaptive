@@ -29,7 +29,7 @@ import { useToast } from "@/hooks/use-toast";
 interface AddCredentialDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess?: (credentialId: string) => void;
+  onSuccess?: (credential: { id: string; title: string; accessKeyId: string; secretKey: string }) => void;
 }
 
 export function AddCredentialDialog({
@@ -53,11 +53,14 @@ export function AddCredentialDialog({
   const onSubmit = async (data: AddUserCredentialParam) => {
     try {
       const result = await addMutation.mutateAsync(data);
-      toast({
-        title: "Credential added successfully",
-        description: `${data.title} has been configured and is ready to use.`,
-      });
-      onSuccess?.(result.id);
+      // Create mock credentials for demo purposes
+      const mockCredential = {
+        id: result.id,
+        title: data.title,
+        accessKeyId: `AK${Math.random().toString(36).substring(2, 18).toUpperCase()}`,
+        secretKey: `SK${Math.random().toString(36).substring(2, 38)}${Math.random().toString(36).substring(2, 10)}`,
+      };
+      onSuccess?.(mockCredential);
       form.reset();
     } catch (error) {
       toast({

@@ -1,154 +1,213 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useParams } from "react-router-dom";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Settings as SettingsIcon, User, Bell, Shield, Database } from "lucide-react";
+import { CredentialSelector } from "@/components/credentials/CredentialSelector";
+import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
+import { CodeBlock } from "@/components/ui/code-block";
+import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
+import { Terminal, Book, ExternalLink } from "lucide-react";
 
-const Settings = () => {
-  return (
-    <div className="min-h-screen bg-background p-6 space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-        <p className="text-muted-foreground">Manage your account and application preferences</p>
-      </div>
+export default function Settings() {
+  const { credentialId } = useParams();
+  const { data: credentials } = useListUserCredentialsQuery();
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="glass">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="w-5 h-5" />
-              Account Settings
-            </CardTitle>
-            <CardDescription>
-              Manage your profile and account information
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
-              <p className="text-sm text-muted-foreground">john.doe@example.com</p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="name">Display Name</Label>
-              <p className="text-sm text-muted-foreground">John Doe</p>
-            </div>
-            <Button variant="outline" size="sm">
-              Edit Profile
-            </Button>
-          </CardContent>
-        </Card>
+  if (!credentialId) {
+    return <NoCredentialsMessage />;
+  }
 
-        <Card className="glass">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bell className="w-5 h-5" />
-              Notifications
-            </CardTitle>
-            <CardDescription>
-              Configure your notification preferences
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="email-notifications">Email Notifications</Label>
-              <Switch id="email-notifications" defaultChecked />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="push-notifications">Push Notifications</Label>
-              <Switch id="push-notifications" />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="weekly-reports">Weekly Reports</Label>
-              <Switch id="weekly-reports" defaultChecked />
-            </div>
-          </CardContent>
-        </Card>
+  const currentCredential = credentials?.find(c => c.id === credentialId);
 
-        <Card className="glass">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="w-5 h-5" />
-              Privacy & Security
-            </CardTitle>
-            <CardDescription>
-              Manage your privacy and security settings
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="two-factor">Two-Factor Authentication</Label>
-              <Switch id="two-factor" />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="data-sharing">Data Sharing</Label>
-              <Switch id="data-sharing" defaultChecked />
-            </div>
-            <Button variant="outline" size="sm">
-              Change Password
-            </Button>
-          </CardContent>
-        </Card>
+  const installCode = `npm install adaptive-engine@latest`;
 
-        <Card className="glass">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Database className="w-5 h-5" />
-              Data Management
-            </CardTitle>
-            <CardDescription>
-              Control your data retention and export options
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Data Retention</Label>
-              <p className="text-sm text-muted-foreground">Keep data for 12 months</p>
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm">
-                Export Data
-              </Button>
-              <Button variant="destructive" size="sm">
-                Delete Account
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+  const providerCode = `import React, { createContext, useContext } from "react";
+import { adaptive, IAdaptive, IAdaptiveInput } from "adaptive-engine";
 
-      <Card className="glass">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <SettingsIcon className="w-5 h-5" />
-            Application Settings
-          </CardTitle>
-          <CardDescription>
-            Configure application-wide settings and preferences
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="analytics-tracking">Analytics Tracking</Label>
-              <Switch id="analytics-tracking" defaultChecked />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="performance-monitoring">Performance Monitoring</Label>
-              <Switch id="performance-monitoring" defaultChecked />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="error-reporting">Error Reporting</Label>
-              <Switch id="error-reporting" defaultChecked />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="feature-flags">Feature Flags</Label>
-              <Switch id="feature-flags" />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
+export const AdaptiveContext = createContext<IAdaptive | undefined>(undefined);
+
+export const useAdaptive = () => {
+  const context = useContext(AdaptiveContext);
+  if (!context) {
+    throw new Error("useAdaptive must be used within an AdaptiveProvider");
+  }
+  return context;
 };
 
-export default Settings;
+export const AdaptiveProvider = ({
+  children,
+  domain,
+  apiKey,
+  apiUrl,
+  identity,
+}: { children: React.ReactNode } & IAdaptiveInput) => {
+  const adaptiveInstance = adaptive({
+    apiKey,
+    apiUrl,
+    domain,
+    identity,
+  });
+
+  if (!adaptiveInstance) {
+    throw new Error("AdaptiveProvider: Failed to initialize adaptive");
+  }
+
+  return (
+    <AdaptiveContext.Provider value={adaptiveInstance}>
+      {children}
+    </AdaptiveContext.Provider>
+  );
+};`;
+
+  const usageCode = `import { AdaptiveProvider, useAdaptive } from './lib/adaptive-provider';
+
+// Wrap your app with the provider
+function App() {
+  return (
+    <AdaptiveProvider
+      domain="${currentCredential?.domain || 'your-domain.com'}"
+      apiKey="your-api-key"
+      apiUrl="https://api.adaptive.fyi"
+      identity={{ email: "user@example.com" }}
+    >
+      <YourAppComponents />
+    </AdaptiveProvider>
+  );
+}
+
+// Use the hook in your components
+function MyComponent() {
+  const adaptive = useAdaptive();
+  
+  // Now you can use adaptive features
+  const handleAnalytics = () => {
+    adaptive.track('user_action', { action: 'button_click' });
+  };
+
+  return <button onClick={handleAnalytics}>Track Event</button>;
+}`;
+
+  return (
+    <div className="container mx-auto py-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Settings</h1>
+        <CredentialSelector />
+      </div>
+
+      <div className="grid gap-6">
+        {/* Installation Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Terminal className="h-5 w-5" />
+              Installation & Setup
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <h3 className="text-lg font-semibold mb-2">1. Install Adaptive Engine</h3>
+              <p className="text-muted-foreground mb-3">
+                First, install the adaptive-engine package in your project:
+              </p>
+              <CodeBlock
+                language="bash"
+                code={installCode}
+              />
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-2">2. Create the Adaptive Provider</h3>
+              <p className="text-muted-foreground mb-3">
+                Create a provider component to wrap your application:
+              </p>
+              <CodeBlock
+                title="lib/adaptive-provider.tsx"
+                language="typescript"
+                code={providerCode}
+              />
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-2">3. Use in Your Application</h3>
+              <p className="text-muted-foreground mb-3">
+                Wrap your app with the provider and use the hook in your components:
+              </p>
+              <CodeBlock
+                title="Example Usage"
+                language="typescript"
+                code={usageCode}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* API Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Book className="h-5 w-5" />
+              API Configuration
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Domain</label>
+                <code className="block mt-1 p-2 bg-muted rounded text-sm">
+                  {currentCredential?.domain || 'Not configured'}
+                </code>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">API URL</label>
+                <code className="block mt-1 p-2 bg-muted rounded text-sm">
+                  https://api.adaptive.fyi
+                </code>
+              </div>
+            </div>
+            
+            <div className="flex gap-3">
+              <Button variant="outline" size="sm">
+                <ExternalLink className="h-4 w-4 mr-2" />
+                View Documentation
+              </Button>
+              <Button variant="outline" size="sm">
+                <ExternalLink className="h-4 w-4 mr-2" />
+                API Reference
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Credential Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Credential Settings</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Title</label>
+                <p className="mt-1">{currentCredential?.title || 'Unknown'}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Description</label>
+                <p className="mt-1 text-muted-foreground">
+                  {currentCredential?.description || 'No description provided'}
+                </p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Scopes</label>
+                <div className="mt-1 flex gap-2">
+                  {currentCredential?.scopes?.map((scope) => (
+                    <Badge key={scope} variant="secondary">
+                      {scope}
+                    </Badge>
+                  )) || <span className="text-muted-foreground">No scopes</span>}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
