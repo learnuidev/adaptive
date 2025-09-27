@@ -93,159 +93,264 @@ function MyComponent() {
 
   return (
     <TooltipProvider>
-      <div className="container mx-auto py-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Settings</h1>
-        <CredentialSelector />
-      </div>
-
-      <div className="grid gap-6">
-        {/* Installation Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Terminal className="h-5 w-5" />
-              Installation & Setup
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <h3 className="text-lg font-semibold mb-2">1. Install Adaptive Engine</h3>
-              <p className="text-muted-foreground mb-3">
-                First, install the adaptive-engine package in your project:
-              </p>
-              <CodeBlock
-                language="bash"
-                code={installCode}
-              />
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold mb-2">2. Create the Adaptive Provider</h3>
-              <p className="text-muted-foreground mb-3">
-                Create a provider component to wrap your application:
-              </p>
-              <CodeBlock
-                title="lib/adaptive-provider.tsx"
-                language="typescript"
-                code={providerCode}
-              />
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold mb-2">3. Use in Your Application</h3>
-              <p className="text-muted-foreground mb-3">
-                Wrap your app with the provider and use the hook in your components:
-              </p>
-              <CodeBlock
-                title="Example Usage"
-                language="typescript"
-                code={usageCode}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* API Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Book className="h-5 w-5" />
-              API Configuration
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+        <div className="container mx-auto px-6 py-12 max-w-4xl">
+          {/* Header */}
+          <div className="mb-12 animate-fade-in">
+            <div className="flex items-center justify-between mb-6">
               <div>
-                <label className="text-sm font-medium text-muted-foreground">Domain</label>
-                <code className="block mt-1 p-2 bg-muted rounded text-sm">
-                  {currentCredential?.domain || 'Not configured'}
-                </code>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">API URL</label>
-                <code className="block mt-1 p-2 bg-muted rounded text-sm">
-                  {currentCredential?.urlEndpoint || 'Not configured'}
-                </code>
-              </div>
-              <div className="md:col-span-2">
-                <div className="flex items-center gap-2 mb-2">
-                  <label className="text-sm font-medium text-muted-foreground">
-                    API Secret
-                  </label>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>With this you can make API calls but do keep it secret</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <div className="flex items-center gap-2">
-                  <code className="block flex-1 p-2 bg-muted rounded text-sm font-mono">
-                    {showApiSecret 
-                      ? currentCredential?.apiSecret || 'Not configured'
-                      : '••••••••••••••••••••••••••••••••'
-                    }
-                  </code>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowApiSecret(!showApiSecret)}
-                    className="shrink-0"
-                  >
-                    {showApiSecret ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex gap-3">
-              <Button variant="outline" size="sm">
-                <ExternalLink className="h-4 w-4 mr-2" />
-                View Documentation
-              </Button>
-              <Button variant="outline" size="sm">
-                <ExternalLink className="h-4 w-4 mr-2" />
-                API Reference
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Credential Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Credential Settings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Title</label>
-                <p className="mt-1">{currentCredential?.title || 'Unknown'}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Description</label>
-                <p className="mt-1 text-muted-foreground">
-                  {currentCredential?.description || 'No description provided'}
+                <h1 className="text-4xl font-semibold tracking-tight text-foreground mb-2">
+                  Settings
+                </h1>
+                <p className="text-lg text-muted-foreground">
+                  Configure your API integration and manage credentials
                 </p>
               </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Scopes</label>
-                <div className="mt-1 flex gap-2">
-                  {currentCredential?.scopes?.map((scope) => (
-                    <Badge key={scope} variant="secondary">
-                      {scope}
-                    </Badge>
-                  )) || <span className="text-muted-foreground">No scopes</span>}
+              <div className="glass p-1 rounded-2xl">
+                <CredentialSelector />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-8">
+            {/* Installation Section */}
+            <div className="glass-strong rounded-3xl p-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+              <div className="flex items-center gap-3 mb-8">
+                <div className="p-3 bg-gradient-primary rounded-2xl shadow-emerald">
+                  <Terminal className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-semibold text-foreground">Installation & Setup</h2>
+                  <p className="text-muted-foreground mt-1">Get started with the Adaptive Engine</p>
+                </div>
+              </div>
+
+              <div className="space-y-10">
+                {/* Step 1 */}
+                <div className="group">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="flex items-center justify-center w-8 h-8 bg-primary text-primary-foreground text-sm font-semibold rounded-full">
+                      1
+                    </div>
+                    <h3 className="text-xl font-semibold text-foreground">Install Adaptive Engine</h3>
+                  </div>
+                  <p className="text-muted-foreground mb-4 ml-12">
+                    Add the adaptive-engine package to your project
+                  </p>
+                  <div className="ml-12">
+                    <div className="bg-card border border-border/50 rounded-2xl p-6 shadow-soft">
+                      <CodeBlock
+                        language="bash"
+                        code={installCode}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 2 */}
+                <div className="group">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="flex items-center justify-center w-8 h-8 bg-primary text-primary-foreground text-sm font-semibold rounded-full">
+                      2
+                    </div>
+                    <h3 className="text-xl font-semibold text-foreground">Create the Adaptive Provider</h3>
+                  </div>
+                  <p className="text-muted-foreground mb-4 ml-12">
+                    Set up the provider component to wrap your application
+                  </p>
+                  <div className="ml-12">
+                    <div className="bg-card border border-border/50 rounded-2xl p-6 shadow-soft">
+                      <CodeBlock
+                        title="lib/adaptive-provider.tsx"
+                        language="typescript"
+                        code={providerCode}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 3 */}
+                <div className="group">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="flex items-center justify-center w-8 h-8 bg-primary text-primary-foreground text-sm font-semibold rounded-full">
+                      3
+                    </div>
+                    <h3 className="text-xl font-semibold text-foreground">Use in Your Application</h3>
+                  </div>
+                  <p className="text-muted-foreground mb-4 ml-12">
+                    Implement the provider and hook in your components
+                  </p>
+                  <div className="ml-12">
+                    <div className="bg-card border border-border/50 rounded-2xl p-6 shadow-soft">
+                      <CodeBlock
+                        title="Example Usage"
+                        language="typescript"
+                        code={usageCode}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+
+            {/* API Configuration Section */}
+            <div className="glass-strong rounded-3xl p-8 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+              <div className="flex items-center gap-3 mb-8">
+                <div className="p-3 bg-gradient-primary rounded-2xl shadow-emerald">
+                  <Book className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-semibold text-foreground">API Configuration</h2>
+                  <p className="text-muted-foreground mt-1">Your API endpoint and authentication details</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Domain */}
+                <div className="group">
+                  <label className="text-sm font-semibold text-foreground mb-3 block uppercase tracking-wide">
+                    Domain
+                  </label>
+                  <div className="bg-muted/50 border border-border/30 rounded-xl px-4 py-3 transition-all duration-200 group-hover:border-primary/20">
+                    <code className="text-sm font-mono text-foreground">
+                      {currentCredential?.domain || 'Not configured'}
+                    </code>
+                  </div>
+                </div>
+
+                {/* API URL */}
+                <div className="group">
+                  <label className="text-sm font-semibold text-foreground mb-3 block uppercase tracking-wide">
+                    API URL
+                  </label>
+                  <div className="bg-muted/50 border border-border/30 rounded-xl px-4 py-3 transition-all duration-200 group-hover:border-primary/20">
+                    <code className="text-sm font-mono text-foreground">
+                      {currentCredential?.urlEndpoint || 'Not configured'}
+                    </code>
+                  </div>
+                </div>
+
+                {/* API Secret */}
+                <div className="lg:col-span-2 group">
+                  <div className="flex items-center gap-3 mb-3">
+                    <label className="text-sm font-semibold text-foreground uppercase tracking-wide">
+                      API Secret
+                    </label>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="p-1 rounded-full hover:bg-muted/50 transition-colors cursor-help">
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        <p>With this you can make API calls but do keep it secret</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="bg-muted/50 border border-border/30 rounded-xl px-4 py-3 flex-1 transition-all duration-200 group-hover:border-primary/20">
+                      <code className="text-sm font-mono text-foreground">
+                        {showApiSecret 
+                          ? currentCredential?.apiSecret || 'Not configured'
+                          : '••••••••••••••••••••••••••••••••••••••••••••••••••••'
+                        }
+                      </code>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowApiSecret(!showApiSecret)}
+                      className="shrink-0 h-12 w-12 rounded-xl border-border/30 hover:border-primary/30 hover:bg-primary/5 transition-all duration-200"
+                    >
+                      {showApiSecret ? 
+                        <EyeOff className="h-4 w-4" /> : 
+                        <Eye className="h-4 w-4" />
+                      }
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex gap-3 mt-8 pt-6 border-t border-border/30">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="rounded-xl border-border/30 hover:border-primary/30 hover:bg-primary/5 transition-all duration-200"
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  View Documentation
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="rounded-xl border-border/30 hover:border-primary/30 hover:bg-primary/5 transition-all duration-200"
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  API Reference
+                </Button>
+              </div>
+            </div>
+
+            {/* Credential Details Section */}
+            <div className="glass-strong rounded-3xl p-8 animate-slide-up" style={{ animationDelay: '0.3s' }}>
+              <div className="mb-8">
+                <h2 className="text-2xl font-semibold text-foreground mb-2">Credential Details</h2>
+                <p className="text-muted-foreground">Information about your current credential configuration</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Title */}
+                <div className="group">
+                  <label className="text-sm font-semibold text-foreground mb-3 block uppercase tracking-wide">
+                    Title
+                  </label>
+                  <div className="bg-muted/50 border border-border/30 rounded-xl px-4 py-3 transition-all duration-200 group-hover:border-primary/20">
+                    <p className="text-sm text-foreground font-medium">
+                      {currentCredential?.title || 'Unknown'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div className="group">
+                  <label className="text-sm font-semibold text-foreground mb-3 block uppercase tracking-wide">
+                    Description
+                  </label>
+                  <div className="bg-muted/50 border border-border/30 rounded-xl px-4 py-3 transition-all duration-200 group-hover:border-primary/20">
+                    <p className="text-sm text-muted-foreground">
+                      {currentCredential?.description || 'No description provided'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Scopes */}
+                <div className="md:col-span-2 group">
+                  <label className="text-sm font-semibold text-foreground mb-3 block uppercase tracking-wide">
+                    Scopes
+                  </label>
+                  <div className="bg-muted/50 border border-border/30 rounded-xl px-4 py-3 transition-all duration-200 group-hover:border-primary/20">
+                    <div className="flex flex-wrap gap-2">
+                      {currentCredential?.scopes?.length ? (
+                        currentCredential.scopes.map((scope) => (
+                          <Badge 
+                            key={scope} 
+                            variant="secondary"
+                            className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/15 transition-colors"
+                          >
+                            {scope}
+                          </Badge>
+                        ))
+                      ) : (
+                        <span className="text-sm text-muted-foreground">No scopes configured</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
     </TooltipProvider>
   );
 }
