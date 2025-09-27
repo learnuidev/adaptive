@@ -211,7 +211,7 @@ function MyComponent() {
                   <label className="text-sm font-semibold text-foreground mb-3 block uppercase tracking-wide">
                     Domain
                   </label>
-                  <div className="bg-muted/50 border border-border/30 rounded-xl px-4 py-3 transition-all duration-200 group-hover:border-primary/20">
+                  <div className="bg-muted/50 rounded-xl px-4 py-3 transition-all duration-200 group-hover:bg-muted/70">
                     <code className="text-sm font-mono text-foreground">
                       {currentCredential?.domain || 'Not configured'}
                     </code>
@@ -223,7 +223,7 @@ function MyComponent() {
                   <label className="text-sm font-semibold text-foreground mb-3 block uppercase tracking-wide">
                     API URL
                   </label>
-                  <div className="bg-muted/50 border border-border/30 rounded-xl px-4 py-3 transition-all duration-200 group-hover:border-primary/20">
+                  <div className="bg-muted/50 rounded-xl px-4 py-3 transition-all duration-200 group-hover:bg-muted/70">
                     <code className="text-sm font-mono text-foreground">
                       {currentCredential?.urlEndpoint || 'Not configured'}
                     </code>
@@ -248,7 +248,7 @@ function MyComponent() {
                     </Tooltip>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="bg-muted/50 border border-border/30 rounded-xl px-4 py-3 flex-1 transition-all duration-200 group-hover:border-primary/20">
+                    <div className="bg-muted/50 rounded-xl px-4 py-3 flex-1 transition-all duration-200 group-hover:bg-muted/70">
                       <code className="text-sm font-mono text-foreground">
                         {showApiSecret 
                           ? currentCredential?.apiSecret || 'Not configured'
@@ -260,7 +260,7 @@ function MyComponent() {
                       variant="outline"
                       size="sm"
                       onClick={() => setShowApiSecret(!showApiSecret)}
-                      className="shrink-0 h-12 w-12 rounded-xl border-border/30 hover:border-primary/30 hover:bg-primary/5 transition-all duration-200"
+                      className="shrink-0 h-12 w-12 rounded-xl hover:bg-primary/5 transition-all duration-200"
                     >
                       {showApiSecret ? 
                         <EyeOff className="h-4 w-4" /> : 
@@ -271,11 +271,11 @@ function MyComponent() {
                 </div>
               </div>
               
-              <div className="flex gap-3 mt-8 pt-6 border-t border-border/30">
+              <div className="flex gap-3 mt-8 pt-6 border-t border-border/20">
                 <Button 
                   variant="outline" 
                   size="sm"
-                  className="rounded-xl border-border/30 hover:border-primary/30 hover:bg-primary/5 transition-all duration-200"
+                  className="rounded-xl hover:bg-primary/5 transition-all duration-200"
                 >
                   <ExternalLink className="h-4 w-4 mr-2" />
                   View Documentation
@@ -283,7 +283,7 @@ function MyComponent() {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  className="rounded-xl border-border/30 hover:border-primary/30 hover:bg-primary/5 transition-all duration-200"
+                  className="rounded-xl hover:bg-primary/5 transition-all duration-200"
                 >
                   <ExternalLink className="h-4 w-4 mr-2" />
                   API Reference
@@ -304,7 +304,7 @@ function MyComponent() {
                   <label className="text-sm font-semibold text-foreground mb-3 block uppercase tracking-wide">
                     Title
                   </label>
-                  <div className="bg-muted/50 border border-border/30 rounded-xl px-4 py-3 transition-all duration-200 group-hover:border-primary/20">
+                  <div className="bg-muted/50 rounded-xl px-4 py-3 transition-all duration-200 group-hover:bg-muted/70">
                     <p className="text-sm text-foreground font-medium">
                       {currentCredential?.title || 'Unknown'}
                     </p>
@@ -316,7 +316,7 @@ function MyComponent() {
                   <label className="text-sm font-semibold text-foreground mb-3 block uppercase tracking-wide">
                     Description
                   </label>
-                  <div className="bg-muted/50 border border-border/30 rounded-xl px-4 py-3 transition-all duration-200 group-hover:border-primary/20">
+                  <div className="bg-muted/50 rounded-xl px-4 py-3 transition-all duration-200 group-hover:bg-muted/70">
                     <p className="text-sm text-muted-foreground">
                       {currentCredential?.description || 'No description provided'}
                     </p>
@@ -328,14 +328,14 @@ function MyComponent() {
                   <label className="text-sm font-semibold text-foreground mb-3 block uppercase tracking-wide">
                     Scopes
                   </label>
-                  <div className="bg-muted/50 border border-border/30 rounded-xl px-4 py-3 transition-all duration-200 group-hover:border-primary/20">
+                  <div className="bg-muted/50 rounded-xl px-4 py-3 transition-all duration-200 group-hover:bg-muted/70">
                     <div className="flex flex-wrap gap-2">
                       {currentCredential?.scopes?.length ? (
                         currentCredential.scopes.map((scope) => (
                           <Badge 
                             key={scope} 
                             variant="secondary"
-                            className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/15 transition-colors"
+                            className="bg-primary/10 text-primary hover:bg-primary/15 transition-colors"
                           >
                             {scope}
                           </Badge>
