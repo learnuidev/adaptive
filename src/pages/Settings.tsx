@@ -16,15 +16,132 @@ import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list
 import { Terminal, Book, ExternalLink, Eye, EyeOff, Info } from "lucide-react";
 import { possibleScopes } from "@/modules/user-credentials/use-add-user-credential-mutation";
 
-// Reusable Section Header Component
-const SectionHeader = ({
-  icon,
-  title,
-  subtitle,
-}: {
+// ──────────────────────────────────────────────────────────────
+// TYPES
+// ──────────────────────────────────────────────────────────────
+
+type SectionHeaderProps = {
   icon: React.ReactNode;
   title: string;
   subtitle: string;
+};
+
+type InfoFieldProps = {
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+};
+
+type CodeStepProps = {
+  stepNumber: number;
+  title: string;
+  children: React.ReactNode;
+};
+
+type ApiSecretFieldProps = {
+  showSecret: boolean;
+  onToggle: () => void;
+  value: string | undefined;
+};
+
+type ScopesDisplayProps = {
+  scopes?: string[];
+};
+
+type ExternalLinkButtonsProps = {
+  onViewDocs?: () => void;
+  onViewApiRef?: () => void;
+};
+
+type InstallCode = string;
+type ProviderCode = string;
+type UsageCode = string;
+
+// ──────────────────────────────────────────────────────────────
+// CONSTANTS
+// ──────────────────────────────────────────────────────────────
+
+const INSTALL_CODE: InstallCode = `npm install adaptive-engine@latest`;
+
+const PROVIDER_CODE: ProviderCode = `import React, { createContext, useContext } from "react";
+import { adaptive, IAdaptive, IAdaptiveInput } from "adaptive-engine";
+
+export const AdaptiveContext = createContext<IAdaptive | undefined>(undefined);
+
+export const useAdaptive = () => {
+  const context = useContext(AdaptiveContext);
+  if (!context) {
+    throw new Error("useAdaptive must be used within an AdaptiveProvider");
+  }
+  return context;
+};
+
+export const AdaptiveProvider = ({
+  children,
+  domain,
+  apiKey,
+  apiUrl,
+  identity,
+}: { children: React.ReactNode } & IAdaptiveInput) => {
+  const adaptiveInstance = adaptive({
+    apiKey,
+    apiUrl,
+    domain,
+    identity,
+  });
+
+  if (!adaptiveInstance) {
+    throw new Error("AdaptiveProvider: Failed to initialize adaptive");
+  }
+
+  return (
+    <AdaptiveContext.Provider value={adaptiveInstance}>
+      {children}
+    </AdaptiveContext.Provider>
+  );
+};`;
+
+const buildUsageCode = (
+  domain: string,
+  apiKey: string,
+  apiUrl: string
+): UsageCode =>
+  `import { AdaptiveProvider, useAdaptive } from './lib/adaptive-provider';
+
+// Wrap your app with the provider
+function App() {
+  return (
+    <AdaptiveProvider
+      domain="${domain}"
+      apiKey="${apiKey}"
+      apiUrl="${apiUrl}"
+      identity={{ email: "user@example.com" }}
+    >
+      <YourAppComponents />
+    </AdaptiveProvider>
+  );
+}
+
+// Use the hook in your components
+function MyComponent() {
+  const adaptive = useAdaptive();
+  
+  // Now you can use adaptive features
+  const handleAnalytics = () => {
+    adaptive.track('user_action', { action: 'button_click' });
+  };
+
+  return <button onClick={handleAnalytics}>Track Event</button>;
+}`;
+
+// ──────────────────────────────────────────────────────────────
+// REUSABLE COMPONENTS
+// ──────────────────────────────────────────────────────────────
+
+const SectionHeader: React.FC<SectionHeaderProps> = ({
+  icon,
+  title,
+  subtitle,
 }) => (
   <div className="flex items-center gap-3 mb-8">
     <div className="p-3 bg-gradient-primary rounded-2xl shadow-emerald">
@@ -37,15 +154,10 @@ const SectionHeader = ({
   </div>
 );
 
-// Reusable Info Field Component
-const InfoField = ({
+const InfoField: React.FC<InfoFieldProps> = ({
   label,
   children,
   className = "",
-}: {
-  label: string;
-  children: React.ReactNode;
-  className?: string;
 }) => (
   <div className={`group ${className}`}>
     <label className="text-sm font-semibold text-foreground mb-3 block uppercase tracking-wide">
@@ -57,16 +169,7 @@ const InfoField = ({
   </div>
 );
 
-// Reusable Code Step Component
-const CodeStep = ({
-  stepNumber,
-  title,
-  children,
-}: {
-  stepNumber: number;
-  title: string;
-  children: React.ReactNode;
-}) => (
+const CodeStep: React.FC<CodeStepProps> = ({ stepNumber, title, children }) => (
   <div className="group">
     <label className="text-sm font-semibold text-foreground mb-3 block uppercase tracking-wide">
       Step {stepNumber} – {title}
@@ -75,15 +178,10 @@ const CodeStep = ({
   </div>
 );
 
-// Reusable API Secret Field Component
-const ApiSecretField = ({
+const ApiSecretField: React.FC<ApiSecretFieldProps> = ({
   showSecret,
   onToggle,
   value,
-}: {
-  showSecret: boolean;
-  onToggle: () => void;
-  value: string | undefined;
 }) => (
   <div className="lg:col-span-2 group">
     <div className="flex items-center gap-3 mb-3">
@@ -127,8 +225,7 @@ const ApiSecretField = ({
   </div>
 );
 
-// Reusable Scopes Display Component
-const ScopesDisplay = ({ scopes }: { scopes?: string[] }) => (
+const ScopesDisplay: React.FC<ScopesDisplayProps> = ({ scopes }) => (
   <div className="flex flex-wrap gap-2">
     {scopes?.length ? (
       scopes.map((scope) => {
@@ -151,13 +248,16 @@ const ScopesDisplay = ({ scopes }: { scopes?: string[] }) => (
   </div>
 );
 
-// Reusable External Link Buttons Component
-const ExternalLinkButtons = () => (
+const ExternalLinkButtons: React.FC<ExternalLinkButtonsProps> = ({
+  onViewDocs,
+  onViewApiRef,
+}) => (
   <div className="flex gap-3 mt-8 pt-6 border-t border-border/20">
     <Button
       variant="outline"
       size="sm"
       className="rounded-xl hover:bg-primary/5 transition-all duration-200"
+      onClick={onViewDocs}
     >
       <ExternalLink className="h-4 w-4 mr-2" />
       View Documentation
@@ -166,6 +266,7 @@ const ExternalLinkButtons = () => (
       variant="outline"
       size="sm"
       className="rounded-xl hover:bg-primary/5 transition-all duration-200"
+      onClick={onViewApiRef}
     >
       <ExternalLink className="h-4 w-4 mr-2" />
       API Reference
@@ -173,86 +274,24 @@ const ExternalLinkButtons = () => (
   </div>
 );
 
+// ──────────────────────────────────────────────────────────────
+// MAIN COMPONENT
+// ──────────────────────────────────────────────────────────────
+
 export default function Settings() {
-  // Use strict: false to handle cases where params might not exist
   const params = useParams({ strict: false }) as { credentialId?: string };
   const credentialId = params?.credentialId;
   const { data: credentials } = useListUserCredentialsQuery();
   const [showApiSecret, setShowApiSecret] = useState(false);
 
-  if (!credentialId) {
-    return <NoCredentialsMessage />;
-  }
+  if (!credentialId) return <NoCredentialsMessage />;
 
   const currentCredential = credentials?.find((c) => c.id === credentialId);
-
-  const installCode = `npm install adaptive-engine@latest`;
-
-  const providerCode = `import React, { createContext, useContext } from "react";
-import { adaptive, IAdaptive, IAdaptiveInput } from "adaptive-engine";
-
-export const AdaptiveContext = createContext<IAdaptive | undefined>(undefined);
-
-export const useAdaptive = () => {
-  const context = useContext(AdaptiveContext);
-  if (!context) {
-    throw new Error("useAdaptive must be used within an AdaptiveProvider");
-  }
-  return context;
-};
-
-export const AdaptiveProvider = ({
-  children,
-  domain,
-  apiKey,
-  apiUrl,
-  identity,
-}: { children: React.ReactNode } & IAdaptiveInput) => {
-  const adaptiveInstance = adaptive({
-    apiKey,
-    apiUrl,
-    domain,
-    identity,
-  });
-
-  if (!adaptiveInstance) {
-    throw new Error("AdaptiveProvider: Failed to initialize adaptive");
-  }
-
-  return (
-    <AdaptiveContext.Provider value={adaptiveInstance}>
-      {children}
-    </AdaptiveContext.Provider>
+  const usageCode = buildUsageCode(
+    currentCredential?.domain || "your-domain.com",
+    currentCredential?.apiKey || "your-api-key",
+    currentCredential?.urlEndpoint || "https://api.adaptive.fyi"
   );
-};`;
-
-  const usageCode = `import { AdaptiveProvider, useAdaptive } from './lib/adaptive-provider';
-
-// Wrap your app with the provider
-function App() {
-  return (
-    <AdaptiveProvider
-      domain="${currentCredential?.domain || "your-domain.com"}"
-      apiKey="${currentCredential?.apiKey || "your-api-key"}"
-      apiUrl="${currentCredential?.urlEndpoint || "https://api.adaptive.fyi"}"
-      identity={{ email: "user@example.com" }}
-    >
-      <YourAppComponents />
-    </AdaptiveProvider>
-  );
-}
-
-// Use the hook in your components
-function MyComponent() {
-  const adaptive = useAdaptive();
-  
-  // Now you can use adaptive features
-  const handleAnalytics = () => {
-    adaptive.track('user_action', { action: 'button_click' });
-  };
-
-  return <button onClick={handleAnalytics}>Track Event</button>;
-}`;
 
   return (
     <TooltipProvider>
@@ -287,25 +326,22 @@ function MyComponent() {
                 subtitle="Get started with the Adaptive Engine"
               />
 
-              {/* Part One */}
               <div className="grid grid-cols-1 gap-6 mb-12">
                 <CodeStep stepNumber={1} title="Install Package">
-                  <CodeBlock language="bash" code={installCode} />
+                  <CodeBlock language="bash" code={INSTALL_CODE} />
                 </CodeStep>
               </div>
 
-              {/* Part Two */}
               <div className="grid grid-cols-1 gap-6 mb-12">
                 <CodeStep stepNumber={2} title="Provider File">
                   <CodeBlock
                     title="lib/adaptive-provider.tsx"
                     language="typescript"
-                    code={providerCode}
+                    code={PROVIDER_CODE}
                   />
                 </CodeStep>
               </div>
 
-              {/* Part Three*/}
               <div className="grid grid-cols-1 gap-6 mb-12">
                 <CodeStep stepNumber={3} title="Usage Example">
                   <CodeBlock
@@ -345,7 +381,7 @@ function MyComponent() {
 
                 <ApiSecretField
                   showSecret={showApiSecret}
-                  onToggle={() => setShowApiSecret(!showApiSecret)}
+                  onToggle={() => setShowApiSecret((s) => !s)}
                   value={currentCredential?.apiSecret}
                 />
               </div>
