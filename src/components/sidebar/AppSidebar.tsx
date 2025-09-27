@@ -37,19 +37,69 @@ import { useSignOutMutation } from "@/modules/auth/use-signout-mutation";
 import { useToast } from "@/hooks/use-toast";
 
 const getMainItems = (credentialId?: string) => [
-  { title: "Credentials", url: "/", icon: Home },
-  { title: "Dashboard", url: credentialId ? `/dashboard/${credentialId}` : "/", icon: BarChart3 },
-  { title: "Analytics", url: credentialId ? `/analytics/${credentialId}` : "/", icon: BarChart3 },
-  { title: "Users", url: credentialId ? `/users/${credentialId}` : "/", icon: Users },
-  { title: "Performance", url: credentialId ? `/performance/${credentialId}` : "/", icon: TrendingUp },
-  { title: "Feature Flags", url: credentialId ? `/feature-flags/${credentialId}` : "/", icon: Flag },
+  { 
+    title: "Credentials", 
+    url: "/", 
+    icon: Home,
+    requiresCredential: false 
+  },
+  { 
+    title: "Dashboard", 
+    url: credentialId ? `/dashboard/${credentialId}` : null, 
+    icon: BarChart3,
+    requiresCredential: true 
+  },
+  { 
+    title: "Analytics", 
+    url: credentialId ? `/analytics/${credentialId}` : null, 
+    icon: BarChart3,
+    requiresCredential: true 
+  },
+  { 
+    title: "Users", 
+    url: credentialId ? `/users/${credentialId}` : null, 
+    icon: Users,
+    requiresCredential: true 
+  },
+  { 
+    title: "Performance", 
+    url: credentialId ? `/performance/${credentialId}` : null, 
+    icon: TrendingUp,
+    requiresCredential: true 
+  },
+  { 
+    title: "Feature Flags", 
+    url: credentialId ? `/feature-flags/${credentialId}` : null, 
+    icon: Flag,
+    requiresCredential: true 
+  },
 ];
 
 const getToolsItems = (credentialId?: string) => [
-  { title: "Events", url: credentialId ? `/events/${credentialId}` : "/", icon: Activity },
-  { title: "Goals", url: credentialId ? `/goals/${credentialId}` : "/", icon: Target },
-  { title: "Insights", url: credentialId ? `/insights/${credentialId}` : "/", icon: Zap },
-  { title: "Settings", url: credentialId ? `/settings/${credentialId}` : "/", icon: Settings },
+  { 
+    title: "Events", 
+    url: credentialId ? `/events/${credentialId}` : null, 
+    icon: Activity,
+    requiresCredential: true 
+  },
+  { 
+    title: "Goals", 
+    url: credentialId ? `/goals/${credentialId}` : null, 
+    icon: Target,
+    requiresCredential: true 
+  },
+  { 
+    title: "Insights", 
+    url: credentialId ? `/insights/${credentialId}` : null, 
+    icon: Zap,
+    requiresCredential: true 
+  },
+  { 
+    title: "Settings", 
+    url: credentialId ? `/settings/${credentialId}` : null, 
+    icon: Settings,
+    requiresCredential: true 
+  },
 ];
 
 export function AppSidebar() {
@@ -73,12 +123,21 @@ export function AppSidebar() {
   const mainItems = getMainItems(credentialId);
   const toolsItems = getToolsItems(credentialId);
 
-  // Fixed active state logic - check if current path starts with the item path
-  const isActive = (url: string) => {
-    if (url === "/") {
-      return location.pathname === "/";
+  // Precise active state detection
+  const isActive = (url: string | null) => {
+    if (!url) return false;
+    
+    // Exact match for root route
+    if (url === "/" && location.pathname === "/") {
+      return true;
     }
-    return location.pathname.startsWith(url.split('/')[1] ? `/${url.split('/')[1]}` : url);
+    
+    // For other routes, check if current path matches exactly
+    if (url !== "/" && location.pathname === url) {
+      return true;
+    }
+    
+    return false;
   };
 
   const handleSignOut = async () => {
@@ -95,6 +154,40 @@ export function AppSidebar() {
         variant: "destructive",
       });
     }
+  };
+
+  const renderNavItem = (item: any) => {
+    // Don't render items that require credentials when none is selected
+    if (item.requiresCredential && !item.url) {
+      return (
+        <SidebarMenuItem key={item.title}>
+          <SidebarMenuButton disabled>
+            <div className="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground/50">
+              <item.icon className="w-5 h-5 flex-shrink-0" />
+              {!collapsed && <span className="font-medium">{item.title}</span>}
+            </div>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      );
+    }
+
+    return (
+      <SidebarMenuItem key={item.title}>
+        <SidebarMenuButton asChild>
+          <Link
+            to={item.url}
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
+              isActive(item.url)
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground hover:bg-accent"
+            }`}
+          >
+            <item.icon className="w-5 h-5 flex-shrink-0" />
+            {!collapsed && <span className="font-medium">{item.title}</span>}
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    );
   };
 
   return (
@@ -121,25 +214,7 @@ export function AppSidebar() {
           )}
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
-              {mainItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link
-                      to={item.url}
-                      activeProps={{
-                        className: "bg-primary text-primary-foreground"
-                      }}
-                      inactiveProps={{
-                        className: "text-muted-foreground hover:text-foreground hover:bg-accent"
-                      }}
-                      className="flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200"
-                    >
-                      <item.icon className="w-5 h-5 flex-shrink-0" />
-                      {!collapsed && <span className="font-medium">{item.title}</span>}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {mainItems.map((item) => renderNavItem(item))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -153,25 +228,7 @@ export function AppSidebar() {
           )}
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
-              {toolsItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link
-                      to={item.url}
-                      activeProps={{
-                        className: "bg-primary text-primary-foreground"
-                      }}
-                      inactiveProps={{
-                        className: "text-muted-foreground hover:text-foreground hover:bg-accent"
-                      }}
-                      className="flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200"
-                    >
-                      <item.icon className="w-5 h-5 flex-shrink-0" />
-                      {!collapsed && <span className="font-medium">{item.title}</span>}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {toolsItems.map((item) => renderNavItem(item))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
