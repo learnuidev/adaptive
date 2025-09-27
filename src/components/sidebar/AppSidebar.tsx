@@ -37,68 +37,68 @@ import { useSignOutMutation } from "@/modules/auth/use-signout-mutation";
 import { useToast } from "@/hooks/use-toast";
 
 const getMainItems = (credentialId?: string) => [
-  { 
-    title: "Credentials", 
-    url: "/", 
+  {
+    title: "Credentials",
+    url: "/",
     icon: Home,
-    requiresCredential: false 
+    requiresCredential: false,
   },
-  { 
-    title: "Dashboard", 
-    url: credentialId ? `/dashboard/${credentialId}` : null, 
+  {
+    title: "Dashboard",
+    url: credentialId ? `/dashboard/${credentialId}` : null,
     icon: BarChart3,
-    requiresCredential: true 
+    requiresCredential: true,
   },
-  { 
-    title: "Analytics", 
-    url: credentialId ? `/analytics/${credentialId}` : null, 
+  {
+    title: "Analytics",
+    url: credentialId ? `/analytics/${credentialId}` : null,
     icon: BarChart3,
-    requiresCredential: true 
+    requiresCredential: true,
   },
-  { 
-    title: "Users", 
-    url: credentialId ? `/users/${credentialId}` : null, 
+  {
+    title: "Users",
+    url: credentialId ? `/users/${credentialId}` : null,
     icon: Users,
-    requiresCredential: true 
+    requiresCredential: true,
   },
-  { 
-    title: "Performance", 
-    url: credentialId ? `/performance/${credentialId}` : null, 
+  {
+    title: "Performance",
+    url: credentialId ? `/performance/${credentialId}` : null,
     icon: TrendingUp,
-    requiresCredential: true 
+    requiresCredential: true,
   },
-  { 
-    title: "Feature Flags", 
-    url: credentialId ? `/feature-flags/${credentialId}` : null, 
+  {
+    title: "Feature Flags",
+    url: credentialId ? `/feature-flags/${credentialId}` : null,
     icon: Flag,
-    requiresCredential: true 
+    requiresCredential: true,
   },
 ];
 
 const getToolsItems = (credentialId?: string) => [
-  { 
-    title: "Events", 
-    url: credentialId ? `/events/${credentialId}` : null, 
+  {
+    title: "Events",
+    url: credentialId ? `/events/${credentialId}` : null,
     icon: Activity,
-    requiresCredential: true 
+    requiresCredential: true,
   },
-  { 
-    title: "Goals", 
-    url: credentialId ? `/goals/${credentialId}` : null, 
+  {
+    title: "Goals",
+    url: credentialId ? `/goals/${credentialId}` : null,
     icon: Target,
-    requiresCredential: true 
+    requiresCredential: true,
   },
-  { 
-    title: "Insights", 
-    url: credentialId ? `/insights/${credentialId}` : null, 
+  {
+    title: "Insights",
+    url: credentialId ? `/insights/${credentialId}` : null,
     icon: Zap,
-    requiresCredential: true 
+    requiresCredential: true,
   },
-  { 
-    title: "Settings", 
-    url: credentialId ? `/settings/${credentialId}` : null, 
+  {
+    title: "Settings",
+    url: credentialId ? `/settings/${credentialId}` : null,
     icon: Settings,
-    requiresCredential: true 
+    requiresCredential: true,
   },
 ];
 
@@ -112,7 +112,7 @@ export function AppSidebar() {
 
   // Get credentialId from current route params (handle case where it might not exist)
   const getCredentialId = () => {
-    const pathParts = location.pathname.split('/');
+    const pathParts = location.pathname.split("/");
     if (pathParts.length >= 3) {
       return pathParts[2]; // e.g., /dashboard/credentialId -> credentialId
     }
@@ -126,17 +126,17 @@ export function AppSidebar() {
   // Precise active state detection
   const isActive = (url: string | null) => {
     if (!url) return false;
-    
+
     // Exact match for root route
     if (url === "/" && location.pathname === "/") {
       return true;
     }
-    
+
     // For other routes, check if current path matches exactly
     if (url !== "/" && location.pathname === url) {
       return true;
     }
-    
+
     return false;
   };
 
@@ -157,20 +157,6 @@ export function AppSidebar() {
   };
 
   const renderNavItem = (item: any) => {
-    // Don't render items that require credentials when none is selected
-    if (item.requiresCredential && !item.url) {
-      return (
-        <SidebarMenuItem key={item.title}>
-          <SidebarMenuButton disabled>
-            <div className="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground/50">
-              <item.icon className="w-5 h-5 flex-shrink-0" />
-              {!collapsed && <span className="font-medium">{item.title}</span>}
-            </div>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      );
-    }
-
     return (
       <SidebarMenuItem key={item.title}>
         <SidebarMenuButton asChild>
@@ -178,8 +164,8 @@ export function AppSidebar() {
             to={item.url}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
               isActive(item.url)
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                ? "bg-accent text-primary-foreground hover:text-primary-foreground"
+                : "text-muted-foreground hover:bg-accent hover:text-primary-foreground"
             }`}
           >
             <item.icon className="w-5 h-5 flex-shrink-0" />
@@ -238,12 +224,19 @@ export function AppSidebar() {
           {!collapsed && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="w-full justify-start">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start"
+                >
                   <Palette className="w-4 h-4 mr-2" />
                   Theme
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-popover border-border">
+              <DropdownMenuContent
+                align="end"
+                className="bg-popover border-border"
+              >
                 <DropdownMenuItem
                   onClick={() => setTheme("light")}
                   className="cursor-pointer"
