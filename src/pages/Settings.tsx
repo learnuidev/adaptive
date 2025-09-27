@@ -138,7 +138,7 @@ function MyComponent() {
                     Add the adaptive-engine package to your project
                   </p>
                   <div className="ml-12">
-                    <div className="bg-card border border-border/50 rounded-2xl p-6 shadow-soft">
+                    <div className="bg-muted/50 rounded-xl p-6 transition-all duration-200 group-hover:bg-muted/70">
                       <CodeBlock
                         language="bash"
                         code={installCode}
@@ -159,7 +159,7 @@ function MyComponent() {
                     Set up the provider component to wrap your application
                   </p>
                   <div className="ml-12">
-                    <div className="bg-card border border-border/50 rounded-2xl p-6 shadow-soft">
+                    <div className="bg-muted/50 rounded-xl p-6 transition-all duration-200 group-hover:bg-muted/70">
                       <CodeBlock
                         title="lib/adaptive-provider.tsx"
                         language="typescript"
@@ -181,7 +181,7 @@ function MyComponent() {
                     Implement the provider and hook in your components
                   </p>
                   <div className="ml-12">
-                    <div className="bg-card border border-border/50 rounded-2xl p-6 shadow-soft">
+                    <div className="bg-muted/50 rounded-xl p-6 transition-all duration-200 group-hover:bg-muted/70">
                       <CodeBlock
                         title="Example Usage"
                         language="typescript"
