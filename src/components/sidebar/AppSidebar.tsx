@@ -47,31 +47,31 @@ const getMainItems = (credentialId?: string) => [
   },
   {
     title: "Dashboard",
-    url: credentialId ? `/dashboard/${credentialId}` : null,
+    url: "/dashboard",
     icon: BarChart3,
     requiresCredential: true,
   },
   {
     title: "Analytics",
-    url: credentialId ? `/analytics/${credentialId}` : null,
+    url: "/analytics",
     icon: BarChart3,
     requiresCredential: true,
   },
   {
     title: "Users",
-    url: credentialId ? `/users/${credentialId}` : null,
+    url: "/users",
     icon: Users,
     requiresCredential: true,
   },
   {
     title: "Performance",
-    url: credentialId ? `/performance/${credentialId}` : null,
+    url: "/performance",
     icon: TrendingUp,
     requiresCredential: true,
   },
   {
     title: "Feature Flags",
-    url: credentialId ? `/feature-flags/${credentialId}` : null,
+    url: "/feature-flags",
     icon: Flag,
     requiresCredential: true,
   },
@@ -80,25 +80,25 @@ const getMainItems = (credentialId?: string) => [
 const getToolsItems = (credentialId?: string) => [
   {
     title: "Events",
-    url: credentialId ? `/events/${credentialId}` : null,
+    url: "/events",
     icon: Activity,
     requiresCredential: true,
   },
   {
     title: "Goals",
-    url: credentialId ? `/goals/${credentialId}` : null,
+    url: "/goals",
     icon: Target,
     requiresCredential: true,
   },
   {
     title: "Insights",
-    url: credentialId ? `/insights/${credentialId}` : null,
+    url: "/insights",
     icon: Zap,
     requiresCredential: true,
   },
   {
     title: "Settings",
-    url: credentialId ? `/settings/${credentialId}` : null,
+    url: "/settings",
     icon: Settings,
     requiresCredential: true,
   },
@@ -138,26 +138,22 @@ export function AppSidebar() {
       return;
     }
 
-    // If it requires a credential but we don't have one in the URL
-    if (requiresCredential && !credentialId) {
-      let targetCredentialId = selectedCredentialId;
+    // If it requires a credential, we need to determine which credential to use
+    if (requiresCredential) {
+      let targetCredentialId = credentialId || selectedCredentialId;
       
-      // If no stored credential, use the first available credential
+      // If no credential is available, use the first available credential
       if (!targetCredentialId && credentials && credentials.length > 0) {
         targetCredentialId = credentials[0].id;
         setSelectedCredential(targetCredentialId);
       }
       
       if (targetCredentialId) {
-        const newUrl = url.replace(/\/[^\/]+$/, `/${targetCredentialId}`);
-        navigate({ to: newUrl as any });
+        const fullUrl = `${url}/${targetCredentialId}`;
+        navigate({ to: fullUrl as any });
       }
     } else {
       navigate({ to: url as any });
-      // If we're navigating to a page with a credential, store it
-      if (requiresCredential && credentialId) {
-        setSelectedCredential(credentialId);
-      }
     }
   };
 
@@ -170,8 +166,8 @@ export function AppSidebar() {
       return true;
     }
 
-    // For other routes, check if current path matches exactly
-    if (url !== "/" && location.pathname === url) {
+    // For other routes, check if current path starts with the base route
+    if (url !== "/" && location.pathname.startsWith(url)) {
       return true;
     }
 
