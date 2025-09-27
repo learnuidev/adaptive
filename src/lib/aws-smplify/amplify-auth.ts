@@ -36,7 +36,9 @@ async function getAuthSession() {
 }
 
 export async function getAmplifyAuthToken() {
-  const authToken = (await getAuthSession())?.tokens?.accessToken?.toString();
+  const tokens = await getAuthSession();
+
+  const authToken = tokens?.tokens?.idToken?.toString();
 
   if (authToken) {
     return authToken;

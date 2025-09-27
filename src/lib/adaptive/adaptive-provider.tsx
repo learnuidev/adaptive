@@ -2,6 +2,7 @@ import { useGetAuthUserQuery } from "@/modules/auth/use-get-auth-user-query";
 import { adaptiveAppConfig } from "./adaptive-app-config";
 import { AdaptiveProvider as _AdaptiveProvider } from "./adaptive-core-provider";
 import { AdapiveIdentityProvider } from "./adaptive-identity-provider";
+import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
 
 export const AdapiveProvider = ({
   children,
@@ -9,6 +10,12 @@ export const AdapiveProvider = ({
   children: React.ReactNode;
 }) => {
   const { data: authUser, isLoading } = useGetAuthUserQuery();
+
+  console.log("auth user", authUser);
+
+  const { data: credentials } = useListUserCredentialsQuery();
+
+  console.log("CREDENIALS", credentials);
 
   if (isLoading) {
     return;
