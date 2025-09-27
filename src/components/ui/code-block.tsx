@@ -11,7 +11,12 @@ interface CodeBlockProps {
   className?: string;
 }
 
-export function CodeBlock({ title, language = "javascript", code, className }: CodeBlockProps) {
+export function CodeBlock({
+  title,
+  language = "javascript",
+  code,
+  className,
+}: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 
@@ -34,47 +39,23 @@ export function CodeBlock({ title, language = "javascript", code, className }: C
   };
 
   return (
-    <Card className={className}>
-      {title && (
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base">{title}</CardTitle>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={copyToClipboard}
-              className="h-8 w-8 p-0"
-            >
-              {copied ? (
-                <Check className="h-4 w-4 text-green-600" />
-              ) : (
-                <Copy className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
-        </CardHeader>
-      )}
-      <CardContent className={title ? "pt-0" : "pt-6"}>
-        <div className="relative">
-          {!title && (
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={copyToClipboard}
-              className="absolute top-2 right-2 h-8 w-8 p-0 z-10"
-            >
-              {copied ? (
-                <Check className="h-4 w-4 text-green-600" />
-              ) : (
-                <Copy className="h-4 w-4" />
-              )}
-            </Button>
-          )}
-          <pre className="bg-muted rounded-lg p-4 text-sm overflow-x-auto">
-            <code className={`language-${language}`}>{code}</code>
-          </pre>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="relative">
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={copyToClipboard}
+        className="absolute top-2 right-2 h-8 w-8 p-0 z-10"
+      >
+        {copied ? (
+          <Check className="h-4 w-4 text-green-600" />
+        ) : (
+          <Copy className="h-4 w-4" />
+        )}
+      </Button>
+
+      <pre className="bg-muted rounded-lg p-4 text-sm overflow-x-auto">
+        <code className={`language-${language}`}>{code}</code>
+      </pre>
+    </div>
   );
 }
