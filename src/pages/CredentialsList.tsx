@@ -2,7 +2,14 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Settings, Trash2, Database, ExternalLink, Key } from "lucide-react";
+import { 
+  Plus, 
+  Settings, 
+  Trash2, 
+  Database, 
+  ExternalLink, 
+  Key 
+} from "lucide-react";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
 import { AddCredentialDialog } from "@/components/credentials/AddCredentialDialog";
 import { CredentialSuccessDialog } from "@/components/credentials/CredentialSuccessDialog";
