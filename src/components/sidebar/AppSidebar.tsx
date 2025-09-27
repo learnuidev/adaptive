@@ -200,12 +200,9 @@ export function AppSidebar() {
         <SidebarMenuButton asChild>
           <button
             onClick={() => handleNavigation(item.url, item.requiresCredential)}
-            disabled={item.requiresCredential && !item.url}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 w-full text-left ${
               isActive(item.url)
                 ? "bg-accent text-primary-foreground hover:text-primary-foreground"
-                : item.requiresCredential && !item.url
-                ? "text-muted-foreground/50 cursor-not-allowed"
                 : "text-muted-foreground hover:bg-accent hover:text-primary-foreground cursor-pointer"
             }`}
           >
