@@ -2,8 +2,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Target, TrendingUp, Users, DollarSign } from "lucide-react";
+import { useParams } from "react-router-dom";
+import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
+import { CredentialSelector } from "@/components/credentials/CredentialSelector";
+import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
 
 const Goals = () => {
+  const { credentialId } = useParams();
+  const { data: credentials } = useListUserCredentialsQuery();
+  
+  const currentCredential = credentials?.find(cred => cred.id === credentialId);
+
+  // Show credentials selection if no credential ID or credential not found
+  if (!credentialId || (credentials && !currentCredential)) {
+    return <NoCredentialsMessage />;
+  }
+
   const mockGoals = [
     { 
       id: 1, 
@@ -61,9 +75,14 @@ const Goals = () => {
 
   return (
     <div className="min-h-screen bg-background p-6 space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold text-foreground">Goals</h1>
-        <p className="text-muted-foreground">Track progress towards your business objectives</p>
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold text-foreground">Goals</h1>
+          <p className="text-muted-foreground">
+            {currentCredential ? `Track goals for ${currentCredential.title}` : "Track progress towards your business objectives"}
+          </p>
+        </div>
+        <CredentialSelector />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

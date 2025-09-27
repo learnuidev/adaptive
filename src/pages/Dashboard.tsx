@@ -3,6 +3,10 @@ import { AnalyticsChart } from "@/components/dashboard/AnalyticsChart";
 import { FeatureFlagCard } from "@/components/feature-flags/FeatureFlagCard";
 import { Users, Eye, Clock, TrendingUp, MousePointer, Smartphone } from "lucide-react";
 import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
+import { CredentialSelector } from "@/components/credentials/CredentialSelector";
+import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
 
 // Mock data
 const metricsData = [
@@ -87,13 +91,22 @@ const featureFlags = [
 ];
 
 export default function Dashboard() {
+  const { credentialId } = useParams();
+  const { data: credentials } = useListUserCredentialsQuery();
   const [flags, setFlags] = useState(featureFlags);
+  
+  const currentCredential = credentials?.find(cred => cred.id === credentialId);
 
   const toggleFlag = (id: number) => {
     setFlags(flags.map(flag => 
       flag.id === id ? { ...flag, enabled: !flag.enabled } : flag
     ));
   };
+
+  // Show credentials selection if no credential ID or credential not found
+  if (!credentialId || (credentials && !currentCredential)) {
+    return <NoCredentialsMessage />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -103,11 +116,16 @@ export default function Dashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-foreground">Dashboard Overview</h1>
-              <p className="text-muted-foreground">Welcome back! Here's what's happening with your analytics.</p>
+              <p className="text-muted-foreground">
+                {currentCredential ? `Analytics for ${currentCredential.title}` : "Welcome back! Here's what's happening with your analytics."}
+              </p>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
-              <span className="text-sm text-muted-foreground">Live data</span>
+            <div className="flex items-center gap-4">
+              <CredentialSelector />
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
+                <span className="text-sm text-muted-foreground">Live data</span>
+              </div>
             </div>
           </div>
         </div>

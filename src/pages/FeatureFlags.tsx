@@ -5,6 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
+import { CredentialSelector } from "@/components/credentials/CredentialSelector";
+import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
 
 const featureFlags = [
   {
@@ -64,8 +68,17 @@ const featureFlags = [
 ];
 
 export default function FeatureFlags() {
+  const { credentialId } = useParams();
+  const { data: credentials } = useListUserCredentialsQuery();
   const [flags, setFlags] = useState(featureFlags);
   const [searchQuery, setSearchQuery] = useState("");
+  
+  const currentCredential = credentials?.find(cred => cred.id === credentialId);
+
+  // Show credentials selection if no credential ID or credential not found
+  if (!credentialId || (credentials && !currentCredential)) {
+    return <NoCredentialsMessage />;
+  }
 
   const toggleFlag = (id: number) => {
     setFlags(flags.map(flag => 
@@ -89,12 +102,17 @@ export default function FeatureFlags() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-2xl font-bold text-foreground">Feature Flags</h1>
-              <p className="text-muted-foreground">Manage and monitor feature releases across environments</p>
+              <p className="text-muted-foreground">
+                {currentCredential ? `Manage flags for ${currentCredential.title}` : "Manage and monitor feature releases across environments"}
+              </p>
             </div>
-            <Button className="bg-gradient-primary hover:bg-primary-glow shadow-emerald">
-              <Plus className="w-4 h-4 mr-2" />
-              Create Flag
-            </Button>
+            <div className="flex items-center gap-3">
+              <CredentialSelector />
+              <Button className="bg-gradient-primary hover:bg-primary-glow shadow-emerald">
+                <Plus className="w-4 h-4 mr-2" />
+                Create Flag
+              </Button>
+            </div>
           </div>
           
           {/* Stats */}

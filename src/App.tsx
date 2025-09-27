@@ -19,6 +19,7 @@ import Events from "./pages/Events";
 import Goals from "./pages/Goals";
 import Insights from "./pages/Insights";
 import Settings from "./pages/Settings";
+import CredentialsList from "./pages/CredentialsList";
 import NotFound from "./pages/NotFound";
 import { Authenticated } from "./components/authenticated";
 import { AdapiveProvider } from "./lib/adaptive/adaptive-provider";
@@ -49,17 +50,15 @@ const App = () => (
                     </header>
                     <main className="flex-1">
                       <Routes>
-                        <Route path="/" element={<Dashboard />} />
-                        <Route
-                          path="/feature-flags"
-                          element={<FeatureFlags />}
-                        />
-                        <Route path="/analytics" element={<Analytics />} />
-                        <Route path="/users" element={<Users />} />
-                        <Route path="/performance" element={<Performance />} />
-                        <Route path="/events" element={<Events />} />
-                        <Route path="/goals" element={<Goals />} />
-                        <Route path="/insights" element={<Insights />} />
+                        <Route path="/" element={<CredentialsList />} />
+                        <Route path="/dashboard/:credentialId" element={<Dashboard />} />
+                        <Route path="/analytics/:credentialId" element={<Analytics />} />
+                        <Route path="/users/:credentialId" element={<Users />} />
+                        <Route path="/performance/:credentialId" element={<Performance />} />
+                        <Route path="/feature-flags/:credentialId" element={<FeatureFlags />} />
+                        <Route path="/events/:credentialId" element={<Events />} />
+                        <Route path="/goals/:credentialId" element={<Goals />} />
+                        <Route path="/insights/:credentialId" element={<Insights />} />
                         <Route path="/settings" element={<Settings />} />
                         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                         <Route path="*" element={<NotFound />} />

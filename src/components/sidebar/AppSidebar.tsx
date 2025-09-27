@@ -35,28 +35,35 @@ import { Button } from "@/components/ui/button";
 import { useSignOutMutation } from "@/modules/auth/use-signout-mutation";
 import { useToast } from "@/hooks/use-toast";
 
-const mainItems = [
-  { title: "Dashboard", url: "/", icon: Home },
-  { title: "Analytics", url: "/analytics", icon: BarChart3 },
-  { title: "Users", url: "/users", icon: Users },
-  { title: "Performance", url: "/performance", icon: TrendingUp },
-  { title: "Feature Flags", url: "/feature-flags", icon: Flag },
+import { useParams } from "react-router-dom";
+
+const getMainItems = (credentialId?: string) => [
+  { title: "Credentials", url: "/", icon: Home },
+  { title: "Dashboard", url: credentialId ? `/dashboard/${credentialId}` : "/", icon: BarChart3 },
+  { title: "Analytics", url: credentialId ? `/analytics/${credentialId}` : "/", icon: BarChart3 },
+  { title: "Users", url: credentialId ? `/users/${credentialId}` : "/", icon: Users },
+  { title: "Performance", url: credentialId ? `/performance/${credentialId}` : "/", icon: TrendingUp },
+  { title: "Feature Flags", url: credentialId ? `/feature-flags/${credentialId}` : "/", icon: Flag },
 ];
 
-const toolsItems = [
-  { title: "Events", url: "/events", icon: Activity },
-  { title: "Goals", url: "/goals", icon: Target },
-  { title: "Insights", url: "/insights", icon: Zap },
+const getToolsItems = (credentialId?: string) => [
+  { title: "Events", url: credentialId ? `/events/${credentialId}` : "/", icon: Activity },
+  { title: "Goals", url: credentialId ? `/goals/${credentialId}` : "/", icon: Target },
+  { title: "Insights", url: credentialId ? `/insights/${credentialId}` : "/", icon: Zap },
 ];
 
 export function AppSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
+  const { credentialId } = useParams();
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
   const signOutMutation = useSignOutMutation();
   const currentPath = location.pathname;
   const collapsed = state === "collapsed";
+  
+  const mainItems = getMainItems(credentialId);
+  const toolsItems = getToolsItems(credentialId);
 
   const handleSignOut = async () => {
     try {
