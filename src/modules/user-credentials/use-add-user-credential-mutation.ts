@@ -7,7 +7,11 @@ import { listUserCredentialsQueryId } from "./use-list-user-credentials-query";
 import { z } from "zod";
 
 type Scope = "read" | "write" | "*";
-export const possibleScops: Scope[] = ["read", "write", "*"];
+export const possibleScopes = [
+  { name: "Read", value: "read" },
+  { name: "Write", value: "write" },
+  { name: "All", value: "*" },
+] as const;
 
 const sampleData = {
   title: "Mandarino",

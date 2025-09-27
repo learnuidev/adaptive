@@ -17,7 +17,9 @@ export default function CredentialsList() {
     return (
       <div className="min-h-screen bg-background">
         <div className="p-6">
-          <h1 className="text-2xl font-bold text-foreground mb-6">Your Credentials</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-6">
+            Your Credentials
+          </h1>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
               <Card key={i} className="p-6 animate-pulse">
@@ -44,13 +46,14 @@ export default function CredentialsList() {
               Welcome to Analytics
             </h1>
             <p className="text-muted-foreground">
-              Start by adding your first API credential to access your analytics data.
+              Start by adding your first API credential to access your analytics
+              data.
             </p>
           </div>
-          
-          <Button 
+
+          <Button
             onClick={() => {
-              console.log("Add first credential button clicked"); 
+              console.log("Add first credential button clicked");
               setShowAddDialog(true);
             }}
             className="w-full flex items-center gap-2"
@@ -60,6 +63,19 @@ export default function CredentialsList() {
             Add Your First Credential
           </Button>
         </Card>
+
+        <AddCredentialDialog
+          open={showAddDialog}
+          onOpenChange={(open) => {
+            console.log("Dialog open state changed:", open);
+            setShowAddDialog(open);
+          }}
+          onSuccess={(credentialId) => {
+            console.log("Credential added successfully:", credentialId);
+            setShowAddDialog(false);
+            navigate(`/dashboard/${credentialId}`);
+          }}
+        />
       </div>
     );
   }
@@ -69,10 +85,14 @@ export default function CredentialsList() {
       <div className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Your Credentials</h1>
-            <p className="text-muted-foreground">Manage your API credentials and access analytics</p>
+            <h1 className="text-2xl font-bold text-foreground">
+              Your Credentials
+            </h1>
+            <p className="text-muted-foreground">
+              Manage your API credentials and access analytics
+            </p>
           </div>
-          <Button 
+          <Button
             onClick={() => setShowAddDialog(true)}
             className="flex items-center gap-2"
           >
@@ -83,8 +103,8 @@ export default function CredentialsList() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {credentials.map((credential) => (
-            <Card 
-              key={credential.id} 
+            <Card
+              key={credential.id}
               className="p-6 hover:shadow-lg transition-all duration-200 cursor-pointer bg-card/50 border-border/50"
               onClick={() => navigate(`/dashboard/${credential.id}`)}
             >
@@ -94,8 +114,12 @@ export default function CredentialsList() {
                     <Database className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground">{credential.title}</h3>
-                    <p className="text-sm text-muted-foreground">{credential.domain}</p>
+                    <h3 className="font-semibold text-foreground">
+                      {credential.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {credential.domain}
+                    </p>
                   </div>
                 </div>
                 <ExternalLink className="w-4 h-4 text-muted-foreground" />
@@ -119,7 +143,10 @@ export default function CredentialsList() {
                   <span>API Key: •••••••••</span>
                 </div>
                 <span>
-                  Added {formatDistance(new Date(credential.createdAt), new Date(), { addSuffix: true })}
+                  Added{" "}
+                  {formatDistance(new Date(credential.createdAt), new Date(), {
+                    addSuffix: true,
+                  })}
                 </span>
               </div>
             </Card>
@@ -127,8 +154,8 @@ export default function CredentialsList() {
         </div>
       </div>
 
-      <AddCredentialDialog 
-        open={showAddDialog} 
+      <AddCredentialDialog
+        open={showAddDialog}
         onOpenChange={(open) => {
           console.log("Dialog open state changed:", open);
           setShowAddDialog(open);

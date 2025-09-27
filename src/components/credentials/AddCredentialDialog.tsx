@@ -18,7 +18,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useAddUserCredentialMutation, AddUserCredentialParam, addUserCredentialParamSchema, possibleScops } from "@/modules/user-credentials/use-add-user-credential-mutation";
+import {
+  useAddUserCredentialMutation,
+  AddUserCredentialParam,
+  addUserCredentialParamSchema,
+  possibleScopes,
+} from "@/modules/user-credentials/use-add-user-credential-mutation";
 import { useToast } from "@/hooks/use-toast";
 
 interface AddCredentialDialogProps {
@@ -27,10 +32,14 @@ interface AddCredentialDialogProps {
   onSuccess?: (credentialId: string) => void;
 }
 
-export function AddCredentialDialog({ open, onOpenChange, onSuccess }: AddCredentialDialogProps) {
+export function AddCredentialDialog({
+  open,
+  onOpenChange,
+  onSuccess,
+}: AddCredentialDialogProps) {
   const { toast } = useToast();
   const addMutation = useAddUserCredentialMutation();
-  
+
   const form = useForm<AddUserCredentialParam>({
     resolver: zodResolver(addUserCredentialParamSchema),
     defaultValues: {
@@ -53,7 +62,8 @@ export function AddCredentialDialog({ open, onOpenChange, onSuccess }: AddCreden
     } catch (error) {
       toast({
         title: "Failed to add credential",
-        description: "There was an error adding your credential. Please try again.",
+        description:
+          "There was an error adding your credential. Please try again.",
         variant: "destructive",
       });
     }
@@ -65,7 +75,7 @@ export function AddCredentialDialog({ open, onOpenChange, onSuccess }: AddCreden
         <DialogHeader>
           <DialogTitle>Add New Credential</DialogTitle>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -89,7 +99,10 @@ export function AddCredentialDialog({ open, onOpenChange, onSuccess }: AddCreden
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Input placeholder="Brief description of this credential" {...field} />
+                    <Input
+                      placeholder="Brief description of this credential"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -116,22 +129,30 @@ export function AddCredentialDialog({ open, onOpenChange, onSuccess }: AddCreden
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Scopes</FormLabel>
-                  <div className="space-y-2">
-                    {possibleScops.map((scope) => (
-                      <div key={scope} className="flex items-center space-x-2">
+                  <div className="gap-8 flex flex-row">
+                    {possibleScopes.map((scope) => (
+                      <div
+                        key={scope.value}
+                        className="flex items-center space-x-2"
+                      >
                         <Checkbox
-                          id={scope}
-                          checked={field.value.includes(scope)}
+                          id={scope.value}
+                          checked={field.value.includes(scope.value)}
                           onCheckedChange={(checked) => {
                             if (checked) {
-                              field.onChange([...field.value, scope]);
+                              field.onChange([...field.value, scope?.value]);
                             } else {
-                              field.onChange(field.value.filter(s => s !== scope));
+                              field.onChange(
+                                field.value.filter((s) => s !== scope.value)
+                              );
                             }
                           }}
                         />
-                        <label htmlFor={scope} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                          {scope}
+                        <label
+                          htmlFor={scope.value}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {scope.name}
                         </label>
                       </div>
                     ))}
@@ -142,17 +163,14 @@ export function AddCredentialDialog({ open, onOpenChange, onSuccess }: AddCreden
             />
 
             <div className="flex justify-end gap-3 pt-4">
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => onOpenChange(false)}
               >
                 Cancel
               </Button>
-              <Button 
-                type="submit" 
-                disabled={addMutation.isPending}
-              >
+              <Button type="submit" disabled={addMutation.isPending}>
                 {addMutation.isPending ? "Adding..." : "Add Credential"}
               </Button>
             </div>

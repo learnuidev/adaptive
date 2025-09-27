@@ -20,12 +20,12 @@ export function NoCredentialsMessage() {
             No Credentials Found
           </h3>
           <p className="text-muted-foreground text-sm">
-            You need to add your API credentials to start viewing analytics data. 
-            Click the button below to add your first credential.
+            You need to add your API credentials to start viewing analytics
+            data. Click the button below to add your first credential.
           </p>
         </div>
-        
-        <Button 
+
+        <Button
           onClick={() => {
             console.log("Add credential button clicked");
             setShowAddDialog(true);
@@ -37,8 +37,8 @@ export function NoCredentialsMessage() {
         </Button>
 
         {showAddDialog && (
-          <AddCredentialDialog 
-            open={showAddDialog} 
+          <AddCredentialDialog
+            open={showAddDialog}
             onOpenChange={setShowAddDialog}
             onSuccess={(credentialId) => {
               setShowAddDialog(false);
