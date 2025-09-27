@@ -67,8 +67,8 @@ function App() {
   return (
     <AdaptiveProvider
       domain="${currentCredential?.domain || 'your-domain.com'}"
-      apiKey="your-api-key"
-      apiUrl="https://api.adaptive.fyi"
+      apiKey="${currentCredential?.apiKey || 'your-api-key'}"
+      apiUrl="${currentCredential?.urlEndpoint || 'https://api.adaptive.fyi'}"
       identity={{ email: "user@example.com" }}
     >
       <YourAppComponents />
@@ -161,7 +161,7 @@ function MyComponent() {
               <div>
                 <label className="text-sm font-medium text-muted-foreground">API URL</label>
                 <code className="block mt-1 p-2 bg-muted rounded text-sm">
-                  https://api.adaptive.fyi
+                  {currentCredential?.urlEndpoint || 'Not configured'}
                 </code>
               </div>
             </div>
