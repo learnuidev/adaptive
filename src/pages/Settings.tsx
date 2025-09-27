@@ -9,7 +9,9 @@ import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list
 import { Terminal, Book, ExternalLink } from "lucide-react";
 
 export default function Settings() {
-  const { credentialId } = useParams({ from: '/settings/$credentialId' });
+  // Use strict: false to handle cases where params might not exist
+  const params = useParams({ strict: false }) as { credentialId?: string };
+  const credentialId = params?.credentialId;
   const { data: credentials } = useListUserCredentialsQuery();
 
   if (!credentialId) {

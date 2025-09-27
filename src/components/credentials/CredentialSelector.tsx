@@ -17,7 +17,9 @@ interface CredentialSelectorProps {
 }
 
 export function CredentialSelector({ onCredentialChange }: CredentialSelectorProps) {
-  const { credentialId } = useParams({ strict: false });
+  // Use strict: false to handle cases where params might not exist  
+  const params = useParams({ strict: false }) as { credentialId?: string };
+  const credentialId = params?.credentialId;
   const navigate = useNavigate();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const { data: credentials, isLoading } = useListUserCredentialsQuery();

@@ -8,7 +8,9 @@ import { CredentialSelector } from "@/components/credentials/CredentialSelector"
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
 
 const Users = () => {
-  const { credentialId } = useParams({ from: '/users/$credentialId' });
+  // Use strict: false to handle cases where params might not exist
+  const params = useParams({ strict: false }) as { credentialId?: string };
+  const credentialId = params?.credentialId;
   const { data: credentials } = useListUserCredentialsQuery();
   
   const currentCredential = credentials?.find(cred => cred.id === credentialId);

@@ -91,7 +91,9 @@ const featureFlags = [
 ];
 
 export default function Dashboard() {
-  const { credentialId } = useParams({ from: '/dashboard/$credentialId' });
+  // Use strict: false to handle cases where params might not exist
+  const params = useParams({ strict: false }) as { credentialId?: string };
+  const credentialId = params?.credentialId;
   const { data: credentials } = useListUserCredentialsQuery();
   const [flags, setFlags] = useState(featureFlags);
   
