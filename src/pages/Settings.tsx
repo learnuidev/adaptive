@@ -426,3 +426,13 @@ export default function Settings() {
     </TooltipProvider>
   );
 }
+
+const newWebsite = {
+  websiteId: "68d852dc00505c5494663311",
+  domain: "www.mandarino.io",
+};
+
+const updatedWebsite = {
+  websiteId: "68d852dc00505c5494663311",
+  domain: "www.mandarino.io",
+};
