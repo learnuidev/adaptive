@@ -1,19 +1,20 @@
-import { MetricsCard } from "@/components/dashboard/MetricsCard";
-import { AnalyticsChart } from "@/components/dashboard/AnalyticsChart";
-import { FeatureFlagCard } from "@/components/feature-flags/FeatureFlagCard";
-import {
-  Users,
-  Eye,
-  Clock,
-  TrendingUp,
-  MousePointer,
-  Smartphone,
-} from "lucide-react";
-import { useState } from "react";
-import { useParams } from "@tanstack/react-router";
-import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
 import { CredentialSelector } from "@/components/credentials/CredentialSelector";
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
+import { AnalyticsChart } from "@/components/dashboard/AnalyticsChart";
+import { MetricsCard } from "@/components/dashboard/MetricsCard";
+import { FeatureFlagCard } from "@/components/feature-flags/FeatureFlagCard";
+import { WithNewEvents } from "@/components/with-new-events";
+import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
+import { useParams } from "@tanstack/react-router";
+import {
+  Clock,
+  Eye,
+  MousePointer,
+  Smartphone,
+  TrendingUp,
+  Users,
+} from "lucide-react";
+import { useState } from "react";
 
 // Mock data
 const metricsData = [
@@ -122,171 +123,179 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background w-full">
-      {/* Header */}
-      <div className="border-b border-border/50 bg-card/50 backdrop-blur-sm">
-        <div className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">
-                Dashboard Overview
-              </h1>
-              <p className="text-muted-foreground">
-                {currentCredential
-                  ? `Analytics for ${currentCredential.title}`
-                  : "Welcome back! Here's what's happening with your analytics."}
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              <CredentialSelector />
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
-                <span className="text-sm text-muted-foreground">Live data</span>
+    <WithNewEvents credentialId={credentialId}>
+      <div className="min-h-screen bg-background w-full">
+        {/* Header */}
+        <div className="border-b border-border/50 bg-card/50 backdrop-blur-sm">
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">
+                  Dashboard Overview
+                </h1>
+                <p className="text-muted-foreground">
+                  {currentCredential
+                    ? `Analytics for ${currentCredential.title}`
+                    : "Welcome back! Here's what's happening with your analytics."}
+                </p>
+              </div>
+              <div className="flex items-center gap-4">
+                <CredentialSelector />
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
+                  <span className="text-sm text-muted-foreground">
+                    Live data
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="p-6 space-y-8">
-        {/* Metrics Grid */}
-        <div>
-          <h2 className="text-lg font-semibold text-foreground mb-4">
-            Key Metrics
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {metricsData.map((metric, index) => (
-              <div
-                key={metric.title}
-                className="animate-slide-up"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <MetricsCard {...metric} />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <AnalyticsChart
-              title="Visitor Traffic"
-              data={chartData}
-              height={350}
-              type="area"
-            />
-          </div>
+        <div className="p-6 space-y-8">
+          {/* Metrics Grid */}
           <div>
-            <AnalyticsChart
-              title="Device Usage"
-              data={deviceData}
-              height={350}
-              color="hsl(220, 70%, 50%)"
-              type="line"
-            />
-          </div>
-        </div>
-
-        {/* Top Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="glass p-6 rounded-lg border border-border/50 hover:shadow-medium transition-all duration-300">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-primary-soft rounded-lg">
-                <MousePointer className="w-5 h-5 text-primary" />
-              </div>
-              <h3 className="font-semibold text-foreground">Top Pages</h3>
-            </div>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">
-                  /dashboard
-                </span>
-                <span className="font-medium text-foreground">45.2k</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">
-                  /analytics
-                </span>
-                <span className="font-medium text-foreground">32.1k</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">/users</span>
-                <span className="font-medium text-foreground">28.9k</span>
-              </div>
+            <h2 className="text-lg font-semibold text-foreground mb-4">
+              Key Metrics
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {metricsData.map((metric, index) => (
+                <div
+                  key={metric.title}
+                  className="animate-slide-up"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <MetricsCard {...metric} />
+                </div>
+              ))}
             </div>
           </div>
 
-          <div className="glass p-6 rounded-lg border border-border/50 hover:shadow-medium transition-all duration-300">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-primary-soft rounded-lg">
-                <Smartphone className="w-5 h-5 text-primary" />
-              </div>
-              <h3 className="font-semibold text-foreground">Devices</h3>
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <AnalyticsChart
+                title="Visitor Traffic"
+                data={chartData}
+                height={350}
+                type="area"
+              />
             </div>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Desktop</span>
-                <span className="font-medium text-foreground">65.4%</span>
+            <div>
+              <AnalyticsChart
+                title="Device Usage"
+                data={deviceData}
+                height={350}
+                color="hsl(220, 70%, 50%)"
+                type="line"
+              />
+            </div>
+          </div>
+
+          {/* Top Actions */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="glass p-6 rounded-lg border border-border/50 hover:shadow-medium transition-all duration-300">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-primary-soft rounded-lg">
+                  <MousePointer className="w-5 h-5 text-primary" />
+                </div>
+                <h3 className="font-semibold text-foreground">Top Pages</h3>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Mobile</span>
-                <span className="font-medium text-foreground">28.7%</span>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">
+                    /dashboard
+                  </span>
+                  <span className="font-medium text-foreground">45.2k</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">
+                    /analytics
+                  </span>
+                  <span className="font-medium text-foreground">32.1k</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">/users</span>
+                  <span className="font-medium text-foreground">28.9k</span>
+                </div>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Tablet</span>
-                <span className="font-medium text-foreground">5.9%</span>
+            </div>
+
+            <div className="glass p-6 rounded-lg border border-border/50 hover:shadow-medium transition-all duration-300">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-primary-soft rounded-lg">
+                  <Smartphone className="w-5 h-5 text-primary" />
+                </div>
+                <h3 className="font-semibold text-foreground">Devices</h3>
+              </div>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Desktop</span>
+                  <span className="font-medium text-foreground">65.4%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Mobile</span>
+                  <span className="font-medium text-foreground">28.7%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Tablet</span>
+                  <span className="font-medium text-foreground">5.9%</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="glass p-6 rounded-lg border border-border/50 hover:shadow-medium transition-all duration-300">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-primary-soft rounded-lg">
+                  <TrendingUp className="w-5 h-5 text-primary" />
+                </div>
+                <h3 className="font-semibold text-foreground">Growth</h3>
+              </div>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">
+                    This Week
+                  </span>
+                  <span className="font-medium text-primary">+12.5%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">
+                    This Month
+                  </span>
+                  <span className="font-medium text-primary">+8.3%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">
+                    This Year
+                  </span>
+                  <span className="font-medium text-primary">+24.7%</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="glass p-6 rounded-lg border border-border/50 hover:shadow-medium transition-all duration-300">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-primary-soft rounded-lg">
-                <TrendingUp className="w-5 h-5 text-primary" />
-              </div>
-              <h3 className="font-semibold text-foreground">Growth</h3>
+          {/* Feature Flags Section */}
+          <div>
+            <h2 className="text-lg font-semibold text-foreground mb-4">
+              Active Feature Flags
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {flags.map((flag, index) => (
+                <div
+                  key={flag.id}
+                  className="animate-slide-up"
+                  style={{ animationDelay: `${index * 150}ms` }}
+                >
+                  <FeatureFlagCard
+                    {...flag}
+                    onToggle={() => toggleFlag(flag.id)}
+                  />
+                </div>
+              ))}
             </div>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">This Week</span>
-                <span className="font-medium text-primary">+12.5%</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">
-                  This Month
-                </span>
-                <span className="font-medium text-primary">+8.3%</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">This Year</span>
-                <span className="font-medium text-primary">+24.7%</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Feature Flags Section */}
-        <div>
-          <h2 className="text-lg font-semibold text-foreground mb-4">
-            Active Feature Flags
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {flags.map((flag, index) => (
-              <div
-                key={flag.id}
-                className="animate-slide-up"
-                style={{ animationDelay: `${index * 150}ms` }}
-              >
-                <FeatureFlagCard
-                  {...flag}
-                  onToggle={() => toggleFlag(flag.id)}
-                />
-              </div>
-            ))}
           </div>
         </div>
       </div>
-    </div>
+    </WithNewEvents>
   );
 }
