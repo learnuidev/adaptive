@@ -16,6 +16,163 @@ import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list
 import { Terminal, Book, ExternalLink, Eye, EyeOff, Info } from "lucide-react";
 import { possibleScopes } from "@/modules/user-credentials/use-add-user-credential-mutation";
 
+// Reusable Section Header Component
+const SectionHeader = ({
+  icon,
+  title,
+  subtitle,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+}) => (
+  <div className="flex items-center gap-3 mb-8">
+    <div className="p-3 bg-gradient-primary rounded-2xl shadow-emerald">
+      {icon}
+    </div>
+    <div>
+      <h2 className="text-2xl font-semibold text-foreground">{title}</h2>
+      <p className="text-muted-foreground mt-1">{subtitle}</p>
+    </div>
+  </div>
+);
+
+// Reusable Info Field Component
+const InfoField = ({
+  label,
+  children,
+  className = "",
+}: {
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+}) => (
+  <div className={`group ${className}`}>
+    <label className="text-sm font-semibold text-foreground mb-3 block uppercase tracking-wide">
+      {label}
+    </label>
+    <div className="bg-muted/50 rounded-xl px-4 py-3 transition-all duration-200 group-hover:bg-muted/70">
+      {children}
+    </div>
+  </div>
+);
+
+// Reusable Code Step Component
+const CodeStep = ({
+  stepNumber,
+  title,
+  children,
+}: {
+  stepNumber: number;
+  title: string;
+  children: React.ReactNode;
+}) => (
+  <div className="group">
+    <label className="text-sm font-semibold text-foreground mb-3 block uppercase tracking-wide">
+      Step {stepNumber} – {title}
+    </label>
+    {children}
+  </div>
+);
+
+// Reusable API Secret Field Component
+const ApiSecretField = ({
+  showSecret,
+  onToggle,
+  value,
+}: {
+  showSecret: boolean;
+  onToggle: () => void;
+  value: string | undefined;
+}) => (
+  <div className="lg:col-span-2 group">
+    <div className="flex items-center gap-3 mb-3">
+      <label className="text-sm font-semibold text-foreground uppercase tracking-wide">
+        API Secret
+      </label>
+      <Tooltip delayDuration={100}>
+        <TooltipTrigger asChild>
+          <div className="p-1 rounded-full hover:bg-muted/50 transition-colors cursor-help">
+            <Info className="h-4 w-4 text-muted-foreground" />
+          </div>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-xs">
+          <p>With this you can make API calls but do keep it secret</p>
+        </TooltipContent>
+      </Tooltip>
+    </div>
+    <div className="flex items-center gap-3">
+      <div className="bg-muted/50 rounded-xl px-4 py-3 flex-1 transition-all duration-200 group-hover:bg-muted/70">
+        <p className="break-all">
+          <code className="text-sm font-mono text-foreground">
+            {showSecret
+              ? value || "Not configured"
+              : "•••••••••••••••••••••••••••••••••••••••"}
+          </code>
+        </p>
+      </div>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onToggle}
+        className="shrink-0 h-12 w-12 rounded-xl hover:bg-primary/5 transition-all duration-200"
+      >
+        {showSecret ? (
+          <EyeOff className="h-4 w-4" />
+        ) : (
+          <Eye className="h-4 w-4" />
+        )}
+      </Button>
+    </div>
+  </div>
+);
+
+// Reusable Scopes Display Component
+const ScopesDisplay = ({ scopes }: { scopes?: string[] }) => (
+  <div className="flex flex-wrap gap-2">
+    {scopes?.length ? (
+      scopes.map((scope) => {
+        const scopeItem = possibleScopes?.find((s) => s.value === scope);
+        return (
+          <Badge
+            key={scope}
+            variant="secondary"
+            className="bg-primary/10 text-primary hover:bg-primary/15 transition-colors"
+          >
+            {scopeItem?.name || scope}
+          </Badge>
+        );
+      })
+    ) : (
+      <span className="text-sm text-muted-foreground">
+        No scopes configured
+      </span>
+    )}
+  </div>
+);
+
+// Reusable External Link Buttons Component
+const ExternalLinkButtons = () => (
+  <div className="flex gap-3 mt-8 pt-6 border-t border-border/20">
+    <Button
+      variant="outline"
+      size="sm"
+      className="rounded-xl hover:bg-primary/5 transition-all duration-200"
+    >
+      <ExternalLink className="h-4 w-4 mr-2" />
+      View Documentation
+    </Button>
+    <Button
+      variant="outline"
+      size="sm"
+      className="rounded-xl hover:bg-primary/5 transition-all duration-200"
+    >
+      <ExternalLink className="h-4 w-4 mr-2" />
+      API Reference
+    </Button>
+  </div>
+);
+
 export default function Settings() {
   // Use strict: false to handle cases where params might not exist
   const params = useParams({ strict: false }) as { credentialId?: string };
@@ -124,81 +281,42 @@ function MyComponent() {
               className="glass-strong rounded-3xl p-8 animate-slide-up"
               style={{ animationDelay: "0.1s" }}
             >
-              <div className="flex items-center gap-3 mb-8">
-                <div className="p-3 bg-gradient-primary rounded-2xl shadow-emerald">
-                  <Terminal className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-semibold text-foreground">
-                    Installation & Setup
-                  </h2>
-                  <p className="text-muted-foreground mt-1">
-                    Get started with the Adaptive Engine
-                  </p>
-                </div>
-              </div>
+              <SectionHeader
+                icon={<Terminal className="h-6 w-6 text-white" />}
+                title="Installation & Setup"
+                subtitle="Get started with the Adaptive Engine"
+              />
 
               {/* Part One */}
               <div className="grid grid-cols-1 gap-6 mb-12">
-                {/* Step 1 */}
-                <div className="group">
-                  <label className="text-sm font-semibold text-foreground mb-3 block uppercase tracking-wide">
-                    Step 1 – Install Package
-                  </label>
-                  {/* <div className="bg-muted/50 rounded-xl px-4 py-3 transition-all duration-200 group-hover:bg-muted/70"> */}
+                <CodeStep stepNumber={1} title="Install Package">
                   <CodeBlock language="bash" code={installCode} />
-                  {/* </div> */}
-                </div>
+                </CodeStep>
               </div>
+
               {/* Part Two */}
               <div className="grid grid-cols-1 gap-6 mb-12">
-                {/* Step 2 */}
-                <div className="group">
-                  <label className="text-sm font-semibold text-foreground mb-3 block uppercase tracking-wide">
-                    Step 2 – Provider File
-                  </label>
-
+                <CodeStep stepNumber={2} title="Provider File">
                   <CodeBlock
                     title="lib/adaptive-provider.tsx"
                     language="typescript"
                     code={providerCode}
                   />
-                </div>
+                </CodeStep>
               </div>
+
               {/* Part Three*/}
               <div className="grid grid-cols-1 gap-6 mb-12">
-                {/* Step 3 */}
-                <div className="lg:col-span-2 group">
-                  <label className="text-sm font-semibold text-foreground mb-3 block uppercase tracking-wide">
-                    Step 3 – Usage Example
-                  </label>
-
+                <CodeStep stepNumber={3} title="Usage Example">
                   <CodeBlock
                     title="Example Usage"
                     language="typescript"
                     code={usageCode}
                   />
-                </div>
+                </CodeStep>
               </div>
 
-              <div className="flex gap-3 mt-8 pt-6 border-t border-border/20">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="rounded-xl hover:bg-primary/5 transition-all duration-200"
-                >
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  View Documentation
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="rounded-xl hover:bg-primary/5 transition-all duration-200"
-                >
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  API Reference
-                </Button>
-              </div>
+              <ExternalLinkButtons />
             </div>
 
             {/* API Configuration Section */}
@@ -206,88 +324,30 @@ function MyComponent() {
               className="glass-strong rounded-3xl p-8 animate-slide-up"
               style={{ animationDelay: "0.2s" }}
             >
-              <div className="flex items-center gap-3 mb-8">
-                <div className="p-3 bg-gradient-primary rounded-2xl shadow-emerald">
-                  <Book className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-semibold text-foreground">
-                    API Configuration
-                  </h2>
-                  <p className="text-muted-foreground mt-1">
-                    Your API endpoint and authentication details
-                  </p>
-                </div>
-              </div>
+              <SectionHeader
+                icon={<Book className="h-6 w-6 text-white" />}
+                title="API Configuration"
+                subtitle="Your API endpoint and authentication details"
+              />
 
               <div className="grid grid-cols-1 gap-6">
-                {/* Domain */}
-                <div className="group">
-                  <label className="text-sm font-semibold text-foreground mb-3 block uppercase tracking-wide">
-                    Domain
-                  </label>
-                  <div className="bg-muted/50 rounded-xl px-4 py-3 transition-all duration-200 group-hover:bg-muted/70">
-                    <code className="text-sm font-mono text-foreground">
-                      {currentCredential?.domain || "Not configured"}
-                    </code>
-                  </div>
-                </div>
+                <InfoField label="Domain">
+                  <code className="text-sm font-mono text-foreground">
+                    {currentCredential?.domain || "Not configured"}
+                  </code>
+                </InfoField>
 
-                {/* API URL */}
-                <div className="group">
-                  <label className="text-sm font-semibold text-foreground mb-3 block uppercase tracking-wide">
-                    API URL
-                  </label>
-                  <div className="bg-muted/50 rounded-xl px-4 py-3 transition-all duration-200 group-hover:bg-muted/70">
-                    <code className="text-sm font-mono text-foreground">
-                      {currentCredential?.urlEndpoint || "Not configured"}
-                    </code>
-                  </div>
-                </div>
+                <InfoField label="API URL">
+                  <code className="text-sm font-mono text-foreground">
+                    {currentCredential?.urlEndpoint || "Not configured"}
+                  </code>
+                </InfoField>
 
-                {/* API Secret */}
-                <div className="lg:col-span-2 group">
-                  <div className="flex items-center gap-3 mb-3">
-                    <label className="text-sm font-semibold text-foreground uppercase tracking-wide">
-                      API Secret
-                    </label>
-                    <Tooltip delayDuration={100}>
-                      <TooltipTrigger asChild>
-                        <div className="p-1 rounded-full hover:bg-muted/50 transition-colors cursor-help">
-                          <Info className="h-4 w-4 text-muted-foreground" />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-xs">
-                        <p>
-                          With this you can make API calls but do keep it secret
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="bg-muted/50 rounded-xl px-4 py-3 flex-1 transition-all duration-200 group-hover:bg-muted/70">
-                      <p className="break-all">
-                        <code className="text-sm font-mono text-foreground">
-                          {showApiSecret
-                            ? currentCredential?.apiSecret || "Not configured"
-                            : "•••••••••••••••••••••••••••••••••••••••"}
-                        </code>
-                      </p>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowApiSecret(!showApiSecret)}
-                      className="shrink-0 h-12 w-12 rounded-xl hover:bg-primary/5 transition-all duration-200"
-                    >
-                      {showApiSecret ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
+                <ApiSecretField
+                  showSecret={showApiSecret}
+                  onToggle={() => setShowApiSecret(!showApiSecret)}
+                  value={currentCredential?.apiSecret}
+                />
               </div>
             </div>
 
@@ -306,60 +366,22 @@ function MyComponent() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Title */}
-                <div className="group">
-                  <label className="text-sm font-semibold text-foreground mb-3 block uppercase tracking-wide">
-                    Title
-                  </label>
-                  <div className="bg-muted/50 rounded-xl px-4 py-3 transition-all duration-200 group-hover:bg-muted/70">
-                    <p className="text-sm text-foreground font-medium">
-                      {currentCredential?.title || "Unknown"}
-                    </p>
-                  </div>
-                </div>
+                <InfoField label="Title">
+                  <p className="text-sm text-foreground font-medium">
+                    {currentCredential?.title || "Unknown"}
+                  </p>
+                </InfoField>
 
-                {/* Description */}
-                <div className="group">
-                  <label className="text-sm font-semibold text-foreground mb-3 block uppercase tracking-wide">
-                    Description
-                  </label>
-                  <div className="bg-muted/50 rounded-xl px-4 py-3 transition-all duration-200 group-hover:bg-muted/70">
-                    <p className="text-sm text-muted-foreground">
-                      {currentCredential?.description ||
-                        "No description provided"}
-                    </p>
-                  </div>
-                </div>
+                <InfoField label="Description">
+                  <p className="text-sm text-muted-foreground">
+                    {currentCredential?.description ||
+                      "No description provided"}
+                  </p>
+                </InfoField>
 
-                {/* Scopes */}
-                <div className="md:col-span-2 group">
-                  <label className="text-sm font-semibold text-foreground mb-3 block uppercase tracking-wide">
-                    Scopes
-                  </label>
-
-                  <div className="flex flex-wrap gap-2">
-                    {currentCredential?.scopes?.length ? (
-                      currentCredential.scopes.map((scope) => {
-                        const scopeItem = possibleScopes?.find(
-                          (s) => s.value === scope
-                        );
-                        return (
-                          <Badge
-                            key={scope}
-                            variant="secondary"
-                            className="bg-primary/10 text-primary hover:bg-primary/15 transition-colors"
-                          >
-                            {scopeItem?.name || scope}
-                          </Badge>
-                        );
-                      })
-                    ) : (
-                      <span className="text-sm text-muted-foreground">
-                        No scopes configured
-                      </span>
-                    )}
-                  </div>
-                </div>
+                <InfoField label="Scopes" className="md:col-span-2">
+                  <ScopesDisplay scopes={currentCredential?.scopes} />
+                </InfoField>
               </div>
             </div>
           </div>
