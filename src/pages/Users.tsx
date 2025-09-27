@@ -2,13 +2,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Users as UsersIcon, UserPlus, Activity, Clock } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useParams } from "@tanstack/react-router";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
 import { CredentialSelector } from "@/components/credentials/CredentialSelector";
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
 
 const Users = () => {
-  const { credentialId } = useParams();
+  const { credentialId } = useParams({ from: '/users/$credentialId' });
   const { data: credentials } = useListUserCredentialsQuery();
   
   const currentCredential = credentials?.find(cred => cred.id === credentialId);

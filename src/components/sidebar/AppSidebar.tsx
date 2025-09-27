@@ -12,7 +12,7 @@ import {
   Palette,
   LogOut,
 } from "lucide-react";
-import { NavLink, useLocation } from "react-router-dom";
+import { Link, useLocation, useParams } from "@tanstack/react-router";
 import {
   Sidebar,
   SidebarContent,
@@ -35,8 +35,6 @@ import { Button } from "@/components/ui/button";
 import { useSignOutMutation } from "@/modules/auth/use-signout-mutation";
 import { useToast } from "@/hooks/use-toast";
 
-import { useParams } from "react-router-dom";
-
 const getMainItems = (credentialId?: string) => [
   { title: "Credentials", url: "/", icon: Home },
   { title: "Dashboard", url: credentialId ? `/dashboard/${credentialId}` : "/", icon: BarChart3 },
@@ -50,67 +48,67 @@ const getToolsItems = (credentialId?: string) => [
   { title: "Events", url: credentialId ? `/events/${credentialId}` : "/", icon: Activity },
   { title: "Goals", url: credentialId ? `/goals/${credentialId}` : "/", icon: Target },
   { title: "Insights", url: credentialId ? `/insights/${credentialId}` : "/", icon: Zap },
+  { title: "Settings", url: credentialId ? `/settings/${credentialId}` : "/", icon: Settings },
 ];
 
 export function AppSidebar() {
-  const { state } = useSidebar();
-  const location = useLocation();
-  const { credentialId } = useParams();
   const { theme, setTheme } = useTheme();
-  const { toast } = useToast();
-  const signOutMutation = useSignOutMutation();
-  const currentPath = location.pathname;
+  const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  
+  const location = useLocation();
+  const signOutMutation = useSignOutMutation();
+  const { toast } = useToast();
+
+  // Get credentialId from current route params (handle case where it might not exist)
+  const getCredentialId = () => {
+    const pathParts = location.pathname.split('/');
+    if (pathParts.length >= 3) {
+      return pathParts[2]; // e.g., /dashboard/credentialId -> credentialId
+    }
+    return undefined;
+  };
+
+  const credentialId = getCredentialId();
   const mainItems = getMainItems(credentialId);
   const toolsItems = getToolsItems(credentialId);
+
+  const isActive = (url: string) => location.pathname === url;
 
   const handleSignOut = async () => {
     try {
       await signOutMutation.mutateAsync();
       toast({
         title: "Signed out successfully",
-        description: "You have been logged out of your account.",
+        description: "You have been signed out of your account.",
       });
     } catch (error) {
       toast({
-        title: "Sign out failed",
+        title: "Error signing out",
         description: "There was an error signing you out. Please try again.",
         variant: "destructive",
       });
     }
   };
 
-  const isActive = (path: string) => currentPath === path;
-  const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    isActive
-      ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold"
-      : "hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground";
-
   return (
-    <Sidebar className="border-r border-sidebar-border bg-sidebar">
-      <SidebarContent className="p-4">
+    <Sidebar collapsible="icon" className="border-r bg-background">
+      <SidebarContent className="flex flex-col h-full bg-background">
         {/* Logo */}
-        <div className={`flex items-center gap-3 mb-8 px-2 ${collapsed ? "justify-center" : ""}`}>
-          <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center shadow-emerald flex-shrink-0">
-            <Zap className="w-4 h-4 text-white" />
-          </div>
-          {!collapsed && (
-            <div className="min-w-0">
-              <h1 className="font-bold text-lg text-sidebar-foreground truncate">
-                adaptive.fyi
-              </h1>
-              <p className="text-xs text-muted-foreground truncate">
-                Analytics Platform
-              </p>
+        <div className="flex items-center p-4 border-b">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <BarChart3 className="w-5 h-5 text-primary-foreground" />
             </div>
-          )}
+            {!collapsed && (
+              <h1 className="text-lg font-bold text-foreground">Analytics</h1>
+            )}
+          </div>
         </div>
 
         {/* Main Navigation */}
-        <SidebarGroup className="mb-6">
+        <SidebarGroup className="px-2 pt-4">
           {!collapsed && (
-            <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+            <SidebarGroupLabel className="text-muted-foreground text-xs uppercase tracking-wide mb-2">
               Main
             </SidebarGroupLabel>
           )}
@@ -119,18 +117,17 @@ export function AppSidebar() {
               {mainItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink
+                    <Link
                       to={item.url}
-                      end
-                      className={({ isActive }) => 
-                        `flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
-                          getNavCls({ isActive })
-                        }`
-                      }
+                      className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
+                        isActive(item.url)
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                      }`}
                     >
                       <item.icon className="w-5 h-5 flex-shrink-0" />
                       {!collapsed && <span className="font-medium">{item.title}</span>}
-                    </NavLink>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -138,10 +135,10 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Tools Navigation */}
-        <SidebarGroup className="mb-6">
+        {/* Tools */}
+        <SidebarGroup className="px-2">
           {!collapsed && (
-            <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+            <SidebarGroupLabel className="text-muted-foreground text-xs uppercase tracking-wide mb-2">
               Tools
             </SidebarGroupLabel>
           )}
@@ -150,18 +147,17 @@ export function AppSidebar() {
               {toolsItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink
+                    <Link
                       to={item.url}
-                      end
-                      className={({ isActive }) => 
-                        `flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
-                          getNavCls({ isActive })
-                        }`
-                      }
+                      className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
+                        isActive(item.url)
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                      }`}
                     >
                       <item.icon className="w-5 h-5 flex-shrink-0" />
                       {!collapsed && <span className="font-medium">{item.title}</span>}
-                    </NavLink>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -170,7 +166,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         {/* Settings & Theme */}
-        <div className="mt-auto space-y-2">
+        <div className="mt-auto p-2 space-y-2">
           {!collapsed && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -180,50 +176,42 @@ export function AppSidebar() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-popover border-border">
-                <DropdownMenuItem onClick={() => setTheme("light")}>
-                  <div className="w-3 h-3 rounded-full bg-white border-2 border-muted mr-2" />
+                <DropdownMenuItem
+                  onClick={() => setTheme("light")}
+                  className="cursor-pointer"
+                >
                   Light
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("beige")}>
-                  <div className="w-3 h-3 rounded-full bg-amber-100 border-2 border-muted mr-2" />
-                  Beige
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("dark")}>
-                  <div className="w-3 h-3 rounded-full bg-gray-900 border-2 border-muted mr-2" />
+                <DropdownMenuItem
+                  onClick={() => setTheme("dark")}
+                  className="cursor-pointer"
+                >
                   Dark
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setTheme("beige")}
+                  className="cursor-pointer"
+                >
+                  Beige
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           )}
 
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <NavLink
-                to="/settings"
-                className={({ isActive }) => 
-                  `flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
-                    getNavCls({ isActive })
-                  }`
-                }
-              >
-                <Settings className="w-5 h-5 flex-shrink-0" />
-                {!collapsed && <span className="font-medium">Settings</span>}
-              </NavLink>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-
-          <div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-              onClick={handleSignOut}
-              disabled={signOutMutation.isPending}
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              {!collapsed && <span className="font-medium">Sign Out</span>}
-            </Button>
-          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleSignOut}
+            disabled={signOutMutation.isPending}
+            className={!collapsed ? "w-full justify-start" : ""}
+          >
+            <LogOut className="w-4 h-4" />
+            {!collapsed && (
+              <span className="ml-2">
+                {signOutMutation.isPending ? "Signing out..." : "Sign Out"}
+              </span>
+            )}
+          </Button>
         </div>
       </SidebarContent>
     </Sidebar>

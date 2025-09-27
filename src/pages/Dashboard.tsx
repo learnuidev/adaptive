@@ -3,7 +3,7 @@ import { AnalyticsChart } from "@/components/dashboard/AnalyticsChart";
 import { FeatureFlagCard } from "@/components/feature-flags/FeatureFlagCard";
 import { Users, Eye, Clock, TrendingUp, MousePointer, Smartphone } from "lucide-react";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams } from "@tanstack/react-router";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
 import { CredentialSelector } from "@/components/credentials/CredentialSelector";
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
@@ -91,7 +91,7 @@ const featureFlags = [
 ];
 
 export default function Dashboard() {
-  const { credentialId } = useParams();
+  const { credentialId } = useParams({ from: '/dashboard/$credentialId' });
   const { data: credentials } = useListUserCredentialsQuery();
   const [flags, setFlags] = useState(featureFlags);
   

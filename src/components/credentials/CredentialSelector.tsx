@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "@tanstack/react-router";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,7 +17,7 @@ interface CredentialSelectorProps {
 }
 
 export function CredentialSelector({ onCredentialChange }: CredentialSelectorProps) {
-  const { credentialId } = useParams();
+  const { credentialId } = useParams({ strict: false });
   const navigate = useNavigate();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const { data: credentials, isLoading } = useListUserCredentialsQuery();
@@ -27,7 +27,7 @@ export function CredentialSelector({ onCredentialChange }: CredentialSelectorPro
   const handleCredentialChange = (newCredentialId: string) => {
     const currentPath = location.pathname;
     const basePath = currentPath.split('/')[1] || 'dashboard';
-    navigate(`/${basePath}/${newCredentialId}`);
+    navigate({ to: `/${basePath}/${newCredentialId}` });
     onCredentialChange?.(newCredentialId);
   };
 
@@ -92,7 +92,7 @@ export function CredentialSelector({ onCredentialChange }: CredentialSelectorPro
           setShowAddDialog(false);
           const currentPath = location.pathname;
           const basePath = currentPath.split('/')[1] || 'dashboard';
-          navigate(`/${basePath}/${credentialId}`);
+          navigate({ to: `/${basePath}/${credentialId}` });
         }}
       />
     </div>

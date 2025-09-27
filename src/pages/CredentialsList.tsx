@@ -14,7 +14,7 @@ import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list
 import { AddCredentialDialog } from "@/components/credentials/AddCredentialDialog";
 import { CredentialSuccessDialog } from "@/components/credentials/CredentialSuccessDialog";
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 import { formatDistanceToNow } from "date-fns";
 
 export default function CredentialsList() {
@@ -43,7 +43,7 @@ export default function CredentialsList() {
   const handleSuccessContinue = () => {
     setIsSuccessDialogOpen(false);
     if (newCredential) {
-      navigate(`/dashboard/${newCredential.id}`);
+      navigate({ to: `/dashboard/${newCredential.id}` });
     }
     setNewCredential(null);
   };
@@ -115,7 +115,7 @@ export default function CredentialsList() {
             <Card
               key={credential.id}
               className="p-6 hover:shadow-lg transition-all duration-200 cursor-pointer bg-card/50 border-border/50"
-              onClick={() => navigate(`/dashboard/${credential.id}`)}
+              onClick={() => navigate({ to: `/dashboard/${credential.id}` })}
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">

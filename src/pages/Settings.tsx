@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list
 import { Terminal, Book, ExternalLink } from "lucide-react";
 
 export default function Settings() {
-  const { credentialId } = useParams();
+  const { credentialId } = useParams({ from: '/settings/$credentialId' });
   const { data: credentials } = useListUserCredentialsQuery();
 
   if (!credentialId) {

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Database, Plus } from "lucide-react";
 import { AddCredentialDialog } from "./AddCredentialDialog";
 import { CredentialSuccessDialog } from "./CredentialSuccessDialog";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 
 export function NoCredentialsMessage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -31,7 +31,7 @@ export function NoCredentialsMessage() {
   const handleSuccessContinue = () => {
     setIsSuccessDialogOpen(false);
     if (newCredential) {
-      navigate(`/dashboard/${newCredential.id}`);
+      navigate({ to: `/dashboard/${newCredential.id}` });
     }
     setNewCredential(null);
   };

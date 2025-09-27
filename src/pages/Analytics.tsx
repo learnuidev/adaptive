@@ -1,12 +1,12 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3, TrendingUp, Users, Activity } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useParams } from "@tanstack/react-router";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
 import { CredentialSelector } from "@/components/credentials/CredentialSelector";
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
 
 const Analytics = () => {
-  const { credentialId } = useParams();
+  const { credentialId } = useParams({ from: '/analytics/$credentialId' });
   const { data: credentials } = useListUserCredentialsQuery();
   
   const currentCredential = credentials?.find(cred => cred.id === credentialId);

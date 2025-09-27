@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams } from "@tanstack/react-router";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
 import { CredentialSelector } from "@/components/credentials/CredentialSelector";
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
@@ -68,7 +68,7 @@ const featureFlags = [
 ];
 
 export default function FeatureFlags() {
-  const { credentialId } = useParams();
+  const { credentialId } = useParams({ from: '/feature-flags/$credentialId' });
   const { data: credentials } = useListUserCredentialsQuery();
   const [flags, setFlags] = useState(featureFlags);
   const [searchQuery, setSearchQuery] = useState("");

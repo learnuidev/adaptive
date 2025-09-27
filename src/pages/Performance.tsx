@@ -1,12 +1,12 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Zap, Clock, Activity } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useParams } from "@tanstack/react-router";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
 import { CredentialSelector } from "@/components/credentials/CredentialSelector";
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
 
 const Performance = () => {
-  const { credentialId } = useParams();
+  const { credentialId } = useParams({ from: '/performance/$credentialId' });
   const { data: credentials } = useListUserCredentialsQuery();
   
   const currentCredential = credentials?.find(cred => cred.id === credentialId);
