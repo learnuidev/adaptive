@@ -129,9 +129,12 @@ export function AppSidebar() {
   const toolsItems = getToolsItems(credentialId);
 
   // Handle navigation with credential selection logic
-  const handleNavigation = (url: string | null, requiresCredential: boolean) => {
+  const handleNavigation = (
+    url: string | null,
+    requiresCredential: boolean
+  ) => {
     if (!url) return;
-    
+
     // If it's the credentials page, navigate directly
     if (url === "/") {
       navigate({ to: "/" });
@@ -141,13 +144,13 @@ export function AppSidebar() {
     // If it requires a credential, we need to determine which credential to use
     if (requiresCredential) {
       let targetCredentialId = credentialId || selectedCredentialId;
-      
+
       // If no credential is available, use the first available credential
       if (!targetCredentialId && credentials && credentials.length > 0) {
         targetCredentialId = credentials[0].id;
         setSelectedCredential(targetCredentialId);
       }
-      
+
       if (targetCredentialId) {
         const fullUrl = `${url}/${targetCredentialId}`;
         navigate({ to: fullUrl as any });
@@ -198,7 +201,7 @@ export function AppSidebar() {
             onClick={() => handleNavigation(item.url, item.requiresCredential)}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 w-full text-left ${
               isActive(item.url)
-                ? "bg-accent text-primary-foreground hover:text-primary-foreground"
+                ? "bg-accent hover:text-primary-foreground text-primary-glow"
                 : "text-muted-foreground hover:bg-accent hover:text-primary-foreground cursor-pointer"
             }`}
           >
