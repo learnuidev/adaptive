@@ -49,7 +49,10 @@ export default function CredentialsList() {
           </div>
           
           <Button 
-            onClick={() => setShowAddDialog(true)}
+            onClick={() => {
+              console.log("Add first credential button clicked"); 
+              setShowAddDialog(true);
+            }}
             className="w-full flex items-center gap-2"
             size="lg"
           >
@@ -126,8 +129,12 @@ export default function CredentialsList() {
 
       <AddCredentialDialog 
         open={showAddDialog} 
-        onOpenChange={setShowAddDialog}
+        onOpenChange={(open) => {
+          console.log("Dialog open state changed:", open);
+          setShowAddDialog(open);
+        }}
         onSuccess={(credentialId) => {
+          console.log("Credential added successfully:", credentialId);
           setShowAddDialog(false);
           navigate(`/dashboard/${credentialId}`);
         }}

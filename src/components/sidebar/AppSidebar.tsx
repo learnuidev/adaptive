@@ -84,19 +84,14 @@ export function AppSidebar() {
   const isActive = (path: string) => currentPath === path;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive
-      ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold shadow-soft"
+      ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold"
       : "hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground";
 
   return (
-    <Sidebar
-      className="border-r border-sidebar-border glass-strong"
-      collapsible="icon"
-    >
+    <Sidebar className="border-r border-sidebar-border bg-sidebar">
       <SidebarContent className="p-4">
         {/* Logo */}
-        <div
-          className={`flex items-center ${collapsed ? "justify-center" : ""} gap-3 mb-8 px-2`}
-        >
+        <div className={`flex items-center gap-3 mb-8 px-2 ${collapsed ? "justify-center" : ""}`}>
           <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center shadow-emerald flex-shrink-0">
             <Zap className="w-4 h-4 text-white" />
           </div>
@@ -114,35 +109,27 @@ export function AppSidebar() {
 
         {/* Main Navigation */}
         <SidebarGroup className="mb-6">
-          <SidebarGroupLabel
-            className={`text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 ${collapsed ? "text-center" : ""}`}
-          >
-            {!collapsed && "Main"}
-          </SidebarGroupLabel>
+          {!collapsed && (
+            <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+              Main
+            </SidebarGroupLabel>
+          )}
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
               {mainItems.map((item) => (
-                <SidebarMenuItem
-                  key={item.title}
-                  className={collapsed ? "flex justify-center" : ""}
-                >
-                  <SidebarMenuButton
-                    asChild
-                    className={collapsed ? "flex justify-center w-full" : ""}
-                  >
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
                     <NavLink
                       to={item.url}
                       end
-                      className={`transition-all duration-200 flex items-center ${
-                        collapsed
-                          ? "px-0 justify-center w-full rounded-none"
-                          : "rounded-lg"
-                      } ${getNavCls({ isActive: isActive(item.url) })}`}
+                      className={({ isActive }) => 
+                        `flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
+                          getNavCls({ isActive })
+                        }`
+                      }
                     >
-                      <item.icon className="w-5 h-5" />
-                      {!collapsed && (
-                        <span className="font-medium">{item.title}</span>
-                      )}
+                      <item.icon className="w-5 h-5 flex-shrink-0" />
+                      {!collapsed && <span className="font-medium">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -153,35 +140,27 @@ export function AppSidebar() {
 
         {/* Tools Navigation */}
         <SidebarGroup className="mb-6">
-          <SidebarGroupLabel
-            className={`text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 ${collapsed ? "text-center" : ""}`}
-          >
-            {!collapsed && "Tools"}
-          </SidebarGroupLabel>
+          {!collapsed && (
+            <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+              Tools
+            </SidebarGroupLabel>
+          )}
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
               {toolsItems.map((item) => (
-                <SidebarMenuItem
-                  key={item.title}
-                  className={collapsed ? "flex justify-center" : ""}
-                >
-                  <SidebarMenuButton
-                    asChild
-                    className={collapsed ? "flex justify-center w-full" : ""}
-                  >
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
                     <NavLink
                       to={item.url}
                       end
-                      className={`transition-all duration-200 flex items-center ${
-                        collapsed
-                          ? "px-0 justify-center w-full rounded-none"
-                          : "rounded-lg"
-                      } ${getNavCls({ isActive: isActive(item.url) })}`}
+                      className={({ isActive }) => 
+                        `flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
+                          getNavCls({ isActive })
+                        }`
+                      }
                     >
-                      <item.icon className="w-5 h-5" />
-                      {!collapsed && (
-                        <span className="font-medium">{item.title}</span>
-                      )}
+                      <item.icon className="w-5 h-5 flex-shrink-0" />
+                      {!collapsed && <span className="font-medium">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -195,16 +174,12 @@ export function AppSidebar() {
           {!collapsed && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full justify-start"
-                >
+                <Button variant="ghost" size="sm" className="w-full justify-start">
                   <Palette className="w-4 h-4 mr-2" />
                   Theme
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="glass">
+              <DropdownMenuContent align="end" className="bg-popover border-border">
                 <DropdownMenuItem onClick={() => setTheme("light")}>
                   <div className="w-3 h-3 rounded-full bg-white border-2 border-muted mr-2" />
                   Light
@@ -221,39 +196,32 @@ export function AppSidebar() {
             </DropdownMenu>
           )}
 
-          <SidebarMenuItem className={collapsed ? "flex justify-center" : ""}>
-            <SidebarMenuButton
-              asChild
-              className={collapsed ? "flex justify-center w-full" : ""}
-            >
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
               <NavLink
                 to="/settings"
-                className={`transition-all duration-200 flex items-center ${
-                  collapsed
-                    ? "px-0 justify-center w-full rounded-none"
-                    : "rounded-lg"
-                } ${getNavCls({ isActive: isActive("/settings") })}`}
+                className={({ isActive }) => 
+                  `flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
+                    getNavCls({ isActive })
+                  }`
+                }
               >
-                <Settings className="w-5 h-5" />
+                <Settings className="w-5 h-5 flex-shrink-0" />
                 {!collapsed && <span className="font-medium">Settings</span>}
               </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
 
-          <div className={collapsed ? "flex justify-center w-full" : ""}>
+          <div>
             <Button
               variant="ghost"
               size="sm"
-              className={`${
-                collapsed
-                  ? "w-full px-0 justify-center rounded-none"
-                  : "w-full justify-start rounded-lg"
-              } text-muted-foreground hover:text-destructive hover:bg-destructive/10`}
+              className="w-full justify-start text-muted-foreground hover:text-destructive hover:bg-destructive/10"
               onClick={handleSignOut}
               disabled={signOutMutation.isPending}
             >
-              <LogOut className="w-4 h-4" />
-              {!collapsed && <span className="font-medium ml-2">Sign Out</span>}
+              <LogOut className="w-4 h-4 mr-2" />
+              {!collapsed && <span className="font-medium">Sign Out</span>}
             </Button>
           </div>
         </div>

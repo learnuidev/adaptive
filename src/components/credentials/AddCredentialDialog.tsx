@@ -61,7 +61,7 @@ export function AddCredentialDialog({ open, onOpenChange, onSuccess }: AddCreden
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-popover border-border">
         <DialogHeader>
           <DialogTitle>Add New Credential</DialogTitle>
         </DialogHeader>
@@ -130,7 +130,7 @@ export function AddCredentialDialog({ open, onOpenChange, onSuccess }: AddCreden
                             }
                           }}
                         />
-                        <label htmlFor={scope} className="text-sm font-medium">
+                        <label htmlFor={scope} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                           {scope}
                         </label>
                       </div>

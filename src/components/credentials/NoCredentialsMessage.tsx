@@ -26,21 +26,26 @@ export function NoCredentialsMessage() {
         </div>
         
         <Button 
-          onClick={() => setShowAddDialog(true)}
+          onClick={() => {
+            console.log("Add credential button clicked");
+            setShowAddDialog(true);
+          }}
           className="w-full flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
           Add Your First Credential
         </Button>
 
-        <AddCredentialDialog 
-          open={showAddDialog} 
-          onOpenChange={setShowAddDialog}
-          onSuccess={(credentialId) => {
-            setShowAddDialog(false);
-            navigate(`/dashboard/${credentialId}`);
-          }}
-        />
+        {showAddDialog && (
+          <AddCredentialDialog 
+            open={showAddDialog} 
+            onOpenChange={setShowAddDialog}
+            onSuccess={(credentialId) => {
+              setShowAddDialog(false);
+              navigate(`/dashboard/${credentialId}`);
+            }}
+          />
+        )}
       </Card>
     </div>
   );
