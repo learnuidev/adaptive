@@ -223,7 +223,9 @@ export function AppSidebar() {
               <BarChart3 className="w-5 h-5 text-primary-foreground" />
             </div>
             {!collapsed && (
-              <h1 className="text-lg font-bold text-foreground">Analytics</h1>
+              <h1 className="text-lg font-bold text-foreground">
+                adaptive.fyi
+              </h1>
             )}
           </div>
         </div>
