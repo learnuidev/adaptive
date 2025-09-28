@@ -7,9 +7,10 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Users as UsersIcon, UserPlus, Activity, Clock } from "lucide-react";
+import { Users as UsersIcon, UserPlus, Activity, Clock, MapPin } from "lucide-react";
 import { useParams } from "@tanstack/react-router";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
+import { useGetSummaryQuery } from "@/modules/analytics/use-get-summary-query";
 import { CredentialSelector } from "@/components/credentials/CredentialSelector";
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
 import { WithNewEvents } from "@/components/with-new-events";
@@ -19,6 +20,10 @@ const Users = () => {
   const params = useParams({ strict: false }) as { credentialId?: string };
   const credentialId = params?.credentialId;
   const { data: credentials } = useListUserCredentialsQuery();
+  const { data: summaryData } = useGetSummaryQuery({
+    websiteId: credentialId || "",
+    period: "day",
+  });
 
   const currentCredential = credentials?.find(
     (cred) => cred.id === credentialId
@@ -29,36 +34,35 @@ const Users = () => {
     return <NoCredentialsMessage />;
   }
 
-  const mockUsers = [
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      status: "active",
-      lastSeen: "2 mins ago",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane@example.com",
-      status: "active",
-      lastSeen: "5 mins ago",
-    },
-    {
-      id: 3,
-      name: "Bob Johnson",
-      email: "bob@example.com",
-      status: "inactive",
-      lastSeen: "2 hours ago",
-    },
-    {
-      id: 4,
-      name: "Alice Brown",
-      email: "alice@example.com",
-      status: "active",
-      lastSeen: "1 min ago",
-    },
-  ];
+  // Transform visitors data for display
+  const formatLastSeen = (lastSeen: string) => {
+    const date = new Date(lastSeen);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+  };
+
+  const formatLocation = (country?: string, region?: string, city?: string) => {
+    const parts = [city, region, country].filter(Boolean);
+    return parts.length > 0 ? parts.join(", ") : "Unknown location";
+  };
+
+  const getDisplayName = (email?: string, visitorId?: string) => {
+    if (email) {
+      const name = email.split("@")[0];
+      return name.charAt(0).toUpperCase() + name.slice(1).replace(/[._]/g, " ");
+    }
+    return `Visitor ${visitorId?.slice(-4) || "Unknown"}`;
+  };
+
+  const visitors = summaryData?.visitors || [];
 
   return (
     <WithNewEvents credentialId={credentialId}>
@@ -142,41 +146,50 @@ const Users = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {mockUsers.map((user) => (
-                <div
-                  key={user.id}
-                  className="flex items-center justify-between p-3 rounded-lg border border-border/50 glass"
-                >
-                  <div className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarFallback className="bg-primary/10 text-primary">
-                        {user.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium text-foreground">{user.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {user.email}
-                      </p>
+              {visitors.length > 0 ? (
+                visitors.map((visitor) => (
+                  <div
+                    key={visitor.visitor_id}
+                    className="flex items-center justify-between p-3 rounded-lg border border-border/50 glass"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Avatar>
+                        <AvatarFallback className="bg-primary/10 text-primary">
+                          {getDisplayName(visitor.email, visitor.visitor_id)
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium text-foreground">
+                          {getDisplayName(visitor.email, visitor.visitor_id)}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {visitor.email || "Anonymous visitor"}
+                        </p>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <MapPin className="h-3 w-3" />
+                          <span>{formatLocation(visitor.country, visitor.region, visitor.city)}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Badge variant="default">
+                        Active
+                      </Badge>
+                      <span className="text-sm text-muted-foreground">
+                        {formatLastSeen(visitor.last_seen)}
+                      </span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Badge
-                      variant={
-                        user.status === "active" ? "default" : "secondary"
-                      }
-                    >
-                      {user.status}
-                    </Badge>
-                    <span className="text-sm text-muted-foreground">
-                      {user.lastSeen}
-                    </span>
-                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>No recent users found</p>
+                  <p className="text-sm">Users will appear here once they visit your site</p>
                 </div>
-              ))}
+              )}
             </div>
           </CardContent>
         </Card>
