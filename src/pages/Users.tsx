@@ -16,10 +16,9 @@ import {
 } from "lucide-react";
 import { useParams } from "@tanstack/react-router";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
-import {
-  filterPeriods,
-  useGetSummaryQuery,
-} from "@/modules/analytics/use-get-summary-query";
+import { useGetSummaryQuery } from "@/modules/analytics/use-get-summary-query";
+import { useFilterPeriodStore } from "@/stores/filter-period-store";
+import { FilterPeriodSelector } from "@/components/analytics/FilterPeriodSelector";
 import { CredentialSelector } from "@/components/credentials/CredentialSelector";
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
 import { WithNewEvents } from "@/components/with-new-events";
@@ -29,9 +28,10 @@ const Users = () => {
   const params = useParams({ strict: false }) as { credentialId?: string };
   const credentialId = params?.credentialId;
   const { data: credentials } = useListUserCredentialsQuery();
+  const { selectedPeriod } = useFilterPeriodStore();
   const { data: summaryData } = useGetSummaryQuery({
     websiteId: credentialId,
-    period: filterPeriods.week,
+    period: selectedPeriod,
   });
 
   const currentCredential = credentials?.find(
@@ -86,7 +86,10 @@ const Users = () => {
                 : "Manage and analyze your user base"}
             </p>
           </div>
-          <CredentialSelector />
+          <div className="flex items-center gap-4">
+            <CredentialSelector />
+            <FilterPeriodSelector />
+          </div>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

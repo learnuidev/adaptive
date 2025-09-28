@@ -4,10 +4,9 @@ import { AnalyticsChart } from "@/components/dashboard/AnalyticsChart";
 import { MetricsCard } from "@/components/dashboard/MetricsCard";
 import { FeatureFlagCard } from "@/components/feature-flags/FeatureFlagCard";
 import { WithNewEvents } from "@/components/with-new-events";
-import {
-  filterPeriods,
-  useGetSummaryQuery,
-} from "@/modules/analytics/use-get-summary-query";
+import { useGetSummaryQuery } from "@/modules/analytics/use-get-summary-query";
+import { useFilterPeriodStore } from "@/stores/filter-period-store";
+import { FilterPeriodSelector } from "@/components/analytics/FilterPeriodSelector";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
 import { useParams } from "@tanstack/react-router";
 import {
@@ -121,9 +120,10 @@ export default function Dashboard() {
     );
   };
 
+  const { selectedPeriod } = useFilterPeriodStore();
   const { data: summary } = useGetSummaryQuery({
     websiteId: credentialId,
-    period: filterPeriods.week,
+    period: selectedPeriod,
   });
 
   console.log("summary", summary);
@@ -193,6 +193,7 @@ export default function Dashboard() {
               </div>
               <div className="flex items-center gap-4">
                 <CredentialSelector />
+                <FilterPeriodSelector />
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
                   <span className="text-sm text-muted-foreground">
