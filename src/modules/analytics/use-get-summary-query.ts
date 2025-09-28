@@ -288,9 +288,9 @@ export const useGetSummaryQuery = ({
     },
     refetchInterval: 5000,
 
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    refetchOnWindowFocus: false,
-    refetchIntervalInBackground: false,
+    // refetchOnMount: false,
+    // refetchOnReconnect: false,
+    // refetchOnWindowFocus: false,
+    // refetchIntervalInBackground: false,
   });
 };
