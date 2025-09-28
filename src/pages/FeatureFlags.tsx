@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useParams } from "@tanstack/react-router";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
-import { CredentialSelector } from "@/components/credentials/CredentialSelector";
+import { ResponsiveFilters } from "@/components/analytics/ResponsiveFilters";
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
 
 const featureFlags = [
@@ -108,9 +108,9 @@ export default function FeatureFlags() {
                 {currentCredential ? `Manage flags for ${currentCredential.title}` : "Manage and monitor feature releases across environments"}
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              <CredentialSelector />
-              <Button className="bg-gradient-primary hover:bg-primary-glow shadow-emerald">
+            <div className="flex items-center justify-between gap-3">
+              <ResponsiveFilters />
+              <Button className="hidden md:flex bg-gradient-primary hover:bg-primary-glow shadow-emerald">
                 <Plus className="w-4 h-4 mr-2" />
                 Create Flag
               </Button>

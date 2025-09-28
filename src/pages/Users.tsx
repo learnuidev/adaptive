@@ -18,7 +18,7 @@ import { useParams } from "@tanstack/react-router";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
 import { useGetSummaryQuery } from "@/modules/analytics/use-get-summary-query";
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
-import { FilterPeriodSelector } from "@/components/analytics/FilterPeriodSelector";
+import { ResponsiveFilters } from "@/components/analytics/ResponsiveFilters";
 import { CredentialSelector } from "@/components/credentials/CredentialSelector";
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
 import { WithNewEvents } from "@/components/with-new-events";
@@ -86,10 +86,7 @@ const Users = () => {
                 : "Manage and analyze your user base"}
             </p>
           </div>
-          <div className="flex items-center gap-4">
-            <CredentialSelector />
-            <FilterPeriodSelector />
-          </div>
+          <ResponsiveFilters />
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

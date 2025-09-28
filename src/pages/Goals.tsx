@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Target, TrendingUp, Users, DollarSign } from "lucide-react";
 import { useParams } from "@tanstack/react-router";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
-import { CredentialSelector } from "@/components/credentials/CredentialSelector";
+import { ResponsiveFilters } from "@/components/analytics/ResponsiveFilters";
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
 
 const Goals = () => {
@@ -84,7 +84,7 @@ const Goals = () => {
             {currentCredential ? `Track goals for ${currentCredential.title}` : "Track progress towards your business objectives"}
           </p>
         </div>
-        <CredentialSelector />
+        <ResponsiveFilters />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

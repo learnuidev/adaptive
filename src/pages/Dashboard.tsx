@@ -6,7 +6,7 @@ import { FeatureFlagCard } from "@/components/feature-flags/FeatureFlagCard";
 import { WithNewEvents } from "@/components/with-new-events";
 import { useGetSummaryQuery } from "@/modules/analytics/use-get-summary-query";
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
-import { FilterPeriodSelector } from "@/components/analytics/FilterPeriodSelector";
+import { ResponsiveFilters } from "@/components/analytics/ResponsiveFilters";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
 import { useParams } from "@tanstack/react-router";
 import {
@@ -191,10 +191,9 @@ export default function Dashboard() {
                     : "Welcome back! Here's what's happening with your analytics."}
                 </p>
               </div>
-              <div className="flex items-center gap-4">
-                <CredentialSelector />
-                <FilterPeriodSelector />
-                <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between gap-4">
+                <ResponsiveFilters />
+                <div className="hidden md:flex items-center gap-2">
                   <div className="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
                   <span className="text-sm text-muted-foreground">
                     Live data
