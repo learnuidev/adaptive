@@ -28,5 +28,9 @@ export const useListUserCredentialsQuery = () => {
     queryFn: async () => {
       return listUserCredentials();
     },
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+    refetchIntervalInBackground: false,
   });
 };
