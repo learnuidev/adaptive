@@ -4,6 +4,10 @@ import { AnalyticsChart } from "@/components/dashboard/AnalyticsChart";
 import { MetricsCard } from "@/components/dashboard/MetricsCard";
 import { FeatureFlagCard } from "@/components/feature-flags/FeatureFlagCard";
 import { WithNewEvents } from "@/components/with-new-events";
+import {
+  filterPeriods,
+  useGetSummaryQuery,
+} from "@/modules/analytics/use-get-summary-query";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
 import { useParams } from "@tanstack/react-router";
 import {
@@ -17,40 +21,40 @@ import {
 import { useState } from "react";
 
 // Mock data
-const metricsData = [
-  {
-    title: "Total Visitors",
-    value: "24,583",
-    change: "+12.5% from last week",
-    changeType: "positive" as const,
-    icon: Users,
-    trend: [20, 35, 25, 45, 30, 55, 40],
-  },
-  {
-    title: "Page Views",
-    value: "156,234",
-    change: "+8.2% from last week",
-    changeType: "positive" as const,
-    icon: Eye,
-    trend: [40, 35, 50, 45, 60, 55, 65],
-  },
-  {
-    title: "Avg Session",
-    value: "4m 32s",
-    change: "-2.1% from last week",
-    changeType: "negative" as const,
-    icon: Clock,
-    trend: [60, 55, 50, 45, 50, 40, 35],
-  },
-  {
-    title: "Conversion Rate",
-    value: "3.24%",
-    change: "+0.8% from last week",
-    changeType: "positive" as const,
-    icon: TrendingUp,
-    trend: [15, 20, 25, 30, 28, 35, 40],
-  },
-];
+// const metricsData = [
+//   {
+//     title: "Total Visitors",
+//     value: "24,583",
+//     change: "+12.5% from last week",
+//     changeType: "positive" as const,
+//     icon: Users,
+//     trend: [20, 35, 25, 45, 30, 55, 40],
+//   },
+//   {
+//     title: "Page Views",
+//     value: "156,234",
+//     change: "+8.2% from last week",
+//     changeType: "positive" as const,
+//     icon: Eye,
+//     trend: [40, 35, 50, 45, 60, 55, 65],
+//   },
+//   {
+//     title: "Avg Session",
+//     value: "4m 32s",
+//     change: "-2.1% from last week",
+//     changeType: "negative" as const,
+//     icon: Clock,
+//     trend: [60, 55, 50, 45, 50, 40, 35],
+//   },
+//   {
+//     title: "Conversion Rate",
+//     value: "3.24%",
+//     change: "+0.8% from last week",
+//     changeType: "positive" as const,
+//     icon: TrendingUp,
+//     trend: [15, 20, 25, 30, 28, 35, 40],
+//   },
+// ];
 
 const chartData = [
   { name: "00:00", value: 120 },
@@ -116,6 +120,54 @@ export default function Dashboard() {
       )
     );
   };
+
+  const { data: summary } = useGetSummaryQuery({
+    websiteId: credentialId,
+    period: filterPeriods.day,
+  });
+
+  console.log("summary", summary);
+
+  const metricsData = [
+    {
+      title: "Total Visitors",
+      value: summary?.totalVisitors.current || "0",
+      change: summary?.totalVisitors.percentageDifference
+        ? `${summary?.totalVisitors.percentageDifference?.toFixed(2)}% from last week`
+        : "",
+      changeType: "positive" as const,
+      icon: Users,
+      trend: [20, 35, 25, 45, 30, 55, 40],
+    },
+    {
+      title: "Page Views",
+      value: summary?.totalPageVisits.current || "0",
+      change: summary?.totalPageVisits.percentageDifference
+        ? `${summary?.totalPageVisits.percentageDifference?.toFixed(2)}% from last week`
+        : "",
+      changeType: "positive" as const,
+      icon: Eye,
+      trend: [40, 35, 50, 45, 60, 55, 65],
+    },
+    {
+      title: "Avg Session",
+      value: "4m 32s",
+      change: "-2.1% from last week",
+      changeType: "negative" as const,
+      icon: Clock,
+      trend: [60, 55, 50, 45, 50, 40, 35],
+    },
+    {
+      title: "Conversion Rate",
+      value: "3.24%",
+      change: "+0.8% from last week",
+      changeType: "positive" as const,
+      icon: TrendingUp,
+      trend: [15, 20, 25, 30, 28, 35, 40],
+    },
+  ];
+
+  console.log("summary", summary);
 
   // Show credentials selection if no credential ID or credential not found
   if (!credentialId || (credentials && !currentCredential)) {
