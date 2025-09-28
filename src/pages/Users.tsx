@@ -7,10 +7,19 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Users as UsersIcon, UserPlus, Activity, Clock, MapPin } from "lucide-react";
+import {
+  Users as UsersIcon,
+  UserPlus,
+  Activity,
+  Clock,
+  MapPin,
+} from "lucide-react";
 import { useParams } from "@tanstack/react-router";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
-import { useGetSummaryQuery } from "@/modules/analytics/use-get-summary-query";
+import {
+  filterPeriods,
+  useGetSummaryQuery,
+} from "@/modules/analytics/use-get-summary-query";
 import { CredentialSelector } from "@/components/credentials/CredentialSelector";
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
 import { WithNewEvents } from "@/components/with-new-events";
@@ -21,8 +30,8 @@ const Users = () => {
   const credentialId = params?.credentialId;
   const { data: credentials } = useListUserCredentialsQuery();
   const { data: summaryData } = useGetSummaryQuery({
-    websiteId: credentialId || "",
-    period: "day",
+    websiteId: credentialId,
+    period: filterPeriods.week,
   });
 
   const currentCredential = credentials?.find(
@@ -44,9 +53,10 @@ const Users = () => {
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
     if (diffMins < 1) return "Just now";
-    if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? "s" : ""} ago`;
+    if (diffHours < 24)
+      return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
+    return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
   };
 
   const formatLocation = (country?: string, region?: string, city?: string) => {
@@ -170,14 +180,18 @@ const Users = () => {
                         </p>
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <MapPin className="h-3 w-3" />
-                          <span>{formatLocation(visitor.country, visitor.region, visitor.city)}</span>
+                          <span>
+                            {formatLocation(
+                              visitor.country,
+                              visitor.region,
+                              visitor.city
+                            )}
+                          </span>
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Badge variant="default">
-                        Active
-                      </Badge>
+                      <Badge variant="default">Active</Badge>
                       <span className="text-sm text-muted-foreground">
                         {formatLastSeen(visitor.last_seen)}
                       </span>
@@ -187,7 +201,9 @@ const Users = () => {
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
                   <p>No recent users found</p>
-                  <p className="text-sm">Users will appear here once they visit your site</p>
+                  <p className="text-sm">
+                    Users will appear here once they visit your site
+                  </p>
                 </div>
               )}
             </div>

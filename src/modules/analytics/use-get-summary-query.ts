@@ -11,6 +11,7 @@ export type Page = {
 export type PageVisit = {
   href: string;
   visits: string;
+  total: string;
   patternHref?: string;
 };
 
@@ -239,52 +240,61 @@ async function getSummary({
 
   const respRaw = (await res.json()) as GetSummaryResponseRaw;
 
-  const totalCurrentPageVisits = respRaw.totalPageVisits.current.reduce(
-    (acc, curr) => {
-      return acc + parseInt(curr?.visits);
-    },
-    0
-  );
-  const totalPreviousPageVisits = respRaw.totalPageVisits.previous.reduce(
-    (acc, curr) => {
-      return acc + parseInt(curr?.visits);
-    },
-    0
-  );
+  try {
+    console.log("RESP RAW", respRaw);
 
-  const totalCurrentVisitors = parseInt(
-    respRaw.totalVisitors.current[0].total || "0"
-  );
-  const totalPreviousVisitors = parseInt(
-    respRaw.totalVisitors.previous[0].total || "0"
-  );
+    const totalCurrentPageVisits = respRaw.totalPageVisits.current.reduce(
+      (acc, curr) => {
+        return acc + parseInt(curr?.visits || curr?.total);
+      },
+      0
+    );
+    const totalPreviousPageVisits = respRaw.totalPageVisits.previous.reduce(
+      (acc, curr) => {
+        return acc + parseInt(curr?.visits || curr?.total);
+      },
+      0
+    );
 
-  const resp = {
-    totalVisitors: {
-      current: totalCurrentVisitors,
-      previous: totalPreviousVisitors,
-      percentageDifference:
-        totalPreviousVisitors === 0
-          ? null
-          : ((totalCurrentVisitors - totalPreviousVisitors) /
-              (totalPreviousVisitors || 1)) *
-              100 || 0,
-    },
+    const totalCurrentVisitors = parseInt(
+      respRaw.totalVisitors?.current?.[0]?.total || "0"
+    );
+    const totalPreviousVisitors = parseInt(
+      respRaw?.totalVisitors?.previous?.[0]?.total || "0"
+    );
 
-    totalPageVisits: {
-      current: totalCurrentPageVisits,
-      previous: totalPreviousPageVisits,
-      percentageDifference:
-        totalPreviousPageVisits === 0
-          ? null
-          : ((totalCurrentPageVisits - totalPreviousPageVisits) /
-              totalPreviousPageVisits) *
-              100 || 0,
-    },
+    const resp = {
+      totalVisitors: {
+        current: totalCurrentVisitors,
+        previous: totalPreviousVisitors,
+        percentageDifference:
+          totalPreviousVisitors === 0
+            ? null
+            : ((totalCurrentVisitors - totalPreviousVisitors) /
+                (totalPreviousVisitors || 1)) *
+                100 || 0,
+      },
 
-    visitors: respRaw.visitors,
-  };
-  return resp;
+      totalPageVisits: {
+        current: totalCurrentPageVisits,
+        previous: totalPreviousPageVisits,
+        percentageDifference:
+          totalPreviousPageVisits === 0
+            ? null
+            : ((totalCurrentPageVisits - totalPreviousPageVisits) /
+                totalPreviousPageVisits) *
+                100 || 0,
+      },
+
+      visitors: respRaw.visitors,
+    };
+
+    console.log("RESP", resp);
+    return resp;
+  } catch (error) {
+    console.log("ERROR", error);
+    throw Error(`Something went wrong`);
+  }
 }
 const getSummaryQueryKey = "get-summary";
 

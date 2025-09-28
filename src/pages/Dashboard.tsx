@@ -123,7 +123,7 @@ export default function Dashboard() {
 
   const { data: summary } = useGetSummaryQuery({
     websiteId: credentialId,
-    period: filterPeriods.day,
+    period: filterPeriods.week,
   });
 
   console.log("summary", summary);
