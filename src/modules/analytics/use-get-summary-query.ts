@@ -286,6 +286,7 @@ export const useGetSummaryQuery = ({
       const response = await getSummary({ websiteId, period });
       return response;
     },
+    refetchInterval: 5000,
 
     refetchOnMount: false,
     refetchOnReconnect: false,
