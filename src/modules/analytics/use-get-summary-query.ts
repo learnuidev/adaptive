@@ -18,6 +18,15 @@ export type VisitorCount = {
   total: string;
 };
 
+export interface Visitor {
+  visitor_id: string;
+  last_seen: string;
+  email?: string;
+  country?: string;
+  region?: string;
+  city?: string;
+}
+
 export type GetSummaryResponseRaw = {
   pages: Page[];
   totalPageVisits: {
@@ -28,9 +37,11 @@ export type GetSummaryResponseRaw = {
     current: VisitorCount[];
     previous: VisitorCount[];
   };
+
+  visitors: Visitor[];
 };
 
-const getSummaryRawResponse: GetSummaryResponseRaw = {
+const getSummaryRawResponse = {
   pages: [
     {
       href: "https://www.adaptive.fyi/",
@@ -169,6 +180,8 @@ type GetSummaryResponse = {
     previous: number;
     percentageDifference: number;
   };
+
+  visitors: Visitor[];
 };
 export type FilterPeriod =
   | "today"
@@ -268,6 +281,8 @@ async function getSummary({
               totalPreviousPageVisits) *
               100 || 0,
     },
+
+    visitors: respRaw.visitors,
   };
   return resp;
 }
