@@ -11,7 +11,13 @@ export interface GetTotalVisitorsByParams {
   period: FilterPeriod;
   from?: Date;
   to?: Date;
-  groupBy: "country" | "region" | "city" | "browser_name" | "os_name";
+  groupBy:
+    | "country"
+    | "region"
+    | "city"
+    | "browser_name"
+    | "os_name"
+    | "device";
 }
 
 async function getTotalVisitorsBy({
