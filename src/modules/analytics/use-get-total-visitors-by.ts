@@ -4,7 +4,7 @@ import { fetchWithToken } from "@/lib/aws-smplify/fetch-with-token";
 import { useQuery } from "@tanstack/react-query";
 import { FilterPeriod } from "./analytics.types";
 
-export type GetVisitorsByResponse = { name: string; visitors: string }[];
+export type GetTotalVisitorsByResponse = { name: string; visitors: string }[];
 
 export interface GetTotalVisitorsByParams {
   websiteId: string;
@@ -26,7 +26,7 @@ async function getTotalVisitorsBy({
   groupBy,
   from,
   to,
-}: GetTotalVisitorsByParams): Promise<GetVisitorsByResponse> {
+}: GetTotalVisitorsByParams): Promise<GetTotalVisitorsByResponse> {
   const res = await fetchWithToken(
     `${appConfig.apiUrl}/v1/analytics/get-total-visitors-by`,
     {
@@ -39,7 +39,7 @@ async function getTotalVisitorsBy({
     throw Error(`Something went wrong`);
   }
 
-  const respRaw = (await res.json()) as GetVisitorsByResponse;
+  const respRaw = (await res.json()) as GetTotalVisitorsByResponse;
 
   return respRaw;
 }
