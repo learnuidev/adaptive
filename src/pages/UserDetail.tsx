@@ -42,6 +42,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
+import { DeviceUsageChart } from "@/components/dashboard/DeviceUsageChart";
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
 import { useGetSummaryQuery } from "@/modules/analytics/use-get-summary-query";
@@ -196,6 +197,17 @@ const UserDetail = () => {
     return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
   };
 
+  const formatDuration = (seconds: number) => {
+    if (seconds === 0) return "0s";
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    if (hours > 0) return `${hours}h ${minutes}m`;
+    if (minutes > 0) return `${minutes}m ${secs}s`;
+    return `${secs}s`;
+  };
+
   const formatLocation = (country?: string, region?: string, city?: string) => {
     const parts = [city, region, country].filter(Boolean);
     return parts.length > 0 ? parts.join(", ") : "Unknown location";
@@ -290,14 +302,14 @@ const UserDetail = () => {
                       <MapPin className="h-4 w-4 text-muted-foreground" />
                       <span className="text-muted-foreground">Location:</span>
                       <span className="text-foreground">
-                        {formatLocation(user.country, user.region, user.city)}
+                        {userInfo?.basicInformation?.location || formatLocation(user.country, user.region, user.city)}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Clock className="h-4 w-4 text-muted-foreground" />
                       <span className="text-muted-foreground">Last Seen:</span>
                       <span className="text-foreground">
-                        {formatLastSeen(user.last_seen)}
+                        {userInfo?.basicInformation?.lastSeen ? formatLastSeen(userInfo.basicInformation.lastSeen) : formatLastSeen(user.last_seen)}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
@@ -306,7 +318,7 @@ const UserDetail = () => {
                         First Visit:
                       </span>
                       <span className="text-foreground">
-                        {new Date(user.last_seen).toLocaleDateString()}
+                        {userInfo?.basicInformation?.firstVisit ? new Date(userInfo.basicInformation.firstVisit).toLocaleDateString() : new Date(user.last_seen).toLocaleDateString()}
                       </span>
                     </div>
                   </div>
@@ -316,24 +328,52 @@ const UserDetail = () => {
               <div className="space-y-4">
                 <div>
                   <h3 className="font-medium text-foreground mb-2">
-                    Device & Browser
+                    Primary Device & Browser
                   </h3>
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Globe className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Browser:</span>
-                      <span className="text-foreground">Chrome</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Monitor className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">OS:</span>
-                      <span className="text-foreground">Windows</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Smartphone className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Device:</span>
-                      <span className="text-foreground">Desktop</span>
-                    </div>
+                    {userInfo?.devicesUsed && userInfo.devicesUsed.length > 0 ? (
+                      <>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Globe className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-muted-foreground">Browser:</span>
+                          <span className="text-foreground">
+                            {userInfo.devicesUsed[0].browser_name} {userInfo.devicesUsed[0].browser_version}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Monitor className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-muted-foreground">OS:</span>
+                          <span className="text-foreground">
+                            {userInfo.devicesUsed[0].os_name} {userInfo.devicesUsed[0].os_version}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Smartphone className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-muted-foreground">Device:</span>
+                          <span className="text-foreground">
+                            {userInfo.devicesUsed[0].device_vendor} {userInfo.devicesUsed[0].device_model}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Globe className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-muted-foreground">Browser:</span>
+                          <span className="text-foreground">Unknown</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Monitor className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-muted-foreground">OS:</span>
+                          <span className="text-foreground">Unknown</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Smartphone className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-muted-foreground">Device:</span>
+                          <span className="text-foreground">Unknown</span>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -349,7 +389,9 @@ const UserDetail = () => {
               <Eye className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">45</div>
+              <div className="text-2xl font-bold">
+                {userInfo?.basicInformation?.totalPageViews ?? 0}
+              </div>
               <p className="text-xs text-muted-foreground">Total page views</p>
             </CardContent>
           </Card>
@@ -360,7 +402,9 @@ const UserDetail = () => {
               <Activity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">8</div>
+              <div className="text-2xl font-bold">
+                {userInfo?.basicInformation?.totalSessions ?? 0}
+              </div>
               <p className="text-xs text-muted-foreground">Number of visits</p>
             </CardContent>
           </Card>
@@ -373,7 +417,9 @@ const UserDetail = () => {
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">3m</div>
+              <div className="text-2xl font-bold">
+                {formatDuration(userInfo?.basicInformation?.averageDuration ?? 0)}
+              </div>
               <p className="text-xs text-muted-foreground">
                 Average session time
               </p>
@@ -387,12 +433,19 @@ const UserDetail = () => {
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-2">
-                <Badge variant="default">Active</Badge>
+                <Badge variant={userInfo?.basicInformation?.status === "active" ? "default" : "secondary"}>
+                  {userInfo?.basicInformation?.status ?? "Unknown"}
+                </Badge>
               </div>
               <p className="text-xs text-muted-foreground">Current status</p>
             </CardContent>
           </Card>
         </div>
+
+        {/* Device Usage Chart */}
+        {userInfo?.devicesUsed && userInfo.devicesUsed.length > 0 && (
+          <DeviceUsageChart devices={userInfo.devicesUsed} />
+        )}
 
         {/* Activity Events */}
         <Card className="glass">
