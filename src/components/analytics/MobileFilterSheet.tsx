@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
-import { FilterPeriod } from "@/modules/analytics/use-get-summary-query";
+import { FilterPeriod } from "@/modules/analytics/analytics.types";
 
 const periodLabels: Record<FilterPeriod, string> = {
   today: "Today",

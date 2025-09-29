@@ -52,21 +52,9 @@ const getMainItems = (credentialId?: string) => [
     requiresCredential: true,
   },
   {
-    title: "Analytics",
-    url: "/analytics",
-    icon: BarChart3,
-    requiresCredential: true,
-  },
-  {
     title: "Users",
     url: "/users",
     icon: Users,
-    requiresCredential: true,
-  },
-  {
-    title: "Performance",
-    url: "/performance",
-    icon: TrendingUp,
     requiresCredential: true,
   },
   {
