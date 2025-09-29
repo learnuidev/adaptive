@@ -1,6 +1,9 @@
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useGetTotalVisitorsByQuery } from "@/modules/analytics/use-get-total-visitors-by";
+import {
+  LocationView,
+  useGetTotalVisitorsByQuery,
+} from "@/modules/analytics/use-get-total-visitors-by";
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
 import { useState } from "react";
 import {
@@ -23,9 +26,7 @@ interface InteractiveVisitorChartProps {
 }
 
 export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
-  const [locationView, setLocationView] = useState<
-    "map" | "country" | "region" | "city"
-  >("map");
+  const [locationView, setLocationView] = useState<LocationView>("map");
   const { selectedPeriod } = useFilterPeriodStore();
 
   const { data: locationData } = useGetTotalVisitorsByQuery({
@@ -123,21 +124,29 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
 
         <TabContent value="country">
           <div className="min-h-[420px]">
-            <LocationList data={locationData} />
+            <LocationList data={locationData} locationView={locationView} />
           </div>
           <DetailsButton />
         </TabContent>
 
         <TabContent value="region">
           <div className="min-h-[420px]">
-            <LocationList data={locationData} icon="📍" />
+            <LocationList
+              data={locationData}
+              icon="📍"
+              locationView={locationView}
+            />
           </div>
           <DetailsButton />
         </TabContent>
 
         <TabContent value="city">
           <div className="min-h-[420px]">
-            <LocationList data={locationData} icon="📍" />
+            <LocationList
+              data={locationData}
+              icon="📍"
+              locationView={locationView}
+            />
           </div>
           <DetailsButton />
         </TabContent>

@@ -45,6 +45,8 @@ async function getTotalVisitorsBy({
 }
 const getSummaryQueryKey = "get-summary";
 
+export type LocationView = "map" | "country" | "region" | "city";
+
 export const useGetTotalVisitorsByQuery = ({
   websiteId,
   period,

@@ -1,7 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { TabsContent } from "@/components/ui/tabs";
+import { countryNames } from "@/lib/country-names";
 import { flags } from "@/lib/flags";
-import { GetTotalVisitorsByResponse } from "@/modules/analytics/use-get-total-visitors-by";
+import { regionNames } from "@/lib/region-names";
+import {
+  GetTotalVisitorsByResponse,
+  LocationView,
+} from "@/modules/analytics/use-get-total-visitors-by";
 import { ExpandIcon, Monitor } from "lucide-react";
 
 interface InteractiveVisitorChartProps {
@@ -31,13 +36,22 @@ function LocationItem({ name, visitors, icon = "📍" }: LocationItemProps) {
 interface LocationListProps {
   data?: GetTotalVisitorsByResponse;
   icon?: React.ReactNode;
+  locationView?: LocationView;
 }
 
 const getCountryFlag = (countryName: string) => {
   return flags[countryName] || "🌍";
 };
 
-export function LocationList({ data, icon }: LocationListProps) {
+const getCountryName = (countryName: string) => {
+  return countryNames[countryName] || "🌍";
+};
+
+const getRegionName = (regionName: string) => {
+  return regionNames[regionName] || "🌍";
+};
+
+export function LocationList({ data, locationView }: LocationListProps) {
   return (
     <div className="flex-1 p-4 space-y-2 overflow-y-auto">
       {data
@@ -45,9 +59,19 @@ export function LocationList({ data, icon }: LocationListProps) {
         .map((item) => (
           <LocationItem
             key={item.name}
-            name={item.name}
+            name={
+              locationView === "country"
+                ? getCountryName(item.name || "")
+                : item.name || ""
+            }
             visitors={item.visitors}
-            icon={getCountryFlag(item?.name || "")}
+            icon={
+              locationView === "country"
+                ? getCountryFlag(item?.name || "")
+                : locationView === "region"
+                  ? getRegionName(item?.name)
+                  : ""
+            }
           />
         ))}
       {(!data || data.length === 0) && (
