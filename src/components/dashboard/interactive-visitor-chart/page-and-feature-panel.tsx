@@ -6,6 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ExternalLink } from "lucide-react";
 import {
   LocationView,
   useGetTotalVisitorsByQuery,
@@ -71,6 +72,18 @@ export function PageAndFeaturePanel({
     [summary?.pageVisitsPerPage.current]
   );
 
+  const handlePageClick = (pagePath: string) => {
+    if (!pagePath) return;
+    
+    // Try to construct the full URL
+    // First, check if credentialId might contain domain info, otherwise use current origin
+    const fullUrl = pagePath.startsWith('http') 
+      ? pagePath 
+      : `${window.location.origin}${pagePath.startsWith('/') ? '' : '/'}${pagePath}`;
+    
+    window.open(fullUrl, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <Card className="bg-gradient-card border-border/50 hover:shadow-medium transition-all duration-300 animate-fade-in glass">
       <Tabs
@@ -110,17 +123,21 @@ export function PageAndFeaturePanel({
                       return (
                         <Tooltip key={index}>
                           <TooltipTrigger asChild>
-                            <div className="group cursor-pointer">
+                            <div 
+                              className="group cursor-pointer"
+                              onClick={() => handlePageClick(page.name)}
+                            >
                               <div className="flex items-center gap-3 mb-1">
                                 <div className="flex-1 relative h-10 bg-secondary/30 rounded overflow-hidden">
                                   <div
                                     className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary/70 to-primary/50 transition-all duration-300 group-hover:from-primary/80 group-hover:to-primary/60"
                                     style={{ width: `${percentage}%` }}
                                   />
-                                  <div className="absolute inset-0 flex items-center px-3">
-                                    <span className="text-sm font-medium text-foreground truncate z-10">
+                                  <div className="absolute inset-0 flex items-center justify-between px-3 gap-2">
+                                    <span className="text-sm font-medium text-foreground truncate z-10 flex-1">
                                       {page.name || "/"}
                                     </span>
+                                    <ExternalLink className="h-3 w-3 text-foreground/50 group-hover:text-foreground/80 transition-colors flex-shrink-0 z-10" />
                                   </div>
                                 </div>
                                 <span className="text-sm font-bold text-foreground w-16 text-right">
@@ -135,7 +152,7 @@ export function PageAndFeaturePanel({
                             <div className="space-y-1">
                               <p className="font-semibold text-sm break-all">{page.name || "/"}</p>
                               <p className="text-xs text-muted-foreground">
-                                {page.value.toLocaleString()} visitor{page.value !== 1 ? 's' : ''}
+                                {page.value.toLocaleString()} visitor{page.value !== 1 ? 's' : ''} • Click to open
                               </p>
                             </div>
                           </TooltipContent>
