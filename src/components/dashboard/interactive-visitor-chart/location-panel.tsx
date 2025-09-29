@@ -133,7 +133,6 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
           <div className="min-h-[420px]">
             <LocationList
               data={locationData}
-              icon="📍"
               locationView={locationView}
             />
           </div>
@@ -144,7 +143,6 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
           <div className="min-h-[420px]">
             <LocationList
               data={locationData}
-              icon="📍"
               locationView={locationView}
             />
           </div>

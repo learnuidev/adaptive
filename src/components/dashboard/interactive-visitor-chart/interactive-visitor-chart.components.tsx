@@ -48,7 +48,28 @@ const getCountryName = (countryName: string) => {
 };
 
 const getRegionName = (regionName: string) => {
-  return regionNames[regionName] || "🌍";
+  return regionNames[regionName] || regionName;
+};
+
+const getCountryCodeFromLocation = (locationName: string): string => {
+  // Extract country code from location strings like "California, US" or "New York, US"
+  const parts = locationName.split(',');
+  if (parts.length > 1) {
+    return parts[parts.length - 1].trim();
+  }
+  return '';
+};
+
+const getFlagForLocation = (locationName: string, locationType: LocationView): React.ReactNode => {
+  if (locationType === 'country') {
+    return getCountryFlag(locationName);
+  }
+  // For regions and cities, try to extract country code and get flag
+  const countryCode = getCountryCodeFromLocation(locationName);
+  if (countryCode) {
+    return getCountryFlag(countryCode);
+  }
+  return "📍";
 };
 
 export function LocationList({ data, locationView }: LocationListProps) {
@@ -62,16 +83,12 @@ export function LocationList({ data, locationView }: LocationListProps) {
             name={
               locationView === "country"
                 ? getCountryName(item.name || "")
-                : item.name || ""
+                : locationView === "region"
+                  ? getRegionName(item.name || "")
+                  : item.name || ""
             }
             visitors={item.visitors}
-            icon={
-              locationView === "country"
-                ? getCountryFlag(item?.name || "")
-                : locationView === "region"
-                  ? getRegionName(item?.name)
-                  : ""
-            }
+            icon={getFlagForLocation(item?.name || "", locationView || "country")}
           />
         ))}
       {(!data || data.length === 0) && (
