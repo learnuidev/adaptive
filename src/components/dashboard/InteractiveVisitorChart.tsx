@@ -15,7 +15,7 @@ interface InteractiveVisitorChartProps {
   credentialId: string;
 }
 
-const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@3/countries-110m.json";
+const geoUrl = "https://unpkg.com/world-atlas@3/countries-110m.json";
 
 export function InteractiveVisitorChart({ credentialId }: InteractiveVisitorChartProps) {
   const [locationView, setLocationView] = useState<"map" | "country" | "region" | "city">("map");
@@ -101,51 +101,31 @@ export function InteractiveVisitorChart({ credentialId }: InteractiveVisitorChar
             {/* Content Area */}
             <div className="h-[548px] relative">
               {locationView === "map" ? (
-                <div className="h-full bg-muted/10">
-                  <ComposableMap
-                    projection="geoMercator"
-                    projectionConfig={{
-                      scale: 100,
-                      center: [0, 20],
-                    }}
-                    width={400}
-                    height={548}
-                    className="w-full h-full"
-                  >
-                    <ZoomableGroup>
-                      <Geographies geography={geoUrl}>
-                        {({ geographies }) =>
-                          geographies.map((geo) => {
-                            const countryData = locationData?.find(
-                              (d) => d.name === geo.properties.NAME
-                            );
-                            return (
-                              <Geography
-                                key={geo.rsmKey}
-                                geography={geo}
-                                fill={countryData ? "hsl(var(--primary))" : "hsl(var(--muted))"}
-                                stroke="hsl(var(--border))"
-                                strokeWidth={0.5}
-                                style={{
-                                  default: {
-                                    outline: "none",
-                                  },
-                                  hover: {
-                                    fill: "hsl(var(--primary-glow))",
-                                    outline: "none",
-                                  },
-                                  pressed: {
-                                    fill: "hsl(var(--primary))",
-                                    outline: "none",
-                                  },
-                                }}
-                              />
-                            );
-                          })
-                        }
-                      </Geographies>
-                    </ZoomableGroup>
-                  </ComposableMap>
+                <div className="h-full bg-muted/10 flex items-center justify-center">
+                  <div className="text-center space-y-4">
+                    <div className="w-32 h-32 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
+                      <svg viewBox="0 0 24 24" className="w-16 h-16 text-primary">
+                        <path fill="currentColor" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-lg font-semibold text-foreground">Interactive World Map</p>
+                      <p className="text-sm text-muted-foreground">Geographic visitor distribution</p>
+                    </div>
+                    {locationData && locationData.length > 0 && (
+                      <div className="space-y-2 max-w-sm">
+                        {locationData.slice(0, 3).map((item, index) => (
+                          <div
+                            key={item.name}
+                            className="flex items-center justify-between p-2 bg-card/50 rounded text-sm"
+                          >
+                            <span className="font-medium">{item.name}</span>
+                            <span className="text-primary">{item.visitors}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               ) : (
                 <div className="h-full flex flex-col">
