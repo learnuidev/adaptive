@@ -2,6 +2,7 @@ import { CredentialSelector } from "@/components/credentials/CredentialSelector"
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
 import { AnalyticsChart } from "@/components/dashboard/AnalyticsChart";
 import { MetricsCard } from "@/components/dashboard/MetricsCard";
+import { InteractiveVisitorChart } from "@/components/dashboard/InteractiveVisitorChart";
 import { FeatureFlagCard } from "@/components/feature-flags/FeatureFlagCard";
 import { WithNewEvents } from "@/components/with-new-events";
 import {
@@ -398,6 +399,14 @@ export default function Dashboard() {
                 type="area"
               />
             </div>
+          </div>
+
+          {/* Interactive Visitor Analytics */}
+          <div>
+            <h2 className="text-lg font-semibold text-foreground mb-4">
+              Interactive Analytics
+            </h2>
+            <InteractiveVisitorChart credentialId={credentialId} />
           </div>
           {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
