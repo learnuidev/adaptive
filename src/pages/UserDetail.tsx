@@ -450,12 +450,12 @@ const UserDetail = () => {
                       </SelectContent>
                     </Select>
 
-                    <Select value={filterField} onValueChange={(value) => setFilterField(value as keyof AnalyticsEvent)}>
+                    <Select value={filterField || "none"} onValueChange={(value) => setFilterField(value === "none" ? "" : value as keyof AnalyticsEvent)}>
                       <SelectTrigger className="w-full sm:w-48">
                         <SelectValue placeholder="Filter by field..." />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">No filter</SelectItem>
+                        <SelectItem value="none">No filter</SelectItem>
                         <SelectItem value="type">Event Type</SelectItem>
                         <SelectItem value="event_name">Event Name</SelectItem>
                         <SelectItem value="domain">Domain</SelectItem>
