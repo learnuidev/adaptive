@@ -3,7 +3,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useGetTotalVisitorsByQuery } from "@/modules/analytics/use-get-total-visitors-by";
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
-import { Chrome, Monitor, Smartphone, RefreshCw } from "lucide-react";
+import { flags } from "@/lib/flags";
+import {
+  Chrome,
+  Monitor,
+  Smartphone,
+  RefreshCw,
+  ExpandIcon,
+} from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ComposableMap,
   Geographies,
@@ -17,9 +25,265 @@ interface InteractiveVisitorChartProps {
   credentialId: string;
 }
 
-export function InteractiveVisitorChart({ credentialId }: InteractiveVisitorChartProps) {
-  const [locationView, setLocationView] = useState<"map" | "country" | "region" | "city">("map");
-  const [techView, setTechView] = useState<"browser_name" | "os_name">("browser_name");
+function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
+  const [locationView, setLocationView] = useState<
+    "map" | "country" | "region" | "city"
+  >("map");
+  const [techView, setTechView] = useState<"browser_name" | "os_name">(
+    "browser_name"
+  );
+  const { selectedPeriod } = useFilterPeriodStore();
+
+  const { data: locationData } = useGetTotalVisitorsByQuery({
+    websiteId: credentialId,
+    period: selectedPeriod,
+    groupBy: locationView === "map" ? "country" : locationView,
+  });
+
+  const { data: techData } = useGetTotalVisitorsByQuery({
+    websiteId: credentialId,
+    period: selectedPeriod,
+    groupBy: techView,
+  });
+
+  console.log("techData", techData);
+
+  const getBrowserIcon = (name: string) => {
+    if (name?.toLowerCase().includes("chrome")) return Chrome;
+    return Monitor;
+  };
+
+  const getCountryFlag = (countryName: string) => {
+    return flags[countryName] || "🌍";
+  };
+
+  return (
+    <Card className="bg-gradient-card border-border/50 hover:shadow-medium transition-all duration-300 animate-fade-in glass">
+      <Tabs
+        value={locationView}
+        onValueChange={(v) => setLocationView(v as any)}
+      >
+        <TabsList className="w-full rounded-none border-b border-border/50 bg-transparent p-0 h-12">
+          <TabsTrigger
+            value="map"
+            className="rounded-none border-r border-border/50 data-[state=active]:bg-secondary data-[state=active]:text-foreground text-muted-foreground"
+          >
+            Map
+          </TabsTrigger>
+          <TabsTrigger
+            value="country"
+            className="rounded-none border-r border-border/50 data-[state=active]:bg-secondary data-[state=active]:text-foreground text-muted-foreground"
+          >
+            Country
+          </TabsTrigger>
+          <TabsTrigger
+            value="region"
+            className="rounded-none border-r border-border/50 data-[state=active]:bg-secondary data-[state=active]:text-foreground text-muted-foreground"
+          >
+            Region
+          </TabsTrigger>
+          <TabsTrigger
+            value="city"
+            className="rounded-none data-[state=active]:bg-secondary data-[state=active]:text-foreground text-muted-foreground"
+          >
+            City
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Content Area */}
+        <TabsContent value="map" className="mt-0 relative">
+          <div className="bg-muted/10 relative">
+            <ComposableMap
+              projection="geoMercator"
+              projectionConfig={{ scale: 120 }}
+              className="w-full"
+            >
+              <ZoomableGroup>
+                <Geographies geography={geoUrl}>
+                  {({ geographies }) =>
+                    geographies.map((geo) => {
+                      const countryName = geo.properties.NAME;
+                      const countryData = locationData?.find(
+                        (item) => item.name === countryName
+                      );
+                      const visitors = countryData
+                        ? parseInt(countryData.visitors)
+                        : 0;
+                      const maxVisitors =
+                        locationData?.reduce(
+                          (max, item) => Math.max(max, parseInt(item.visitors)),
+                          0
+                        ) || 1;
+                      const intensity = visitors / maxVisitors;
+
+                      return (
+                        <Geography
+                          key={geo.rsmKey}
+                          geography={geo}
+                          fill={
+                            visitors > 0
+                              ? `hsl(var(--primary) / ${0.2 + intensity * 0.6})`
+                              : "hsl(var(--muted) / 0.3)"
+                          }
+                          stroke="hsl(var(--border))"
+                          strokeWidth={0.5}
+                          style={{
+                            default: { outline: "none" },
+                            hover: {
+                              fill: `hsl(var(--primary) / ${0.4 + intensity * 0.4})`,
+                              outline: "none",
+                            },
+                            pressed: { outline: "none" },
+                          }}
+                        />
+                      );
+                    })
+                  }
+                </Geographies>
+              </ZoomableGroup>
+            </ComposableMap>
+
+            {/* Legend */}
+            <div className="absolute bottom-4 left-4 bg-card/90 backdrop-blur-sm rounded p-3 border border-border/50">
+              <p className="text-xs font-medium text-foreground mb-2">
+                Visitors
+              </p>
+              <div className="flex items-center gap-2 text-xs">
+                <div
+                  className="w-3 h-3 rounded"
+                  style={{ backgroundColor: "hsl(var(--muted) / 0.3)" }}
+                ></div>
+                <span className="text-muted-foreground">No data</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs mt-1">
+                <div
+                  className="w-3 h-3 rounded"
+                  style={{ backgroundColor: "hsl(var(--primary) / 0.8)" }}
+                ></div>
+                <span className="text-muted-foreground">High traffic</span>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="country" className="mt-0 flex flex-col">
+          <div className="flex-1 p-4 space-y-2 overflow-y-auto">
+            {locationData?.slice(0, 8).map((item) => (
+              <div
+                key={item.name}
+                className="flex items-center justify-between p-3 bg-card/80 backdrop-blur-sm rounded hover:bg-card/90 transition-colors border border-border/30"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-lg">{getCountryFlag(item.name)}</span>
+                  <span className="text-sm font-medium text-foreground">
+                    {item.name}
+                  </span>
+                </div>
+                <span className="text-sm font-mono text-muted-foreground">
+                  {item.visitors}
+                </span>
+              </div>
+            ))}
+            {(!locationData || locationData.length === 0) && (
+              <div className="text-center text-muted-foreground text-sm mt-8">
+                No data available
+              </div>
+            )}
+          </div>
+          <div className="p-4 border-t border-border/50">
+            <Button
+              variant="ghost"
+              className="w-full text-muted-foreground hover:text-foreground"
+              size="sm"
+            >
+              <ExpandIcon className="w-4 h-4 mr-2" />
+              <span className="uppercase">Details</span>
+            </Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="region" className="mt-0 flex flex-col">
+          <div className="flex-1 p-4 space-y-2 overflow-y-auto">
+            {locationData?.slice(0, 8).map((item) => (
+              <div
+                key={item.name}
+                className="flex items-center justify-between p-3 bg-card/80 backdrop-blur-sm rounded hover:bg-card/90 transition-colors border border-border/30"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-lg">📍</span>
+                  <span className="text-sm font-medium text-foreground">
+                    {item.name}
+                  </span>
+                </div>
+                <span className="text-sm font-mono text-muted-foreground">
+                  {item.visitors}
+                </span>
+              </div>
+            ))}
+            {(!locationData || locationData.length === 0) && (
+              <div className="text-center text-muted-foreground text-sm mt-8">
+                No data available
+              </div>
+            )}
+          </div>
+          <div className="p-4 border-t border-border/50">
+            <Button
+              variant="ghost"
+              className="w-full text-muted-foreground hover:text-foreground"
+              size="sm"
+            >
+              <ExpandIcon className="w-4 h-4 mr-2" />
+              <span className="uppercase">Details</span>
+            </Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="city" className="mt-0 flex flex-col">
+          <div className="flex-1 p-4 space-y-2 overflow-y-auto">
+            {locationData?.slice(0, 8).map((item) => (
+              <div
+                key={item.name}
+                className="flex items-center justify-between p-3 bg-card/80 backdrop-blur-sm rounded hover:bg-card/90 transition-colors border border-border/30"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-lg">📍</span>
+                  <span className="text-sm font-medium text-foreground">
+                    {item.name}
+                  </span>
+                </div>
+                <span className="text-sm font-mono text-muted-foreground">
+                  {item.visitors}
+                </span>
+              </div>
+            ))}
+            {(!locationData || locationData.length === 0) && (
+              <div className="text-center text-muted-foreground text-sm mt-8">
+                No data available
+              </div>
+            )}
+          </div>
+          <div className="p-4 border-t border-border/50">
+            <Button
+              variant="ghost"
+              className="w-full text-muted-foreground hover:text-foreground"
+              size="sm"
+            >
+              <ExpandIcon className="w-4 h-4 mr-2" />
+              <span className="uppercase">Details</span>
+            </Button>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </Card>
+  );
+}
+function TechPanel({ credentialId }: InteractiveVisitorChartProps) {
+  const [locationView, setLocationView] = useState<
+    "map" | "country" | "region" | "city"
+  >("map");
+  const [techView, setTechView] = useState<"browser_name" | "os_name">(
+    "browser_name"
+  );
   const { selectedPeriod } = useFilterPeriodStore();
 
   const { data: locationData } = useGetTotalVisitorsByQuery({
@@ -40,251 +304,127 @@ export function InteractiveVisitorChart({ credentialId }: InteractiveVisitorChar
   };
 
   const getCountryFlag = (countryName: string) => {
-    const flags: Record<string, string> = {
-      "Canada": "🇨🇦",
-      "United States": "🇺🇸",
-      "United Kingdom": "🇬🇧",
-      "Germany": "🇩🇪",
-      "France": "🇫🇷",
-      "Japan": "🇯🇵",
-      "Australia": "🇦🇺",
-      "Brazil": "🇧🇷",
-      "India": "🇮🇳",
-      "China": "🇨🇳",
-    };
     return flags[countryName] || "🌍";
   };
 
   return (
-    <Card className="bg-gradient-card border-border/50 hover:shadow-medium transition-all duration-300 glass overflow-hidden">
-      <CardContent className="p-0">
-        <div className="grid grid-cols-1 lg:grid-cols-2 h-[600px]">
-          {/* Left Panel - Location */}
-          <div className="bg-card/50 border-r border-border/50 backdrop-blur-sm">
-            {/* Location Tabs */}
-            <div className="flex border-b border-border/50">
-              <div className="flex">
-                <Button
-                  variant={locationView === "map" ? "secondary" : "ghost"}
-                  className="rounded-none border-r border-border/50 h-12 text-sm text-muted-foreground hover:text-foreground"
-                  onClick={() => setLocationView("map")}
-                >
-                  Map
-                </Button>
-              </div>
-              <div className="w-px bg-border/50 mx-2" />
-              <div className="flex">
-                <Button
-                  variant={locationView === "country" ? "secondary" : "ghost"}
-                  className="rounded-none border-r border-border/50 h-12 text-sm text-muted-foreground hover:text-foreground"
-                  onClick={() => setLocationView("country")}
-                >
-                  Country
-                </Button>
-                <Button
-                  variant={locationView === "region" ? "secondary" : "ghost"}
-                  className="rounded-none border-r border-border/50 h-12 text-sm text-muted-foreground hover:text-foreground"
-                  onClick={() => setLocationView("region")}
-                >
-                  Region
-                </Button>
-                <Button
-                  variant={locationView === "city" ? "secondary" : "ghost"}
-                  className="rounded-none h-12 text-sm text-muted-foreground hover:text-foreground"
-                  onClick={() => setLocationView("city")}
-                >
-                  City
-                </Button>
-              </div>
-            </div>
+    <Card className="bg-gradient-card border-border/50 hover:shadow-medium transition-all duration-300 animate-fade-in glass">
+      <Tabs value={techView} onValueChange={(v) => setTechView(v as any)}>
+        <TabsList className="w-full rounded-none border-b border-border/50 bg-transparent p-0 h-12">
+          <TabsTrigger
+            value="browser_name"
+            className="rounded-none border-r border-border/50 data-[state=active]:bg-secondary data-[state=active]:text-foreground text-muted-foreground"
+          >
+            Browser
+          </TabsTrigger>
+          <TabsTrigger
+            value="os_name"
+            className="rounded-none border-r border-border/50 data-[state=active]:bg-secondary data-[state=active]:text-foreground text-muted-foreground"
+          >
+            OS
+          </TabsTrigger>
+          <TabsTrigger
+            value="device"
+            disabled
+            className="rounded-none text-muted-foreground/50"
+          >
+            Device
+          </TabsTrigger>
+        </TabsList>
 
-            {/* Content Area */}
-            <div className="h-[548px] relative">
-              {locationView === "map" ? (
-                <div className="h-full bg-muted/10 relative">
-                  <ComposableMap
-                    projection="geoMercator"
-                    projectionConfig={{
-                      scale: 120,
-                    }}
-                    className="w-full h-full"
-                  >
-                    <ZoomableGroup>
-                      <Geographies geography={geoUrl}>
-                        {({ geographies }) =>
-                          geographies.map((geo) => {
-                            const countryName = geo.properties.NAME;
-                            const countryData = locationData?.find(
-                              (item) => item.name === countryName
-                            );
-                            const visitors = countryData ? parseInt(countryData.visitors) : 0;
-                            const maxVisitors = locationData?.reduce(
-                              (max, item) => Math.max(max, parseInt(item.visitors)), 
-                              0
-                            ) || 1;
-                            const intensity = visitors / maxVisitors;
-
-                            return (
-                              <Geography
-                                key={geo.rsmKey}
-                                geography={geo}
-                                fill={
-                                  visitors > 0
-                                    ? `hsl(var(--primary) / ${0.2 + intensity * 0.6})`
-                                    : "hsl(var(--muted) / 0.3)"
-                                }
-                                stroke="hsl(var(--border))"
-                                strokeWidth={0.5}
-                                style={{
-                                  default: { outline: "none" },
-                                  hover: { 
-                                    fill: `hsl(var(--primary) / ${0.4 + intensity * 0.4})`,
-                                    outline: "none" 
-                                  },
-                                  pressed: { outline: "none" },
-                                }}
-                              />
-                            );
-                          })
-                        }
-                      </Geographies>
-                    </ZoomableGroup>
-                  </ComposableMap>
-                  
-                  {/* Legend */}
-                  <div className="absolute bottom-4 left-4 bg-card/90 backdrop-blur-sm rounded p-3 border border-border/50">
-                    <p className="text-xs font-medium text-foreground mb-2">Visitors</p>
-                    <div className="flex items-center gap-2 text-xs">
-                      <div className="w-3 h-3 rounded" style={{ backgroundColor: "hsl(var(--muted) / 0.3)" }}></div>
-                      <span className="text-muted-foreground">No data</span>
+        {/* Technology Content */}
+        <TabsContent value="browser_name" className="mt-0 flex flex-col">
+          <div className="flex-1 p-4 space-y-2 overflow-y-auto">
+            {techData?.slice(0, 8).map((item) => {
+              const IconComponent = getBrowserIcon(item.name);
+              return (
+                <div
+                  key={item.name}
+                  className="flex items-center justify-between p-3 bg-card/80 backdrop-blur-sm rounded hover:bg-card/90 transition-colors border border-border/30"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-1.5 bg-primary/20 rounded">
+                      <IconComponent className="w-4 h-4 text-primary" />
                     </div>
-                    <div className="flex items-center gap-2 text-xs mt-1">
-                      <div className="w-3 h-3 rounded" style={{ backgroundColor: "hsl(var(--primary) / 0.8)" }}></div>
-                      <span className="text-muted-foreground">High traffic</span>
-                    </div>
+                    <span className="text-sm font-medium text-foreground">
+                      {item.name}
+                    </span>
                   </div>
+                  <span className="text-sm font-mono text-muted-foreground">
+                    {item.visitors}
+                  </span>
                 </div>
-              ) : (
-                <div className="h-full flex flex-col">
-                  <div className="flex-1 p-4 space-y-2 overflow-y-auto">
-                    {locationData?.slice(0, 8).map((item, index) => (
-                      <div
-                        key={item.name}
-                        className="flex items-center justify-between p-3 bg-card/80 backdrop-blur-sm rounded hover:bg-card/90 transition-colors border border-border/30"
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="text-lg">
-                            {locationView === "country" ? getCountryFlag(item.name) : "📍"}
-                          </span>
-                          <span className="text-sm font-medium text-foreground">{item.name}</span>
-                        </div>
-                        <span className="text-sm font-mono text-muted-foreground">
-                          {item.visitors}
-                        </span>
-                      </div>
-                    ))}
-                    
-                    {(!locationData || locationData.length === 0) && (
-                      <div className="text-center text-muted-foreground text-sm mt-8">
-                        No data available
-                      </div>
-                    )}
+              );
+            })}
+            {(!techData || techData.length === 0) && (
+              <div className="text-center text-muted-foreground text-sm mt-8">
+                No data available
+              </div>
+            )}
+          </div>
+          <div className="p-4 border-t border-border/50">
+            <Button
+              variant="ghost"
+              className="w-full text-muted-foreground hover:text-foreground"
+              size="sm"
+            >
+              <ExpandIcon className="w-4 h-4 mr-2" />
+              <span className="uppercase">Details</span>
+            </Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="os_name" className="mt-0 flex flex-col">
+          <div className="flex-1 p-4 space-y-2 overflow-y-auto">
+            {techData?.slice(0, 8).map((item) => (
+              <div
+                key={item.name}
+                className="flex items-center justify-between p-3 bg-card/80 backdrop-blur-sm rounded hover:bg-card/90 transition-colors border border-border/30"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-1.5 bg-primary/20 rounded">
+                    <Smartphone className="w-4 h-4 text-primary" />
                   </div>
-                  
-                  {/* Details Button */}
-                  <div className="p-4 border-t border-border/50">
-                    <Button
-                      variant="ghost"
-                      className="w-full text-muted-foreground hover:text-foreground"
-                      size="sm"
-                    >
-                      <RefreshCw className="w-4 h-4 mr-2" />
-                      DETAILS
-                    </Button>
-                  </div>
+                  <span className="text-sm font-medium text-foreground">
+                    {item.name}
+                  </span>
                 </div>
-              )}
-            </div>
+                <span className="text-sm font-mono text-muted-foreground">
+                  {item.visitors}
+                </span>
+              </div>
+            ))}
+            {(!techData || techData.length === 0) && (
+              <div className="text-center text-muted-foreground text-sm mt-8">
+                No data available
+              </div>
+            )}
           </div>
-
-          {/* Right Panel - Technology */}
-          <div className="bg-card/50 backdrop-blur-sm">
-            {/* Technology Tabs */}
-            <div className="flex border-b border-border/50">
-              <div className="flex">
-                <Button
-                  variant={techView === "browser_name" ? "secondary" : "ghost"}
-                  className="rounded-none border-r border-border/50 h-12 text-sm flex-1 text-muted-foreground hover:text-foreground"
-                  onClick={() => setTechView("browser_name")}
-                >
-                  Browser
-                </Button>
-                <Button
-                  variant={techView === "os_name" ? "secondary" : "ghost"}
-                  className="rounded-none border-r border-border/50 h-12 text-sm flex-1 text-muted-foreground hover:text-foreground"
-                  onClick={() => setTechView("os_name")}
-                >
-                  OS
-                </Button>
-              </div>
-              <div className="w-px bg-border/50 mx-2" />
-              <div className="flex">
-                <Button
-                  variant="ghost"
-                  className="rounded-none h-12 text-sm flex-1 text-muted-foreground/50"
-                  disabled
-                >
-                  Device
-                </Button>
-              </div>
-            </div>
-
-            {/* Technology Content */}
-            <div className="h-[548px] flex flex-col">
-              <div className="flex-1 p-4 space-y-2 overflow-y-auto">
-                {techData?.slice(0, 8).map((item, index) => {
-                  const IconComponent = techView === "browser_name" ? getBrowserIcon(item.name) : Smartphone;
-                  
-                  return (
-                    <div
-                      key={item.name}
-                      className="flex items-center justify-between p-3 bg-card/80 backdrop-blur-sm rounded hover:bg-card/90 transition-colors border border-border/30"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="p-1.5 bg-primary/20 rounded">
-                          <IconComponent className="w-4 h-4 text-primary" />
-                        </div>
-                        <span className="text-sm font-medium text-foreground">{item.name}</span>
-                      </div>
-                      <span className="text-sm font-mono text-muted-foreground">
-                        {item.visitors}
-                      </span>
-                    </div>
-                  );
-                })}
-                
-                {(!techData || techData.length === 0) && (
-                  <div className="text-center text-muted-foreground text-sm mt-8">
-                    No data available
-                  </div>
-                )}
-              </div>
-              
-              {/* Details Button */}
-              <div className="p-4 border-t border-border/50">
-                <Button
-                  variant="ghost"
-                  className="w-full text-muted-foreground hover:text-foreground"
-                  size="sm"
-                >
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  DETAILS
-                </Button>
-              </div>
-            </div>
+          <div className="p-4 border-t border-border/50">
+            <Button
+              variant="ghost"
+              className="w-full text-muted-foreground hover:text-foreground"
+              size="sm"
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              DETAILS
+            </Button>
           </div>
-        </div>
-      </CardContent>
+        </TabsContent>
+      </Tabs>
     </Card>
+  );
+}
+export function InteractiveVisitorChart({
+  credentialId,
+}: InteractiveVisitorChartProps) {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Left Panel - Location */}
+      <LocationPanel credentialId={credentialId} />
+
+      {/* Right Panel - Technology */}
+      <TechPanel credentialId={credentialId} />
+    </div>
   );
 }

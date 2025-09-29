@@ -402,34 +402,7 @@ export default function Dashboard() {
           </div>
 
           {/* Interactive Visitor Analytics */}
-          <div>
-            <h2 className="text-lg font-semibold text-foreground mb-4">
-              Interactive Analytics
-            </h2>
-            <InteractiveVisitorChart credentialId={credentialId} />
-          </div>
-          {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <AnalyticsChart
-                title="Page Views Overtime"
-                selectedPeriod={selectedPeriod}
-                data={totalPageVisitsOvertimeChartData}
-                previousData={previousTotalPageVisitsOvertimeChartData}
-                height={350}
-                type="area"
-              />
-            </div>
-            <div>
-              <AnalyticsChart
-                title="Device Usage"
-                selectedPeriod={selectedPeriod}
-                data={deviceData}
-                height={350}
-                color="hsl(220, 70%, 50%)"
-                type="line"
-              />
-            </div>
-          </div> */}
+          <InteractiveVisitorChart credentialId={credentialId} />
 
           {/* Top Actions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

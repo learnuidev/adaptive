@@ -25,7 +25,7 @@ async function getTotalVisitorsBy({
     `${appConfig.apiUrl}/v1/analytics/get-total-visitors-by`,
     {
       method: "POST",
-      body: JSON.stringify({ groupBy, from, to }),
+      body: JSON.stringify({ groupBy, from, to, websiteId, period }),
     }
   );
 
