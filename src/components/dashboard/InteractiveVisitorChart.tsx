@@ -56,37 +56,37 @@ export function InteractiveVisitorChart({ credentialId }: InteractiveVisitorChar
   };
 
   return (
-    <Card className="bg-slate-800 border-slate-700 overflow-hidden">
+    <Card className="bg-gradient-card border-border/50 hover:shadow-medium transition-all duration-300 glass overflow-hidden">
       <CardContent className="p-0">
         <div className="grid grid-cols-1 lg:grid-cols-2 h-[600px]">
           {/* Left Panel - Location */}
-          <div className="bg-slate-800 border-r border-slate-700">
+          <div className="bg-card/50 border-r border-border/50 backdrop-blur-sm">
             {/* Location Tabs */}
-            <div className="flex border-b border-slate-700">
+            <div className="flex border-b border-border/50">
               <Button
                 variant={locationView === "map" ? "secondary" : "ghost"}
-                className="rounded-none border-r border-slate-700 h-12 text-sm text-slate-300 hover:text-white"
+                className="rounded-none border-r border-border/50 h-12 text-sm text-muted-foreground hover:text-foreground"
                 onClick={() => setLocationView("map")}
               >
                 Map
               </Button>
               <Button
                 variant={locationView === "country" ? "secondary" : "ghost"}
-                className="rounded-none border-r border-slate-700 h-12 text-sm text-slate-300 hover:text-white"
+                className="rounded-none border-r border-border/50 h-12 text-sm text-muted-foreground hover:text-foreground"
                 onClick={() => setLocationView("country")}
               >
                 Country
               </Button>
               <Button
                 variant={locationView === "region" ? "secondary" : "ghost"}
-                className="rounded-none border-r border-slate-700 h-12 text-sm text-slate-300 hover:text-white"
+                className="rounded-none border-r border-border/50 h-12 text-sm text-muted-foreground hover:text-foreground"
                 onClick={() => setLocationView("region")}
               >
                 Region
               </Button>
               <Button
                 variant={locationView === "city" ? "secondary" : "ghost"}
-                className="rounded-none h-12 text-sm text-slate-300 hover:text-white"
+                className="rounded-none h-12 text-sm text-muted-foreground hover:text-foreground"
                 onClick={() => setLocationView("city")}
               >
                 City
@@ -118,19 +118,19 @@ export function InteractiveVisitorChart({ credentialId }: InteractiveVisitorChar
                               <Geography
                                 key={geo.rsmKey}
                                 geography={geo}
-                                fill={countryData ? "#3b82f6" : "#374151"}
-                                stroke="#6b7280"
+                                fill={countryData ? "hsl(var(--primary))" : "hsl(var(--muted))"}
+                                stroke="hsl(var(--border))"
                                 strokeWidth={0.5}
                                 style={{
                                   default: {
                                     outline: "none",
                                   },
                                   hover: {
-                                    fill: "#60a5fa",
+                                    fill: "hsl(var(--primary-glow))",
                                     outline: "none",
                                   },
                                   pressed: {
-                                    fill: "#2563eb",
+                                    fill: "hsl(var(--primary))",
                                     outline: "none",
                                   },
                                 }}
@@ -148,32 +148,32 @@ export function InteractiveVisitorChart({ credentialId }: InteractiveVisitorChar
                     {locationData?.slice(0, 8).map((item, index) => (
                       <div
                         key={item.name}
-                        className="flex items-center justify-between p-3 bg-slate-700 rounded hover:bg-slate-600 transition-colors"
+                        className="flex items-center justify-between p-3 bg-card/80 backdrop-blur-sm rounded hover:bg-card/90 transition-colors border border-border/30"
                       >
                         <div className="flex items-center gap-3">
                           <span className="text-lg">
                             {locationView === "country" ? getCountryFlag(item.name) : "📍"}
                           </span>
-                          <span className="text-sm font-medium text-white">{item.name}</span>
+                          <span className="text-sm font-medium text-foreground">{item.name}</span>
                         </div>
-                        <span className="text-sm font-mono text-slate-300">
+                        <span className="text-sm font-mono text-muted-foreground">
                           {item.visitors}
                         </span>
                       </div>
                     ))}
                     
                     {(!locationData || locationData.length === 0) && (
-                      <div className="text-center text-slate-400 text-sm mt-8">
+                      <div className="text-center text-muted-foreground text-sm mt-8">
                         No data available
                       </div>
                     )}
                   </div>
                   
                   {/* Details Button */}
-                  <div className="p-4 border-t border-slate-700">
+                  <div className="p-4 border-t border-border/50">
                     <Button
                       variant="ghost"
-                      className="w-full text-slate-400 hover:text-white"
+                      className="w-full text-muted-foreground hover:text-foreground"
                       size="sm"
                     >
                       <RefreshCw className="w-4 h-4 mr-2" />
@@ -186,26 +186,26 @@ export function InteractiveVisitorChart({ credentialId }: InteractiveVisitorChar
           </div>
 
           {/* Right Panel - Technology */}
-          <div className="bg-slate-800">
+          <div className="bg-card/50 backdrop-blur-sm">
             {/* Technology Tabs */}
-            <div className="flex border-b border-slate-700">
+            <div className="flex border-b border-border/50">
               <Button
                 variant={techView === "browser_name" ? "secondary" : "ghost"}
-                className="rounded-none border-r border-slate-700 h-12 text-sm flex-1 text-slate-300 hover:text-white"
+                className="rounded-none border-r border-border/50 h-12 text-sm flex-1 text-muted-foreground hover:text-foreground"
                 onClick={() => setTechView("browser_name")}
               >
                 Browser
               </Button>
               <Button
                 variant={techView === "os_name" ? "secondary" : "ghost"}
-                className="rounded-none border-r border-slate-700 h-12 text-sm flex-1 text-slate-300 hover:text-white"
+                className="rounded-none border-r border-border/50 h-12 text-sm flex-1 text-muted-foreground hover:text-foreground"
                 onClick={() => setTechView("os_name")}
               >
                 OS
               </Button>
               <Button
                 variant="ghost"
-                className="rounded-none h-12 text-sm flex-1 text-slate-500"
+                className="rounded-none h-12 text-sm flex-1 text-muted-foreground/50"
                 disabled
               >
                 Device
@@ -221,15 +221,15 @@ export function InteractiveVisitorChart({ credentialId }: InteractiveVisitorChar
                   return (
                     <div
                       key={item.name}
-                      className="flex items-center justify-between p-3 bg-slate-700 rounded hover:bg-slate-600 transition-colors"
+                      className="flex items-center justify-between p-3 bg-card/80 backdrop-blur-sm rounded hover:bg-card/90 transition-colors border border-border/30"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="p-1.5 bg-blue-500/20 rounded">
-                          <IconComponent className="w-4 h-4 text-blue-400" />
+                        <div className="p-1.5 bg-primary/20 rounded">
+                          <IconComponent className="w-4 h-4 text-primary" />
                         </div>
-                        <span className="text-sm font-medium text-white">{item.name}</span>
+                        <span className="text-sm font-medium text-foreground">{item.name}</span>
                       </div>
-                      <span className="text-sm font-mono text-slate-300">
+                      <span className="text-sm font-mono text-muted-foreground">
                         {item.visitors}
                       </span>
                     </div>
@@ -237,17 +237,17 @@ export function InteractiveVisitorChart({ credentialId }: InteractiveVisitorChar
                 })}
                 
                 {(!techData || techData.length === 0) && (
-                  <div className="text-center text-slate-400 text-sm mt-8">
+                  <div className="text-center text-muted-foreground text-sm mt-8">
                     No data available
                   </div>
                 )}
               </div>
               
               {/* Details Button */}
-              <div className="p-4 border-t border-slate-700">
+              <div className="p-4 border-t border-border/50">
                 <Button
                   variant="ghost"
-                  className="w-full text-slate-400 hover:text-white"
+                  className="w-full text-muted-foreground hover:text-foreground"
                   size="sm"
                 >
                   <RefreshCw className="w-4 h-4 mr-2" />
