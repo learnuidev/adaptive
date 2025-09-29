@@ -74,14 +74,14 @@ export function PageAndFeaturePanel({
 
   const handlePageClick = (pagePath: string) => {
     if (!pagePath) return;
-    
+
     // Try to construct the full URL
     // First, check if credentialId might contain domain info, otherwise use current origin
-    const fullUrl = pagePath.startsWith('http') 
-      ? pagePath 
-      : `${window.location.origin}${pagePath.startsWith('/') ? '' : '/'}${pagePath}`;
-    
-    window.open(fullUrl, '_blank', 'noopener,noreferrer');
+    const fullUrl = pagePath.startsWith("http")
+      ? pagePath
+      : `${window.location.origin}${pagePath.startsWith("/") ? "" : "/"}${pagePath}`;
+
+    window.open(fullUrl, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -113,17 +113,20 @@ export function PageAndFeaturePanel({
                 <span>Visitors ↑↓</span>
               </div>
             </div>
-            <div className="p-4 space-y-2">
-              {currentPageVisitsPerPage && currentPageVisitsPerPage.length > 0 ? (
+            <div className="pr-4 space-y-2">
+              {currentPageVisitsPerPage &&
+              currentPageVisitsPerPage.length > 0 ? (
                 <TooltipProvider>
                   {(() => {
-                    const maxValue = Math.max(...currentPageVisitsPerPage.map(p => p.value));
+                    const maxValue = Math.max(
+                      ...currentPageVisitsPerPage.map((p) => p.value)
+                    );
                     return currentPageVisitsPerPage.map((page, index) => {
                       const percentage = (page.value / maxValue) * 100;
                       return (
                         <Tooltip key={index}>
                           <TooltipTrigger asChild>
-                            <div 
+                            <div
                               className="group cursor-pointer"
                               onClick={() => handlePageClick(page.name)}
                             >
@@ -140,9 +143,9 @@ export function PageAndFeaturePanel({
                                     <ExternalLink className="h-3 w-3 text-foreground/50 group-hover:text-foreground/80 transition-colors flex-shrink-0 z-10" />
                                   </div>
                                 </div>
-                                <span className="text-sm font-bold text-foreground w-16 text-right">
-                                  {page.value >= 1000 
-                                    ? `${(page.value / 1000).toFixed(1)}k` 
+                                <span className="text-sm font-bold text-foreground w-4 text-right">
+                                  {page.value >= 1000
+                                    ? `${(page.value / 1000).toFixed(1)}k`
                                     : page.value.toLocaleString()}
                                 </span>
                               </div>
@@ -150,9 +153,12 @@ export function PageAndFeaturePanel({
                           </TooltipTrigger>
                           <TooltipContent side="top" className="max-w-md">
                             <div className="space-y-1">
-                              <p className="font-semibold text-sm break-all">{page.name || "/"}</p>
+                              <p className="font-semibold text-sm break-all">
+                                {page.name || "/"}
+                              </p>
                               <p className="text-xs text-muted-foreground">
-                                {page.value.toLocaleString()} visitor{page.value !== 1 ? 's' : ''} • Click to open
+                                {page.value.toLocaleString()} visitor
+                                {page.value !== 1 ? "s" : ""} • Click to open
                               </p>
                             </div>
                           </TooltipContent>
