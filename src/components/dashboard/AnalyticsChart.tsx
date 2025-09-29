@@ -10,6 +10,8 @@ import {
   ResponsiveContainer,
   Area,
   AreaChart,
+  ComposedChart,
+  Bar,
 } from "recharts";
 
 function formatPeriodSubtitle(period: FilterPeriod): string {
@@ -54,10 +56,12 @@ interface AnalyticsChartProps {
   selectedPeriod: FilterPeriod;
   data: Array<{ name: string; value: number; [key: string]: any }>;
   previousData?: Array<{ name: string; value: number; [key: string]: any }>;
+  secondaryData?: Array<{ name: string; value: number; [key: string]: any }>;
   height?: number;
   color?: string;
-  type?: "line" | "area";
+  type?: "line" | "area" | "composed";
   chartKey: string;
+  secondaryLabel?: string;
 }
 
 export function AnalyticsChart({
@@ -67,9 +71,10 @@ export function AnalyticsChart({
   colorPalette,
   chartKey,
   data,
+  secondaryData,
   height = 300,
-
   type = "area",
+  secondaryLabel,
 }: AnalyticsChartProps) {
   const subtitle = formatPeriodSubtitle(selectedPeriod);
 
@@ -91,7 +96,49 @@ export function AnalyticsChart({
       </div>
       <div style={{ height }}>
         <ResponsiveContainer width="100%" height="100%">
-          {type === "area" ? (
+          {type === "composed" ? (
+            <ComposedChart data={data}>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="hsl(var(--border))"
+              />
+              <XAxis
+                dataKey="name"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+              />
+              <YAxis
+                yAxisId="left"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+              />
+              <YAxis
+                yAxisId="right"
+                orientation="right"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+              />
+              <Bar
+                yAxisId="right"
+                dataKey="secondaryValue"
+                fill="hsl(40, 50%, 60%)"
+                radius={[4, 4, 0, 0]}
+                opacity={0.8}
+              />
+              <Line
+                yAxisId="left"
+                type="monotone"
+                dataKey="value"
+                stroke={color}
+                strokeWidth={2}
+                dot={false}
+                activeDot={{ r: 4, fill: color }}
+              />
+            </ComposedChart>
+          ) : type === "area" ? (
             <AreaChart data={data}>
               <defs>
                 <linearGradient id={chartKey} x1="0" y1="0" x2="0" y2="1">

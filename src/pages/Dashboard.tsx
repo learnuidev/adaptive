@@ -275,6 +275,12 @@ export default function Dashboard() {
     summary?.totalPageVisitsOvertime?.previous
   );
 
+  // Combine both datasets for composed chart
+  const combinedChartData = chartData.map((item, index) => ({
+    ...item,
+    secondaryValue: totalPageVisitsOvertimeChartData[index]?.value || 0,
+  }));
+
   const metricsData = [
     {
       title: "Total Visitors",
@@ -374,31 +380,17 @@ export default function Dashboard() {
           </div>
 
           {/* Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <div className="lg:col-span-2">
-              <AnalyticsChart
-                chartKey="uniqueVisitorTraffic"
-                title="Unique Visitor Traffic"
-                colorPalette={"green"}
-                selectedPeriod={selectedPeriod}
-                data={chartData}
-                previousData={previousChartData}
-                height={350}
-                type="area"
-              />
-            </div>
-            <div className="lg:col-span-2">
-              <AnalyticsChart
-                chartKey="pageViews"
-                colorPalette={"blue"}
-                title="Page Views"
-                selectedPeriod={selectedPeriod}
-                data={totalPageVisitsOvertimeChartData}
-                previousData={previousTotalPageVisitsOvertimeChartData}
-                height={350}
-                type="area"
-              />
-            </div>
+          <div className="grid grid-cols-1 gap-6">
+            <AnalyticsChart
+              chartKey="visitorTraffic"
+              title="Visitors & Page Views"
+              colorPalette={"blue"}
+              selectedPeriod={selectedPeriod}
+              data={combinedChartData}
+              height={400}
+              type="composed"
+              secondaryLabel="Page Views"
+            />
           </div>
 
           {/* Interactive Visitor Analytics */}
