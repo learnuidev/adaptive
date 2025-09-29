@@ -1,7 +1,41 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
 import { TrendingUp } from "lucide-react";
+import { TrendBuilderForm } from "@/components/trends/TrendBuilderForm";
+import { TrendResultsChart } from "@/components/trends/TrendResultsChart";
+import { TopTrendsTable } from "@/components/trends/TopTrendsTable";
+import { useGenerateCustomTrendQuery } from "@/modules/trends/use-generate-custom-trend-query";
+import { useTopMetadataTrendsQuery } from "@/modules/trends/use-top-metadata-trends-query";
+import { TrendBuilderForm as TrendBuilderFormType } from "@/modules/trends/trends.types";
+import { useToast } from "@/hooks/use-toast";
 
 const Trends = () => {
+  const [trendConfig, setTrendConfig] = useState<TrendBuilderFormType | null>(null);
+  const { toast } = useToast();
+
+  const customTrendQuery = useGenerateCustomTrendQuery(
+    trendConfig!,
+    !!trendConfig
+  );
+
+  const topTrendsQuery = useTopMetadataTrendsQuery(
+    {
+      metadataField: trendConfig?.metadataField || "",
+      topN: 10,
+      timeRange: trendConfig?.timeRange || "7d",
+    },
+    !!trendConfig?.metadataField
+  );
+
+  const handleFormSubmit = (data: TrendBuilderFormType) => {
+    setTrendConfig(data);
+    toast({
+      title: "Trend Analysis Started",
+      description: `Analyzing trends for ${data.metadataField} over ${data.timeRange}`,
+    });
+  };
+
+  const isLoading = customTrendQuery.isLoading || topTrendsQuery.isLoading;
+
   return (
     <div className="space-y-6">
       <div>
@@ -12,22 +46,35 @@ const Trends = () => {
       </div>
 
       <div className="grid gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Trending Analysis
-            </CardTitle>
-            <CardDescription>
-              Identify emerging trends and patterns in user behavior and engagement
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-center h-64 text-muted-foreground">
-              Trend analysis coming soon...
+        <TrendBuilderForm 
+          onSubmit={handleFormSubmit} 
+          isLoading={isLoading}
+        />
+
+        {trendConfig && (
+          <>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <TrendResultsChart 
+                data={customTrendQuery.data || []} 
+                config={trendConfig}
+              />
+              <TopTrendsTable 
+                data={topTrendsQuery.data || []} 
+                metadataField={trendConfig.metadataField}
+                isLoading={topTrendsQuery.isLoading}
+              />
             </div>
-          </CardContent>
-        </Card>
+          </>
+        )}
+
+        {(customTrendQuery.error || topTrendsQuery.error) && (
+          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+            <h3 className="font-semibold text-destructive">Error Loading Trends</h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              {customTrendQuery.error?.message || topTrendsQuery.error?.message}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
