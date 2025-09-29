@@ -87,29 +87,49 @@ export function PageAndFeaturePanel({
         </TabsList>
 
         <TabContent value="page">
-          <div className="min-h-[420px] p-6 space-y-4">
-            {currentPageVisitsPerPage && currentPageVisitsPerPage.length > 0 ? (
-              currentPageVisitsPerPage.map((page, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
-                >
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <span className="text-lg">📄</span>
-                    <span className="text-sm text-foreground truncate" title={page.name}>
-                      {page.name || "/"}
-                    </span>
-                  </div>
-                  <span className="text-sm font-medium text-foreground ml-2">
-                    {page.value.toLocaleString()}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <div className="flex items-center justify-center h-full text-muted-foreground">
-                No page data available
+          <div className="min-h-[420px]">
+            <div className="p-4 border-b border-border/50">
+              <div className="flex items-center justify-between text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <span>Page</span>
+                <span>Visitors ↑↓</span>
               </div>
-            )}
+            </div>
+            <div className="p-4 space-y-2">
+              {currentPageVisitsPerPage && currentPageVisitsPerPage.length > 0 ? (
+                (() => {
+                  const maxValue = Math.max(...currentPageVisitsPerPage.map(p => p.value));
+                  return currentPageVisitsPerPage.map((page, index) => {
+                    const percentage = (page.value / maxValue) * 100;
+                    return (
+                      <div key={index} className="group">
+                        <div className="flex items-center gap-3 mb-1">
+                          <div className="flex-1 relative h-10 bg-secondary/30 rounded overflow-hidden">
+                            <div
+                              className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary/70 to-primary/50 transition-all duration-300 group-hover:from-primary/80 group-hover:to-primary/60"
+                              style={{ width: `${percentage}%` }}
+                            />
+                            <div className="absolute inset-0 flex items-center px-3">
+                              <span className="text-sm font-medium text-foreground truncate z-10" title={page.name}>
+                                {page.name || "/"}
+                              </span>
+                            </div>
+                          </div>
+                          <span className="text-sm font-bold text-foreground w-16 text-right">
+                            {page.value >= 1000 
+                              ? `${(page.value / 1000).toFixed(1)}k` 
+                              : page.value.toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  });
+                })()
+              ) : (
+                <div className="flex items-center justify-center h-[360px] text-muted-foreground">
+                  No page data available
+                </div>
+              )}
+            </div>
           </div>
           <DetailsButton />
         </TabContent>
