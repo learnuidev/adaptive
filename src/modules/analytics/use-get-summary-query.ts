@@ -40,6 +40,12 @@ export type GetSummaryResponseRaw = {
   };
 
   visitors: Visitor[];
+
+  averageSession: {
+    // seconds
+    current: number;
+    previous: number;
+  };
 };
 
 const getSummaryRawResponse = {
@@ -170,7 +176,7 @@ const getSummaryRawResponse = {
   },
 };
 
-type GetSummaryResponse = {
+export type GetSummaryResponse = {
   totalVisitors: {
     current: number;
     previous: number;
@@ -183,6 +189,13 @@ type GetSummaryResponse = {
   };
 
   visitors: Visitor[];
+
+  averageSession: {
+    // seconds
+    current: number;
+    previous: number;
+    percentageDifference: number | null;
+  };
 };
 export type FilterPeriod =
   | "today"
@@ -263,6 +276,16 @@ async function getSummary({
       respRaw?.totalVisitors?.previous?.[0]?.total || "0"
     );
 
+    const currentAverageSession = respRaw.averageSession?.current || 0;
+    const previousAverageSession = respRaw.averageSession?.previous || 0;
+
+    const avgSessionPercDiff =
+      previousAverageSession === 0
+        ? null
+        : ((currentAverageSession - previousAverageSession) /
+            previousAverageSession) *
+            100 || 0;
+
     const resp = {
       totalVisitors: {
         current: totalCurrentVisitors,
@@ -287,6 +310,12 @@ async function getSummary({
       },
 
       visitors: respRaw.visitors,
+
+      averageSession: {
+        current: currentAverageSession,
+        previous: previousAverageSession,
+        percentageDifference: avgSessionPercDiff,
+      },
     };
 
     console.log("RESP", resp);

@@ -101,6 +101,20 @@ const featureFlags = [
   },
 ];
 
+import { GetSummaryResponse } from "@/modules/analytics/use-get-summary-query";
+
+const formatSessionTime = (summary: GetSummaryResponse) => {
+  const totalSeconds = summary?.averageSession.current || 0;
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = Math.floor(totalSeconds % 60);
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  } else {
+    return `${minutes}m ${seconds}s`;
+  }
+};
+
 export default function Dashboard() {
   // Use strict: false to handle cases where params might not exist
   const params = useParams({ strict: false }) as { credentialId?: string };
@@ -151,9 +165,14 @@ export default function Dashboard() {
     },
     {
       title: "Avg Session",
-      value: "4m 32s",
-      change: "-2.1% from last week",
-      changeType: "negative" as const,
+      value: summary?.averageSession.current ? formatSessionTime(summary) : "0",
+      change: summary?.averageSession.percentageDifference
+        ? `${summary?.averageSession.percentageDifference?.toFixed(2)}% from last week`
+        : "",
+      changeType:
+        summary?.averageSession.current - summary?.averageSession?.previous < 0
+          ? ("negative" as const)
+          : ("positive" as const),
       icon: Clock,
       trend: [60, 55, 50, 45, 50, 40, 35],
     },
