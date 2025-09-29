@@ -21,6 +21,8 @@ import {
   Smartphone,
   TrendingUp,
   Users,
+  Monitor,
+  Tablet,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -409,15 +411,24 @@ export default function Dashboard() {
               </div>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Desktop</span>
+                  <div className="flex items-center gap-2">
+                    <Monitor className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">Desktop</span>
+                  </div>
                   <span className="font-medium text-foreground">65.4%</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Mobile</span>
+                  <div className="flex items-center gap-2">
+                    <Smartphone className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">Mobile</span>
+                  </div>
                   <span className="font-medium text-foreground">28.7%</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Tablet</span>
+                  <div className="flex items-center gap-2">
+                    <Tablet className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">Tablet</span>
+                  </div>
                   <span className="font-medium text-foreground">5.9%</span>
                 </div>
               </div>
