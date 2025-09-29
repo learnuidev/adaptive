@@ -9,7 +9,13 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Drawer,
   DrawerContent,
@@ -46,7 +52,8 @@ import { ResponsiveFilters } from "@/components/analytics/ResponsiveFilters";
 import { useListEventsByEmailQuery } from "@/modules/analytics/use-list-events-by-email-query";
 import { useState, useMemo } from "react";
 import { AnalyticsEvent } from "@/modules/analytics/analytics.types";
-import JsonView from '@uiw/react-json-view';
+import JsonView from "@uiw/react-json-view";
+import { useGetUserInfoQuery } from "@/modules/analytics/use-get-user-info-query";
 
 const UserDetail = () => {
   const params = useParams({ strict: false }) as {
@@ -63,15 +70,18 @@ const UserDetail = () => {
   });
 
   // Activity state management
-  const [selectedEvent, setSelectedEvent] = useState<AnalyticsEvent | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<AnalyticsEvent | null>(
+    null
+  );
   const [visibleCount, setVisibleCount] = useState(20);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortField, setSortField] = useState<keyof AnalyticsEvent>("created_at");
+  const [sortField, setSortField] =
+    useState<keyof AnalyticsEvent>("created_at");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-  const [filterField, setFilterField] = useState<keyof AnalyticsEvent | "none">("none");
+  const [filterField, setFilterField] = useState<keyof AnalyticsEvent | "none">(
+    "none"
+  );
   const [filterValue, setFilterValue] = useState("");
-
-  console.log("FilterField state:", filterField, "Type:", typeof filterField);
 
   const currentCredential = credentials?.find(
     (cred) => cred.id === credentialId
@@ -87,16 +97,20 @@ const UserDetail = () => {
     websiteId: credentialId,
     period: selectedPeriod,
   });
+  const { data: userInfo } = useGetUserInfoQuery({
+    email: user?.email,
+    websiteId: credentialId,
+  });
 
   // Filter and sort events
   const filteredAndSortedEvents = useMemo(() => {
     if (!userEvents) return [];
-    
+
     let filtered = userEvents.filter((event) => {
       // Search query filter
       if (searchQuery) {
         const searchLower = searchQuery.toLowerCase();
-        const matchesSearch = 
+        const matchesSearch =
           event.event_name?.toLowerCase().includes(searchLower) ||
           event.href?.toLowerCase().includes(searchLower) ||
           event.type?.toLowerCase().includes(searchLower) ||
@@ -104,18 +118,22 @@ const UserDetail = () => {
           JSON.stringify(event.metadata).toLowerCase().includes(searchLower);
         if (!matchesSearch) return false;
       }
-      
+
       // Field-specific filter
       if (filterField && filterField !== "none" && filterValue) {
         const fieldValue = event[filterField as keyof AnalyticsEvent];
-        if (typeof fieldValue === 'string') {
+        if (typeof fieldValue === "string") {
           return fieldValue.toLowerCase().includes(filterValue.toLowerCase());
-        } else if (typeof fieldValue === 'object') {
-          return JSON.stringify(fieldValue).toLowerCase().includes(filterValue.toLowerCase());
+        } else if (typeof fieldValue === "object") {
+          return JSON.stringify(fieldValue)
+            .toLowerCase()
+            .includes(filterValue.toLowerCase());
         }
-        return String(fieldValue).toLowerCase().includes(filterValue.toLowerCase());
+        return String(fieldValue)
+          .toLowerCase()
+          .includes(filterValue.toLowerCase());
       }
-      
+
       return true;
     });
 
@@ -123,27 +141,32 @@ const UserDetail = () => {
     filtered.sort((a, b) => {
       const aValue = a[sortField];
       const bValue = b[sortField];
-      
-      if (typeof aValue === 'string' && typeof bValue === 'string') {
+
+      if (typeof aValue === "string" && typeof bValue === "string") {
         const comparison = aValue.localeCompare(bValue);
-        return sortDirection === 'asc' ? comparison : -comparison;
+        return sortDirection === "asc" ? comparison : -comparison;
       }
-      
-      if (typeof aValue === 'number' && typeof bValue === 'number') {
-        return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+
+      if (typeof aValue === "number" && typeof bValue === "number") {
+        return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
       }
-      
+
       // Default to string comparison
       const aStr = String(aValue);
       const bStr = String(bValue);
       const comparison = aStr.localeCompare(bStr);
-      return sortDirection === 'asc' ? comparison : -comparison;
+      return sortDirection === "asc" ? comparison : -comparison;
     });
 
     return filtered;
-  }, [userEvents, searchQuery, filterField, filterValue, sortField, sortDirection]);
-
-  console.log("EVENT", userEvents);
+  }, [
+    userEvents,
+    searchQuery,
+    filterField,
+    filterValue,
+    sortField,
+    sortDirection,
+  ]);
 
   // Show credentials selection if no credential ID or credential not found
   if (!credentialId || (credentials && !currentCredential)) {
@@ -383,9 +406,7 @@ const UserDetail = () => {
                 </Badge>
               )}
             </CardTitle>
-            <CardDescription>
-              Recent user activity and events
-            </CardDescription>
+            <CardDescription>Recent user activity and events</CardDescription>
           </CardHeader>
           <CardContent>
             {/* Filters and Sorting */}
@@ -406,17 +427,28 @@ const UserDetail = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}
+                    onClick={() =>
+                      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+                    }
                     className="gap-2"
                   >
-                    {sortDirection === 'asc' ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
+                    {sortDirection === "asc" ? (
+                      <SortAsc className="h-4 w-4" />
+                    ) : (
+                      <SortDesc className="h-4 w-4" />
+                    )}
                     Sort
                   </Button>
                 </div>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Select value={sortField} onValueChange={(value) => setSortField(value as keyof AnalyticsEvent)}>
+                <Select
+                  value={sortField}
+                  onValueChange={(value) =>
+                    setSortField(value as keyof AnalyticsEvent)
+                  }
+                >
                   <SelectTrigger className="w-full sm:w-48">
                     <SelectValue placeholder="Sort by..." />
                   </SelectTrigger>
@@ -429,11 +461,14 @@ const UserDetail = () => {
                   </SelectContent>
                 </Select>
 
-                <Select 
-                  value={filterField} 
+                <Select
+                  value={filterField}
                   onValueChange={(value) => {
-                    console.log("Filter field changed to:", value, "Type:", typeof value);
-                    setFilterField(value === "none" ? "none" : value as keyof AnalyticsEvent);
+                    setFilterField(
+                      value === "none"
+                        ? "none"
+                        : (value as keyof AnalyticsEvent)
+                    );
                     if (value === "none") {
                       setFilterValue("");
                     }
@@ -515,11 +550,13 @@ const UserDetail = () => {
                       onClick={() => setSelectedEvent(event)}
                     >
                       <div className="flex items-center space-x-4">
-                        <Badge 
+                        <Badge
                           variant={
-                            event.type === 'pageview' ? 'default' : 
-                            event.type === 'payment' ? 'secondary' : 
-                            'outline'
+                            event.type === "pageview"
+                              ? "default"
+                              : event.type === "payment"
+                                ? "secondary"
+                                : "outline"
                           }
                         >
                           {event.type}
@@ -554,9 +591,10 @@ const UserDetail = () => {
                   <div className="text-center pt-4">
                     <Button
                       variant="outline"
-                      onClick={() => setVisibleCount(prev => prev + 20)}
+                      onClick={() => setVisibleCount((prev) => prev + 20)}
                     >
-                      Load More ({filteredAndSortedEvents.length - visibleCount} remaining)
+                      Load More ({filteredAndSortedEvents.length - visibleCount}{" "}
+                      remaining)
                     </Button>
                   </div>
                 )}
@@ -566,7 +604,10 @@ const UserDetail = () => {
         </Card>
 
         {/* Event Details Drawer */}
-        <Drawer open={selectedEvent !== null} onOpenChange={(open) => !open && setSelectedEvent(null)}>
+        <Drawer
+          open={selectedEvent !== null}
+          onOpenChange={(open) => !open && setSelectedEvent(null)}
+        >
           <DrawerContent className="max-h-[80vh]">
             <DrawerHeader className="pb-4">
               <div className="flex items-center justify-between">
@@ -581,11 +622,11 @@ const UserDetail = () => {
             <div className="px-4 pb-6 overflow-auto">
               {selectedEvent && (
                 <div className="rounded-lg border bg-card p-4">
-                  <JsonView 
-                    value={selectedEvent} 
-                    style={{ 
-                      backgroundColor: 'transparent',
-                      fontSize: '14px',
+                  <JsonView
+                    value={selectedEvent}
+                    style={{
+                      backgroundColor: "transparent",
+                      fontSize: "14px",
                     }}
                     collapsed={false}
                     displayDataTypes={false}

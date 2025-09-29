@@ -11,11 +11,7 @@ export const AdapiveProvider = ({
 }) => {
   const { data: authUser, isLoading } = useGetAuthUserQuery();
 
-  console.log("auth user", authUser);
-
   const { data: credentials } = useListUserCredentialsQuery();
-
-  console.log("CREDENIALS", credentials);
 
   if (isLoading) {
     return;

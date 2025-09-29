@@ -17,7 +17,5 @@ export const AdapiveIdentityProvider = ({
     refetchIntervalInBackground: false,
   });
 
-  console.log("IDENTITY", data);
-
   return children;
 };

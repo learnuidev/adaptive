@@ -61,7 +61,6 @@ export const useAddUserCredentialMutation = () => {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: [listUserCredentialsQueryId] });
-      console.log(data);
     },
   });
 };

@@ -49,7 +49,6 @@ export const AuthForm: React.FC = () => {
     password: string;
     name: string;
   }) => {
-    console.log("Register data:", data);
     toast({
       title: "Registration",
       description: "Registration functionality coming soon",

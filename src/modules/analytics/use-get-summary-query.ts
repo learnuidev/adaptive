@@ -270,8 +270,6 @@ async function getSummary({
   const respRaw = (await res.json()) as GetSummaryResponseRaw;
 
   try {
-    console.log("RESP RAW", respRaw);
-
     const totalCurrentPageVisits = respRaw.totalPageVisits.current.reduce(
       (acc, curr) => {
         return acc + parseInt(curr?.visits || curr?.total);
@@ -346,7 +344,6 @@ async function getSummary({
       },
     };
 
-    console.log("RESP", resp);
     return resp;
   } catch (error) {
     console.log("ERROR", error);
