@@ -1,4 +1,5 @@
 import { LocationPanel } from "./location-panel";
+import { PageAndFeaturePanel } from "./page-and-feature-panel";
 import { TechPanel } from "./tech-panel";
 
 interface InteractiveVisitorChartProps {
@@ -9,12 +10,16 @@ export function InteractiveVisitorChart({
   credentialId,
 }: InteractiveVisitorChartProps) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Left Panel - Location */}
-      <LocationPanel credentialId={credentialId} />
+    <>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Panel - Location */}
+        <LocationPanel credentialId={credentialId} />
 
-      {/* Right Panel - Technology */}
-      <TechPanel credentialId={credentialId} />
-    </div>
+        <PageAndFeaturePanel credentialId={credentialId} />
+
+        {/* Right Panel - Technology */}
+        <TechPanel credentialId={credentialId} />
+      </div>
+    </>
   );
 }

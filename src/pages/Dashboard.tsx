@@ -1,30 +1,19 @@
-import { CredentialSelector } from "@/components/credentials/CredentialSelector";
+import { ResponsiveFilters } from "@/components/analytics/ResponsiveFilters";
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
 import { AnalyticsChart } from "@/components/dashboard/AnalyticsChart";
 import { MetricsCard } from "@/components/dashboard/MetricsCard";
 import { InteractiveVisitorChart } from "@/components/dashboard/interactive-visitor-chart/interactive-visitor-chart";
-import { FeatureFlagCard } from "@/components/feature-flags/FeatureFlagCard";
 import { WithNewEvents } from "@/components/with-new-events";
 import {
   // FilterPeriod,
   useGetSummaryQuery,
   VisitorCount,
 } from "@/modules/analytics/use-get-summary-query";
-import { useFilterPeriodStore } from "@/stores/filter-period-store";
-import { ResponsiveFilters } from "@/components/analytics/ResponsiveFilters";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
+import { useFilterPeriodStore } from "@/stores/filter-period-store";
 import { useParams } from "@tanstack/react-router";
-import {
-  Clock,
-  Eye,
-  MousePointer,
-  Smartphone,
-  TrendingUp,
-  Users,
-  Monitor,
-  Tablet,
-} from "lucide-react";
-import { useMemo, useState } from "react";
+import { Clock, Eye, TrendingUp, Users } from "lucide-react";
+import { useState } from "react";
 
 function buildChartData(
   selectedPeriod: FilterPeriod,
@@ -166,58 +155,8 @@ const featureFlags = [
   },
 ];
 
-import { GetSummaryResponse } from "@/modules/analytics/use-get-summary-query";
 import { FilterPeriod } from "@/modules/analytics/analytics.types";
-
-function TopPagesList() {
-  const params = useParams({ strict: false }) as { credentialId?: string };
-  const credentialId = params?.credentialId;
-
-  const { selectedPeriod } = useFilterPeriodStore();
-  const { data: summary } = useGetSummaryQuery({
-    websiteId: credentialId,
-    period: selectedPeriod,
-  });
-
-  const currentPageVisitsPerPage = useMemo(
-    () =>
-      (summary?.pageVisitsPerPage.current || [])
-        ?.sort(
-          (a, b) =>
-            parseInt(b?.total || b?.visits || "0" || "0") -
-            parseInt(a?.total || a?.visits || "0" || "0")
-        )
-        .slice(0, 3)
-        ?.map((page) => {
-          return {
-            name: page?.patternHref || page?.href || "",
-            value: parseInt(page?.total || page?.visits || "0" || "0"),
-          };
-        }),
-    [summary?.pageVisitsPerPage.current]
-  );
-
-  return (
-    <div className="glass p-6 rounded-lg border border-border/50 hover:shadow-medium transition-all duration-300">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="p-2 bg-primary-soft rounded-lg">
-          <MousePointer className="w-5 h-5 text-primary" />
-        </div>
-        <h3 className="font-semibold text-foreground">Top Pages</h3>
-      </div>
-      <div className="space-y-3">
-        {currentPageVisitsPerPage?.map((page) => (
-          <div key={page.name} className="flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">{page.name}</span>
-            <span className="font-medium text-foreground">
-              {page.value.toLocaleString()}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+import { GetSummaryResponse } from "@/modules/analytics/use-get-summary-query";
 
 const formatSessionTime = (summary: GetSummaryResponse) => {
   const totalSeconds = summary?.averageSession.current || 0;
@@ -397,93 +336,6 @@ export default function Dashboard() {
 
           {/* Interactive Visitor Analytics */}
           <InteractiveVisitorChart credentialId={credentialId} />
-
-          {/* Top Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <TopPagesList />
-
-            <div className="glass p-6 rounded-lg border border-border/50 hover:shadow-medium transition-all duration-300">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-primary-soft rounded-lg">
-                  <Smartphone className="w-5 h-5 text-primary" />
-                </div>
-                <h3 className="font-semibold text-foreground">Devices</h3>
-              </div>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <Monitor className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">Desktop</span>
-                  </div>
-                  <span className="font-medium text-foreground">65.4%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <Smartphone className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">Mobile</span>
-                  </div>
-                  <span className="font-medium text-foreground">28.7%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <Tablet className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">Tablet</span>
-                  </div>
-                  <span className="font-medium text-foreground">5.9%</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="glass p-6 rounded-lg border border-border/50 hover:shadow-medium transition-all duration-300">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-primary-soft rounded-lg">
-                  <TrendingUp className="w-5 h-5 text-primary" />
-                </div>
-                <h3 className="font-semibold text-foreground">Growth</h3>
-              </div>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">
-                    This Week
-                  </span>
-                  <span className="font-medium text-primary">+12.5%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">
-                    This Month
-                  </span>
-                  <span className="font-medium text-primary">+8.3%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">
-                    This Year
-                  </span>
-                  <span className="font-medium text-primary">+24.7%</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Feature Flags Section */}
-          <div>
-            <h2 className="text-lg font-semibold text-foreground mb-4">
-              Active Feature Flags
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {flags.map((flag, index) => (
-                <div
-                  key={flag.id}
-                  className="animate-slide-up"
-                  style={{ animationDelay: `${index * 150}ms` }}
-                >
-                  <FeatureFlagCard
-                    {...flag}
-                    onToggle={() => toggleFlag(flag.id)}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </WithNewEvents>
