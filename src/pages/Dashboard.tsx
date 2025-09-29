@@ -1,8 +1,12 @@
+import { CredentialSelector } from "@/components/credentials/CredentialSelector";
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
 import { AnalyticsChart } from "@/components/dashboard/AnalyticsChart";
 import { MetricsCard } from "@/components/dashboard/MetricsCard";
+import { InteractiveVisitorChart } from "@/components/dashboard/interactive-visitor-chart/interactive-visitor-chart";
+import { FeatureFlagCard } from "@/components/feature-flags/FeatureFlagCard";
 import { WithNewEvents } from "@/components/with-new-events";
 import {
+  // FilterPeriod,
   useGetSummaryQuery,
   VisitorCount,
 } from "@/modules/analytics/use-get-summary-query";
@@ -13,9 +17,12 @@ import { useParams } from "@tanstack/react-router";
 import {
   Clock,
   Eye,
+  MousePointer,
+  Smartphone,
   TrendingUp,
   Users,
 } from "lucide-react";
+import { useMemo, useState } from "react";
 
 function buildChartData(
   selectedPeriod: FilterPeriod,
@@ -121,9 +128,94 @@ function buildChartData(
 
   return filled;
 }
+const deviceData = [
+  { name: "Desktop", value: 65 },
+  { name: "Mobile", value: 85 },
+  { name: "Tablet", value: 35 },
+];
+
+const featureFlags = [
+  {
+    id: 1,
+    name: "New Dashboard UI",
+    description: "Updated dashboard design with improved navigation",
+    enabled: true,
+    rolloutPercentage: 75,
+    environment: "production" as const,
+    usersAffected: 18500,
+  },
+  {
+    id: 2,
+    name: "Advanced Analytics",
+    description: "Enhanced analytics with real-time data processing",
+    enabled: false,
+    rolloutPercentage: 25,
+    environment: "staging" as const,
+    usersAffected: 2300,
+  },
+  {
+    id: 3,
+    name: "AI Insights",
+    description: "Machine learning powered insights and predictions",
+    enabled: true,
+    rolloutPercentage: 100,
+    environment: "development" as const,
+    usersAffected: 500,
+  },
+];
 
 import { GetSummaryResponse } from "@/modules/analytics/use-get-summary-query";
 import { FilterPeriod } from "@/modules/analytics/analytics.types";
+
+function TopPagesList() {
+  const params = useParams({ strict: false }) as { credentialId?: string };
+  const credentialId = params?.credentialId;
+
+  const { selectedPeriod } = useFilterPeriodStore();
+  const { data: summary } = useGetSummaryQuery({
+    websiteId: credentialId,
+    period: selectedPeriod,
+  });
+
+  const currentPageVisitsPerPage = useMemo(
+    () =>
+      (summary?.pageVisitsPerPage.current || [])
+        ?.sort(
+          (a, b) =>
+            parseInt(b?.total || b?.visits || "0" || "0") -
+            parseInt(a?.total || a?.visits || "0" || "0")
+        )
+        .slice(0, 3)
+        ?.map((page) => {
+          return {
+            name: page?.patternHref || page?.href || "",
+            value: parseInt(page?.total || page?.visits || "0" || "0"),
+          };
+        }),
+    [summary?.pageVisitsPerPage.current]
+  );
+
+  return (
+    <div className="glass p-6 rounded-lg border border-border/50 hover:shadow-medium transition-all duration-300">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="p-2 bg-primary-soft rounded-lg">
+          <MousePointer className="w-5 h-5 text-primary" />
+        </div>
+        <h3 className="font-semibold text-foreground">Top Pages</h3>
+      </div>
+      <div className="space-y-3">
+        {currentPageVisitsPerPage?.map((page) => (
+          <div key={page.name} className="flex justify-between items-center">
+            <span className="text-sm text-muted-foreground">{page.name}</span>
+            <span className="font-medium text-foreground">
+              {page.value.toLocaleString()}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const formatSessionTime = (summary: GetSummaryResponse) => {
   const totalSeconds = summary?.averageSession.current || 0;
@@ -138,13 +230,23 @@ const formatSessionTime = (summary: GetSummaryResponse) => {
 };
 
 export default function Dashboard() {
+  // Use strict: false to handle cases where params might not exist
   const params = useParams({ strict: false }) as { credentialId?: string };
   const credentialId = params?.credentialId;
   const { data: credentials } = useListUserCredentialsQuery();
+  const [flags, setFlags] = useState(featureFlags);
 
   const currentCredential = credentials?.find(
     (cred) => cred.id === credentialId
   );
+
+  const toggleFlag = (id: number) => {
+    setFlags(
+      flags.map((flag) =>
+        flag.id === id ? { ...flag, enabled: !flag.enabled } : flag
+      )
+    );
+  };
 
   const { selectedPeriod } = useFilterPeriodStore();
   const { data: summary } = useGetSummaryQuery({
@@ -152,6 +254,9 @@ export default function Dashboard() {
     period: selectedPeriod,
   });
 
+  // Reusable helper: turns summary.totalVisitors.current into chart-ready points
+
+  // Inside component:
   const chartData = buildChartData(
     selectedPeriod,
     summary?.totalVisitors.current
@@ -214,6 +319,7 @@ export default function Dashboard() {
     },
   ];
 
+  // Show credentials selection if no credential ID or credential not found
   if (!credentialId || (credentials && !currentCredential)) {
     return <NoCredentialsMessage />;
   }
@@ -221,6 +327,7 @@ export default function Dashboard() {
   return (
     <WithNewEvents credentialId={credentialId}>
       <div className="min-h-screen bg-background w-full">
+        {/* Header */}
         <div className="border-b border-border/50 bg-card/50 backdrop-blur-sm">
           <div className="p-6">
             <div className="flex items-center justify-between">
@@ -248,6 +355,7 @@ export default function Dashboard() {
         </div>
 
         <div className="p-6 space-y-8">
+          {/* Metrics Grid */}
           <div>
             <h2 className="text-lg font-semibold text-foreground mb-4">
               Key Metrics
@@ -265,27 +373,113 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <AnalyticsChart
-              chartKey="uniqueVisitorTraffic"
-              title="Unique Visitor Traffic"
-              colorPalette={"green"}
-              selectedPeriod={selectedPeriod}
-              data={chartData}
-              previousData={previousChartData}
-              height={350}
-              type="area"
-            />
-            <AnalyticsChart
-              chartKey="pageViews"
-              colorPalette={"blue"}
-              title="Page Views"
-              selectedPeriod={selectedPeriod}
-              data={totalPageVisitsOvertimeChartData}
-              previousData={previousTotalPageVisitsOvertimeChartData}
-              height={350}
-              type="area"
-            />
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="lg:col-span-2">
+              <AnalyticsChart
+                chartKey="uniqueVisitorTraffic"
+                title="Unique Visitor Traffic"
+                colorPalette={"green"}
+                selectedPeriod={selectedPeriod}
+                data={chartData}
+                previousData={previousChartData}
+                height={350}
+                type="area"
+              />
+            </div>
+            <div className="lg:col-span-2">
+              <AnalyticsChart
+                chartKey="pageViews"
+                colorPalette={"blue"}
+                title="Page Views"
+                selectedPeriod={selectedPeriod}
+                data={totalPageVisitsOvertimeChartData}
+                previousData={previousTotalPageVisitsOvertimeChartData}
+                height={350}
+                type="area"
+              />
+            </div>
+          </div>
+
+          {/* Interactive Visitor Analytics */}
+          <InteractiveVisitorChart credentialId={credentialId} />
+
+          {/* Top Actions */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <TopPagesList />
+
+            <div className="glass p-6 rounded-lg border border-border/50 hover:shadow-medium transition-all duration-300">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-primary-soft rounded-lg">
+                  <Smartphone className="w-5 h-5 text-primary" />
+                </div>
+                <h3 className="font-semibold text-foreground">Devices</h3>
+              </div>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Desktop</span>
+                  <span className="font-medium text-foreground">65.4%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Mobile</span>
+                  <span className="font-medium text-foreground">28.7%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Tablet</span>
+                  <span className="font-medium text-foreground">5.9%</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="glass p-6 rounded-lg border border-border/50 hover:shadow-medium transition-all duration-300">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-primary-soft rounded-lg">
+                  <TrendingUp className="w-5 h-5 text-primary" />
+                </div>
+                <h3 className="font-semibold text-foreground">Growth</h3>
+              </div>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">
+                    This Week
+                  </span>
+                  <span className="font-medium text-primary">+12.5%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">
+                    This Month
+                  </span>
+                  <span className="font-medium text-primary">+8.3%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">
+                    This Year
+                  </span>
+                  <span className="font-medium text-primary">+24.7%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature Flags Section */}
+          <div>
+            <h2 className="text-lg font-semibold text-foreground mb-4">
+              Active Feature Flags
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {flags.map((flag, index) => (
+                <div
+                  key={flag.id}
+                  className="animate-slide-up"
+                  style={{ animationDelay: `${index * 150}ms` }}
+                >
+                  <FeatureFlagCard
+                    {...flag}
+                    onToggle={() => toggleFlag(flag.id)}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
