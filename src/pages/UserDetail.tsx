@@ -41,6 +41,7 @@ import {
   X,
   ChevronDown,
   ChevronUp,
+  ExternalLink,
 } from "lucide-react";
 import { DeviceUsageChart } from "@/components/dashboard/DeviceUsageChart";
 import { useParams, useNavigate } from "@tanstack/react-router";
@@ -599,10 +600,12 @@ const UserDetail = () => {
                   .map((event, index) => (
                     <div
                       key={`${event.id}-${index}`}
-                      className="flex items-center justify-between p-4 rounded-lg border bg-card/50 hover:bg-card cursor-pointer transition-colors"
-                      onClick={() => setSelectedEvent(event)}
+                      className="flex items-center justify-between p-4 rounded-lg border bg-card/50 hover:bg-card transition-colors"
                     >
-                      <div className="flex items-center space-x-4">
+                      <div 
+                        className="flex items-center space-x-4 flex-1 cursor-pointer"
+                        onClick={() => setSelectedEvent(event)}
+                      >
                         <Badge
                           variant={
                             event.type === "pageview"
@@ -628,14 +631,32 @@ const UserDetail = () => {
                           )}
                         </div>
                       </div>
-                      <div className="text-right space-y-1">
-                        <p className="text-sm text-muted-foreground">
-                          {new Date(event.created_at).toLocaleDateString()}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(event.created_at).toLocaleTimeString()}
-                        </p>
-                        <ChevronDown className="h-4 w-4 text-muted-foreground ml-auto" />
+                      <div className="flex items-center gap-3">
+                        <div className="text-right space-y-1">
+                          <p className="text-sm text-muted-foreground">
+                            {new Date(event.created_at).toLocaleDateString()}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(event.created_at).toLocaleTimeString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {event.href && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(event.href, '_blank');
+                              }}
+                              className="gap-1"
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                              Visit
+                            </Button>
+                          )}
+                          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                        </div>
                       </div>
                     </div>
                   ))}
