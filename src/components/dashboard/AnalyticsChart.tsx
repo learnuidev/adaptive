@@ -167,6 +167,26 @@ export function AnalyticsChart({
                 fill="hsl(40, 50%, 60%)"
                 radius={[4, 4, 0, 0]}
                 opacity={0.8}
+                onMouseEnter={(data, index) => {
+                  // Dim other bars
+                  const bars = document.querySelectorAll('.recharts-bar-rectangle');
+                  bars.forEach((bar, i) => {
+                    if (i !== index) {
+                      (bar as HTMLElement).style.opacity = '0.3';
+                    } else {
+                      (bar as HTMLElement).style.filter = 'drop-shadow(0 0 8px hsl(40, 50%, 60%))';
+                      (bar as HTMLElement).style.opacity = '1';
+                    }
+                  });
+                }}
+                onMouseLeave={() => {
+                  // Reset all bars
+                  const bars = document.querySelectorAll('.recharts-bar-rectangle');
+                  bars.forEach((bar) => {
+                    (bar as HTMLElement).style.opacity = '0.8';
+                    (bar as HTMLElement).style.filter = 'none';
+                  });
+                }}
               />
               <Line
                 yAxisId="left"
@@ -175,7 +195,28 @@ export function AnalyticsChart({
                 stroke={color}
                 strokeWidth={2}
                 dot={false}
-                activeDot={{ r: 4, fill: color }}
+                activeDot={{ 
+                  r: 6, 
+                  fill: color,
+                  filter: 'drop-shadow(0 0 6px hsl(200, 84%, 39%))',
+                  stroke: 'hsl(var(--background))',
+                  strokeWidth: 2
+                }}
+                strokeDasharray=""
+                onMouseEnter={() => {
+                  // Add glow to line
+                  const lines = document.querySelectorAll('.recharts-line-curve');
+                  lines.forEach((line) => {
+                    (line as HTMLElement).style.filter = 'drop-shadow(0 0 4px hsl(200, 84%, 39%))';
+                  });
+                }}
+                onMouseLeave={() => {
+                  // Remove glow from line
+                  const lines = document.querySelectorAll('.recharts-line-curve');
+                  lines.forEach((line) => {
+                    (line as HTMLElement).style.filter = 'none';
+                  });
+                }}
               />
             </ComposedChart>
           ) : type === "area" ? (
