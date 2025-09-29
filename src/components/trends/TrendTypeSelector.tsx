@@ -1,4 +1,3 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BarChart3, List, Clock } from "lucide-react";
 import { TrendVariant } from "@/modules/trends/trends.types";
@@ -11,72 +10,74 @@ interface TrendTypeSelectorProps {
 const trendTypes = [
   {
     type: "analytics" as const,
-    title: "Analytics Metadata Trend",
-    description: "Analyze trends across metadata values over time with customizable metrics",
+    title: "Analytics Metadata",
+    subtitle: "Analyze trends across metadata values",
     icon: BarChart3,
-    features: ["Time-based grouping", "Multiple trend types", "Event filtering"],
   },
   {
     type: "top-values" as const,
-    title: "Top N Metadata Values",
-    description: "Find the most popular metadata values ranked by activity",
+    title: "Top N Values",
+    subtitle: "Find the most popular metadata values",
     icon: List,
-    features: ["Ranked by event count", "Unique user metrics", "Configurable limit"],
   },
   {
     type: "timeline" as const,
     title: "Metadata Timeline",
-    description: "Track a specific metadata value's performance over time",
+    subtitle: "Track specific value performance",
     icon: Clock,
-    features: ["Single value focus", "Event & user counts", "Time series analysis"],
   },
 ];
 
 export const TrendTypeSelector = ({ onSelect, onCancel }: TrendTypeSelectorProps) => {
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-semibold">Select Trend Type</h3>
-          <p className="text-sm text-muted-foreground">
-            Choose the type of trend analysis you want to create
-          </p>
-        </div>
-        <Button variant="outline" onClick={onCancel}>
-          Cancel
-        </Button>
+    <div className="max-w-2xl mx-auto">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-semibold text-foreground mb-2">
+          Create New Trend
+        </h2>
+        <p className="text-muted-foreground text-sm">
+          Choose the type of analysis you want to create
+        </p>
       </div>
       
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="space-y-3 mb-8">
         {trendTypes.map((trend) => {
           const Icon = trend.icon;
           return (
-            <Card key={trend.type} className="cursor-pointer hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Icon className="h-5 w-5" />
-                  {trend.title}
-                </CardTitle>
-                <CardDescription className="text-sm">
-                  {trend.description}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <ul className="text-xs text-muted-foreground space-y-1 mb-4">
-                  {trend.features.map((feature, index) => (
-                    <li key={index}>• {feature}</li>
-                  ))}
-                </ul>
-                <Button 
-                  className="w-full" 
-                  onClick={() => onSelect(trend.type)}
-                >
-                  Create {trend.title}
-                </Button>
-              </CardContent>
-            </Card>
+            <button
+              key={trend.type}
+              onClick={() => onSelect(trend.type)}
+              className="w-full p-6 bg-card hover:bg-accent/50 border border-border rounded-xl transition-all duration-200 hover:shadow-sm hover:scale-[0.995] active:scale-[0.99] group text-left"
+            >
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-primary/10 rounded-full group-hover:bg-primary/15 transition-colors">
+                  <Icon className="h-6 w-6 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-medium text-foreground mb-1">
+                    {trend.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {trend.subtitle}
+                  </p>
+                </div>
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="w-2 h-2 rounded-full bg-primary"></div>
+                </div>
+              </div>
+            </button>
           );
         })}
+      </div>
+
+      <div className="text-center">
+        <Button 
+          variant="ghost" 
+          onClick={onCancel}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          Cancel
+        </Button>
       </div>
     </div>
   );
