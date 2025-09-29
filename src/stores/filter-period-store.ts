@@ -1,6 +1,11 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { FilterPeriod, filterPeriods } from '@/modules/analytics/use-get-summary-query';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+// import { FilterPeriod, filterPeriods } from '@/modules/analytics/use-get-summary-query';
+
+import {
+  FilterPeriod,
+  filterPeriods,
+} from "@/modules/analytics/analytics.types";
 
 interface FilterPeriodStore {
   selectedPeriod: FilterPeriod;
@@ -15,7 +20,7 @@ export const useFilterPeriodStore = create<FilterPeriodStore>()(
         set({ selectedPeriod: period }),
     }),
     {
-      name: 'selected-filter-period',
+      name: "selected-filter-period",
     }
   )
 );
