@@ -2,6 +2,8 @@
 import { appConfig } from "@/lib/app-config";
 import { fetchWithToken } from "@/lib/aws-smplify/fetch-with-token";
 import { useQuery } from "@tanstack/react-query";
+import { FilterPeriod } from "./analytics.types";
+// import { FilterPeriod } from "./use-list-events-by-email-query";
 
 type HourlyRecord = { hour: string; total: number };
 type DailyRecord = { day: string; total: number };
@@ -244,40 +246,6 @@ export type GetSummaryResponse = {
     current: PageVisit[];
     previous: PageVisit[];
   };
-};
-export type FilterPeriod =
-  | "today"
-  | "yesterday"
-  | "day"
-  | "week"
-  | "month"
-  | "year"
-  | "last24h"
-  | "last7d"
-  | "last30d"
-  | "last12m"
-  | "wtd"
-  | "mtd"
-  | "ytd"
-  | "all"
-  | "custom";
-
-export const filterPeriods: Record<FilterPeriod, FilterPeriod> = {
-  today: "today",
-  yesterday: "yesterday",
-  day: "day",
-  week: "week",
-  month: "month",
-  year: "year",
-  last24h: "last24h",
-  last7d: "last7d",
-  last30d: "last30d",
-  last12m: "last12m",
-  wtd: "wtd",
-  mtd: "mtd",
-  ytd: "ytd",
-  all: "all",
-  custom: "custom",
 };
 
 async function getSummary({

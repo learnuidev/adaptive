@@ -5,12 +5,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { filterPeriods, FilterPeriod } from "@/modules/analytics/use-get-summary-query";
+import { FilterPeriod } from "@/modules/analytics/analytics.types";
+
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
 
 const periodLabels: Record<FilterPeriod, string> = {
   today: "Today",
-  yesterday: "Yesterday", 
+  yesterday: "Yesterday",
   day: "Day",
   week: "Week",
   month: "Month",
@@ -20,7 +21,7 @@ const periodLabels: Record<FilterPeriod, string> = {
   last30d: "Last 30 days",
   last12m: "Last 12 months",
   wtd: "Week to date",
-  mtd: "Month to date", 
+  mtd: "Month to date",
   ytd: "Year to date",
   all: "All time",
   custom: "Custom",

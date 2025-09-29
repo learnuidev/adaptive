@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
-import { FilterPeriod } from "@/modules/analytics/use-get-summary-query";
-// import { FilterPeriod } from "@/modules/analytics/use-get-summary-query";
+import { FilterPeriod } from "@/modules/analytics/analytics.types";
+
 import {
   LineChart,
   Line,

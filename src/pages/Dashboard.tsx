@@ -5,7 +5,7 @@ import { MetricsCard } from "@/components/dashboard/MetricsCard";
 import { FeatureFlagCard } from "@/components/feature-flags/FeatureFlagCard";
 import { WithNewEvents } from "@/components/with-new-events";
 import {
-  FilterPeriod,
+  // FilterPeriod,
   useGetSummaryQuery,
   VisitorCount,
 } from "@/modules/analytics/use-get-summary-query";
@@ -164,6 +164,7 @@ const featureFlags = [
 ];
 
 import { GetSummaryResponse } from "@/modules/analytics/use-get-summary-query";
+import { FilterPeriod } from "@/modules/analytics/analytics.types";
 
 function TopPagesList() {
   const params = useParams({ strict: false }) as { credentialId?: string };
