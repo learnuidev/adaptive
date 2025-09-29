@@ -10,33 +10,53 @@ import { TrendCard } from "@/components/trends/TrendCard";
 import { useAnalyzeMetadataTrendsQuery } from "@/modules/trends/use-analyze-metadata-trends-query";
 import { useTopMetadataValuesQuery } from "@/modules/trends/use-top-metadata-values-query";
 import { useMetadataTimelineQuery } from "@/modules/trends/use-metadata-timeline-query";
-import { 
-  TrendVariant, 
-  TrendItem, 
+import {
+  TrendVariant,
+  TrendItem,
   AnalyticsMetadataTrendForm,
   TopMetadataValuesForm,
-  MetadataTimelineForm 
+  MetadataTimelineForm,
 } from "@/modules/trends/trends.types";
 import { useToast } from "@/hooks/use-toast";
+import {
+  AdaptiveFeature,
+  useFeatureKey,
+  useTrackFeature,
+} from "@/lib/adaptive/adaptive-feature";
+import { useAdaptive } from "@/lib/adaptive/adaptive-core-provider";
 
 type ViewState = "list" | "selector" | "form";
 
-const Trends = () => {
+const TrendsFeature = () => {
+  // const { featureKey } = useFeatureKey();
+
+  // console.log("feature Key", featureKey);
+
+  const { track } = useTrackFeature();
+
+  // const adaptive = useAdaptive();
   // Handle credentialId parameter like other pages
   const params = useParams({ strict: false }) as { credentialId?: string };
   const credentialId = params?.credentialId;
-  
+
   const [viewState, setViewState] = useState<ViewState>("list");
   const [selectedType, setSelectedType] = useState<TrendVariant | null>(null);
   const [trends, setTrends] = useState<TrendItem[]>([]);
   const { toast } = useToast();
 
   // Query hooks (we'll manage them dynamically)
-  const [activeQueries, setActiveQueries] = useState<Map<string, any>>(new Map());
+  const [activeQueries, setActiveQueries] = useState<Map<string, any>>(
+    new Map()
+  );
 
-  const generateTrendId = () => `trend_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const generateTrendId = () =>
+    `trend_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
   const handleTypeSelect = (type: TrendVariant) => {
+    track("select-trend-type", {
+      type,
+    });
+
     setSelectedType(type);
     setViewState("form");
   };
@@ -51,16 +71,22 @@ const Trends = () => {
       isLoading: true,
     };
 
-    setTrends(prev => [...prev, newTrend]);
+    setTrends((prev) => [...prev, newTrend]);
     setViewState("list");
 
     // Execute query (mock - in real app this would be handled by React Query)
     setTimeout(() => {
-      setTrends(prev => prev.map(trend => 
-        trend.id === id 
-          ? { ...trend, isLoading: false, data: generateMockAnalyticsData(data) }
-          : trend
-      ));
+      setTrends((prev) =>
+        prev.map((trend) =>
+          trend.id === id
+            ? {
+                ...trend,
+                isLoading: false,
+                data: generateMockAnalyticsData(data),
+              }
+            : trend
+        )
+      );
     }, 1500);
 
     toast({
@@ -79,16 +105,24 @@ const Trends = () => {
       isLoading: true,
     };
 
-    setTrends(prev => [...prev, newTrend]);
+    track("submit-trend", newTrend);
+
+    setTrends((prev) => [...prev, newTrend]);
     setViewState("list");
 
     // Execute query (mock)
     setTimeout(() => {
-      setTrends(prev => prev.map(trend => 
-        trend.id === id 
-          ? { ...trend, isLoading: false, data: generateMockTopValuesData(data) }
-          : trend
-      ));
+      setTrends((prev) =>
+        prev.map((trend) =>
+          trend.id === id
+            ? {
+                ...trend,
+                isLoading: false,
+                data: generateMockTopValuesData(data),
+              }
+            : trend
+        )
+      );
     }, 1000);
 
     toast({
@@ -107,16 +141,24 @@ const Trends = () => {
       isLoading: true,
     };
 
-    setTrends(prev => [...prev, newTrend]);
+    track("submit-trend", newTrend);
+
+    setTrends((prev) => [...prev, newTrend]);
     setViewState("list");
 
     // Execute query (mock)
     setTimeout(() => {
-      setTrends(prev => prev.map(trend => 
-        trend.id === id 
-          ? { ...trend, isLoading: false, data: generateMockTimelineData(data) }
-          : trend
-      ));
+      setTrends((prev) =>
+        prev.map((trend) =>
+          trend.id === id
+            ? {
+                ...trend,
+                isLoading: false,
+                data: generateMockTimelineData(data),
+              }
+            : trend
+        )
+      );
     }, 1200);
 
     toast({
@@ -126,30 +168,40 @@ const Trends = () => {
   };
 
   const handleRefresh = (id: string) => {
-    setTrends(prev => prev.map(trend => 
-      trend.id === id ? { ...trend, isLoading: true } : trend
-    ));
+    setTrends((prev) =>
+      prev.map((trend) =>
+        trend.id === id ? { ...trend, isLoading: true } : trend
+      )
+    );
 
     setTimeout(() => {
-      setTrends(prev => prev.map(trend => {
-        if (trend.id === id) {
-          let newData;
-          if (trend.type === "analytics") {
-            newData = generateMockAnalyticsData(trend.config as AnalyticsMetadataTrendForm);
-          } else if (trend.type === "top-values") {
-            newData = generateMockTopValuesData(trend.config as TopMetadataValuesForm);
-          } else {
-            newData = generateMockTimelineData(trend.config as MetadataTimelineForm);
+      setTrends((prev) =>
+        prev.map((trend) => {
+          if (trend.id === id) {
+            let newData;
+            if (trend.type === "analytics") {
+              newData = generateMockAnalyticsData(
+                trend.config as AnalyticsMetadataTrendForm
+              );
+            } else if (trend.type === "top-values") {
+              newData = generateMockTopValuesData(
+                trend.config as TopMetadataValuesForm
+              );
+            } else {
+              newData = generateMockTimelineData(
+                trend.config as MetadataTimelineForm
+              );
+            }
+            return { ...trend, isLoading: false, data: newData };
           }
-          return { ...trend, isLoading: false, data: newData };
-        }
-        return trend;
-      }));
+          return trend;
+        })
+      );
     }, 1000);
   };
 
   const handleDelete = (id: string) => {
-    setTrends(prev => prev.filter(trend => trend.id !== id));
+    setTrends((prev) => prev.filter((trend) => trend.id !== id));
     toast({
       title: "Trend Deleted",
       description: "The trend has been removed",
@@ -157,6 +209,9 @@ const Trends = () => {
   };
 
   const handleCancel = () => {
+    track("cancel-selected-trend-type", {
+      type: selectedType,
+    });
     setViewState("list");
     setSelectedType(null);
   };
@@ -164,13 +219,20 @@ const Trends = () => {
   // Mock data generators
   const generateMockAnalyticsData = (config: AnalyticsMetadataTrendForm) => {
     const data = [];
-    const days = config.timeRange === "1d" ? 1 : config.timeRange === "7d" ? 7 : config.timeRange === "30d" ? 30 : 90;
-    
+    const days =
+      config.timeRange === "1d"
+        ? 1
+        : config.timeRange === "7d"
+          ? 7
+          : config.timeRange === "30d"
+            ? 30
+            : 90;
+
     for (let i = 0; i < Math.min(days, 20); i++) {
       const date = new Date();
       date.setDate(date.getDate() - i);
       data.push({
-        time_period: date.toISOString().split('T')[0],
+        time_period: date.toISOString().split("T")[0],
         metadata_value: `${config.metadataField}_value_${i % 3}`,
         trend_value: Math.floor(Math.random() * 100) + 10,
       });
@@ -188,13 +250,20 @@ const Trends = () => {
 
   const generateMockTimelineData = (config: MetadataTimelineForm) => {
     const data = [];
-    const days = config.timeRange === "1d" ? 1 : config.timeRange === "7d" ? 7 : config.timeRange === "30d" ? 30 : 90;
-    
+    const days =
+      config.timeRange === "1d"
+        ? 1
+        : config.timeRange === "7d"
+          ? 7
+          : config.timeRange === "30d"
+            ? 30
+            : 90;
+
     for (let i = 0; i < days; i++) {
       const date = new Date();
       date.setDate(date.getDate() - i);
       data.push({
-        time_period: date.toISOString().split('T')[0],
+        time_period: date.toISOString().split("T")[0],
         event_count: Math.floor(Math.random() * 200) + 50,
         daily_users: Math.floor(Math.random() * 100) + 20,
       });
@@ -223,8 +292,16 @@ const Trends = () => {
 
           {trends.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground mb-4">No trends created yet</p>
-              <Button onClick={() => setViewState("selector")}>
+              <p className="text-muted-foreground mb-4">
+                No trends created yet
+              </p>
+              <Button
+                onClick={() => {
+                  track("create-new-trend");
+
+                  setViewState("selector");
+                }}
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 Create Your First Trend
               </Button>
@@ -245,34 +322,37 @@ const Trends = () => {
       )}
 
       {viewState === "selector" && (
-        <TrendTypeSelector 
+        <TrendTypeSelector
           onSelect={handleTypeSelect}
           onCancel={handleCancel}
         />
       )}
 
       {viewState === "form" && selectedType === "analytics" && (
-        <AnalyticsTrendForm 
+        <AnalyticsTrendForm
           onSubmit={handleAnalyticsSubmit}
           onCancel={handleCancel}
         />
       )}
 
       {viewState === "form" && selectedType === "top-values" && (
-        <TopValuesForm 
+        <TopValuesForm
           onSubmit={handleTopValuesSubmit}
           onCancel={handleCancel}
         />
       )}
 
       {viewState === "form" && selectedType === "timeline" && (
-        <TimelineForm 
-          onSubmit={handleTimelineSubmit}
-          onCancel={handleCancel}
-        />
+        <TimelineForm onSubmit={handleTimelineSubmit} onCancel={handleCancel} />
       )}
     </div>
   );
 };
 
-export default Trends;
+export default function Trends() {
+  return (
+    <AdaptiveFeature featureKey="trends-feature">
+      <TrendsFeature />
+    </AdaptiveFeature>
+  );
+}

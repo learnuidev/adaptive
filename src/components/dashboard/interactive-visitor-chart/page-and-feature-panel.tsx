@@ -37,7 +37,7 @@ interface InteractiveVisitorChartProps {
 export function PageAndFeaturePanel({
   credentialId,
 }: InteractiveVisitorChartProps) {
-  const [locationView, setLocationView] = useState<LocationView>("map");
+  const [locationView, setLocationView] = useState<LocationView>("page");
   const { selectedPeriod } = useFilterPeriodStore();
 
   const { data: locationData } = useGetTotalVisitorsByQuery({
