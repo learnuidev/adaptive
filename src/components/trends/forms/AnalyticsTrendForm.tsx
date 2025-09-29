@@ -1,25 +1,24 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Play, Settings } from "lucide-react";
+import { BarChart3, Play } from "lucide-react";
 import { 
-  TrendBuilderForm as TrendBuilderFormType, 
+  AnalyticsMetadataTrendForm, 
   TREND_TYPE_OPTIONS, 
   TIME_RANGE_OPTIONS, 
   GROUP_BY_TIME_OPTIONS 
 } from "@/modules/trends/trends.types";
 
-interface TrendBuilderFormProps {
-  onSubmit: (data: TrendBuilderFormType) => void;
+interface AnalyticsTrendFormProps {
+  onSubmit: (data: AnalyticsMetadataTrendForm) => void;
+  onCancel: () => void;
   isLoading?: boolean;
 }
 
-const defaultValues: TrendBuilderFormType = {
+const defaultValues: AnalyticsMetadataTrendForm = {
   metadataField: "",
   trendType: "count",
   timeRange: "7d",
@@ -28,29 +27,25 @@ const defaultValues: TrendBuilderFormType = {
   limit: 50,
 };
 
-export const TrendBuilderForm = ({ onSubmit, isLoading }: TrendBuilderFormProps) => {
-  const form = useForm<TrendBuilderFormType>({
+export const AnalyticsTrendForm = ({ onSubmit, onCancel, isLoading }: AnalyticsTrendFormProps) => {
+  const form = useForm<AnalyticsMetadataTrendForm>({
     defaultValues,
   });
-
-  const handleSubmit = (data: TrendBuilderFormType) => {
-    onSubmit(data);
-  };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Settings className="h-5 w-5" />
-          Trend Builder
+          <BarChart3 className="h-5 w-5" />
+          Analytics Metadata Trend
         </CardTitle>
         <CardDescription>
-          Configure your custom trend analysis parameters
+          Analyze trends across metadata values over time with customizable metrics
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -104,7 +99,7 @@ export const TrendBuilderForm = ({ onSubmit, isLoading }: TrendBuilderFormProps)
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select trend type" />
+                          <SelectValue />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -132,7 +127,7 @@ export const TrendBuilderForm = ({ onSubmit, isLoading }: TrendBuilderFormProps)
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select time range" />
+                          <SelectValue />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -157,7 +152,7 @@ export const TrendBuilderForm = ({ onSubmit, isLoading }: TrendBuilderFormProps)
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select grouping" />
+                          <SelectValue />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -197,10 +192,15 @@ export const TrendBuilderForm = ({ onSubmit, isLoading }: TrendBuilderFormProps)
               )}
             />
 
-            <Button type="submit" disabled={isLoading} className="w-full">
-              <Play className="mr-2 h-4 w-4" />
-              {isLoading ? "Generating Trends..." : "Generate Trends"}
-            </Button>
+            <div className="flex gap-3">
+              <Button type="submit" disabled={isLoading} className="flex-1">
+                <Play className="mr-2 h-4 w-4" />
+                {isLoading ? "Creating..." : "Create Trend"}
+              </Button>
+              <Button type="button" variant="outline" onClick={onCancel}>
+                Cancel
+              </Button>
+            </div>
           </form>
         </Form>
       </CardContent>

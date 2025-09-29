@@ -2,7 +2,10 @@ export type TrendType = "count" | "unique_users" | "avg_per_user";
 export type TimeRange = "1d" | "7d" | "30d" | "90d";
 export type GroupByTime = "hour" | "day" | "week" | "month";
 
-export interface TrendBuilderForm {
+export type TrendVariant = "analytics" | "top-values" | "timeline";
+
+// Analytics Metadata Trend Form
+export interface AnalyticsMetadataTrendForm {
   metadataField: string;
   trendType: TrendType;
   timeRange: TimeRange;
@@ -11,6 +14,22 @@ export interface TrendBuilderForm {
   limit: number;
 }
 
+// Top N Metadata Values Form
+export interface TopMetadataValuesForm {
+  metadataField: string;
+  topN: number;
+  timeRange: TimeRange;
+}
+
+// Metadata Timeline Form
+export interface MetadataTimelineForm {
+  metadataField: string;
+  metadataValue: string;
+  timeRange: TimeRange;
+  groupByTime: GroupByTime;
+}
+
+// Data interfaces
 export interface TrendData {
   time_period: string;
   metadata_value: string;
@@ -29,10 +48,13 @@ export interface MetadataValueTrendData {
   daily_users: number;
 }
 
-export interface TrendBuilderState {
-  form: TrendBuilderForm;
-  results?: TrendData[];
-  topTrends?: TopMetadataTrendData[];
+// Trend item interface
+export interface TrendItem {
+  id: string;
+  type: TrendVariant;
+  title: string;
+  config: AnalyticsMetadataTrendForm | TopMetadataValuesForm | MetadataTimelineForm;
+  data?: TrendData[] | TopMetadataTrendData[] | MetadataValueTrendData[];
   isLoading: boolean;
   error?: string;
 }
