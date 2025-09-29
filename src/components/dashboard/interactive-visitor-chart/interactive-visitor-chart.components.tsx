@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { TabsContent } from "@/components/ui/tabs";
+import { cityNames } from "@/lib/city-names";
 import { countryNames } from "@/lib/country-names";
 import { flags } from "@/lib/flags";
 import { regionNames } from "@/lib/region-names";
+// import { regionNames } from "@/lib/region-names";
 import {
   GetTotalVisitorsByResponse,
   LocationView,
@@ -42,28 +44,46 @@ interface LocationListProps {
 const getCountryFlag = (countryName: string) => {
   return flags[countryName] || "🌍";
 };
+const getRegionFlag = (countryName: string) => {
+  return regionNames[countryName]?.countryFlag || "🌍";
+};
+const getCityFlag = (countryName: string) => {
+  return cityNames[countryName]?.countryFlag || "🌍";
+};
 
 const getCountryName = (countryName: string) => {
   return countryNames[countryName] || "🌍";
 };
 
 const getRegionName = (regionName: string) => {
-  return regionNames[regionName] || regionName;
+  return regionNames[regionName]?.regionName || regionName;
 };
 
 const getCountryCodeFromLocation = (locationName: string): string => {
   // Extract country code from location strings like "California, US" or "New York, US"
-  const parts = locationName.split(',');
+  const parts = locationName.split(",");
   if (parts.length > 1) {
     return parts[parts.length - 1].trim();
   }
-  return '';
+  return "";
 };
 
-const getFlagForLocation = (locationName: string, locationType: LocationView): React.ReactNode => {
-  if (locationType === 'country') {
+const getFlagForLocation = (
+  locationName: string,
+  locationType: LocationView
+): React.ReactNode => {
+  if (locationType === "country") {
     return getCountryFlag(locationName);
   }
+
+  if (locationType === "region") {
+    return getRegionFlag(locationName);
+  }
+
+  if (locationType === "city") {
+    return getCityFlag(locationName);
+  }
+
   // For regions and cities, try to extract country code and get flag
   const countryCode = getCountryCodeFromLocation(locationName);
   if (countryCode) {
@@ -88,7 +108,10 @@ export function LocationList({ data, locationView }: LocationListProps) {
                   : item.name || ""
             }
             visitors={item.visitors}
-            icon={getFlagForLocation(item?.name || "", locationView || "country")}
+            icon={getFlagForLocation(
+              item?.name || "",
+              locationView || "country"
+            )}
           />
         ))}
       {(!data || data.length === 0) && (
