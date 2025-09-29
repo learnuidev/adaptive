@@ -15,6 +15,7 @@ import { AdapiveProvider } from "./lib/adaptive/adaptive-provider";
 
 import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
+import UserDetail from "./pages/UserDetail";
 import FeatureFlags from "./pages/FeatureFlags";
 import Events from "./pages/Events";
 import Goals from "./pages/Goals";
@@ -71,6 +72,12 @@ const usersRoute = createRoute({
   component: Users,
 });
 
+const userDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/users/$credentialId/$userId",
+  component: UserDetail,
+});
+
 const featureFlagsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/feature-flags/$credentialId",
@@ -105,6 +112,7 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   dashboardRoute,
   usersRoute,
+  userDetailRoute,
   featureFlagsRoute,
   eventsRoute,
   goalsRoute,

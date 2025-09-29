@@ -14,7 +14,7 @@ import {
   Clock,
   MapPin,
 } from "lucide-react";
-import { useParams } from "@tanstack/react-router";
+import { useParams, useNavigate } from "@tanstack/react-router";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
 import { useGetSummaryQuery } from "@/modules/analytics/use-get-summary-query";
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
@@ -27,6 +27,7 @@ const Users = () => {
   // Use strict: false to handle cases where params might not exist
   const params = useParams({ strict: false }) as { credentialId?: string };
   const credentialId = params?.credentialId;
+  const navigate = useNavigate();
   const { data: credentials } = useListUserCredentialsQuery();
   const { selectedPeriod } = useFilterPeriodStore();
   const { data: summaryData } = useGetSummaryQuery({
@@ -160,7 +161,8 @@ const Users = () => {
                 visitors.map((visitor) => (
                   <div
                     key={visitor.visitor_id}
-                    className="flex items-center justify-between p-3 rounded-lg border border-border/50 glass"
+                    onClick={() => navigate({ to: `/users/${credentialId}/${visitor.visitor_id}` as any })}
+                    className="flex items-center justify-between p-3 rounded-lg border border-border/50 glass hover:bg-accent/50 cursor-pointer transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       <Avatar>
