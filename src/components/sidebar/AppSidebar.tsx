@@ -11,6 +11,7 @@ import {
   Target,
   Palette,
   LogOut,
+  Route,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
@@ -70,6 +71,12 @@ const getToolsItems = (credentialId?: string) => [
     title: "Cohorts",
     url: "/cohorts",
     icon: Users,
+    requiresCredential: true,
+  },
+  {
+    title: "User Journeys",
+    url: "/user-journeys",
+    icon: Route,
     requiresCredential: true,
   },
   {
