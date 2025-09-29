@@ -4,7 +4,10 @@ import { AnalyticsChart } from "@/components/dashboard/AnalyticsChart";
 import { MetricsCard } from "@/components/dashboard/MetricsCard";
 import { FeatureFlagCard } from "@/components/feature-flags/FeatureFlagCard";
 import { WithNewEvents } from "@/components/with-new-events";
-import { useGetSummaryQuery } from "@/modules/analytics/use-get-summary-query";
+import {
+  useGetSummaryQuery,
+  VisitorCount,
+} from "@/modules/analytics/use-get-summary-query";
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
 import { ResponsiveFilters } from "@/components/analytics/ResponsiveFilters";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
@@ -19,51 +22,68 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-// Mock data
-// const metricsData = [
-//   {
-//     title: "Total Visitors",
-//     value: "24,583",
-//     change: "+12.5% from last week",
-//     changeType: "positive" as const,
-//     icon: Users,
-//     trend: [20, 35, 25, 45, 30, 55, 40],
-//   },
-//   {
-//     title: "Page Views",
-//     value: "156,234",
-//     change: "+8.2% from last week",
-//     changeType: "positive" as const,
-//     icon: Eye,
-//     trend: [40, 35, 50, 45, 60, 55, 65],
-//   },
-//   {
-//     title: "Avg Session",
-//     value: "4m 32s",
-//     change: "-2.1% from last week",
-//     changeType: "negative" as const,
-//     icon: Clock,
-//     trend: [60, 55, 50, 45, 50, 40, 35],
-//   },
-//   {
-//     title: "Conversion Rate",
-//     value: "3.24%",
-//     change: "+0.8% from last week",
-//     changeType: "positive" as const,
-//     icon: TrendingUp,
-//     trend: [15, 20, 25, 30, 28, 35, 40],
-//   },
-// ];
+function buildChartData(totalVisitors: VisitorCount[]) {
+  if (!totalVisitors) return [];
 
-const chartData = [
-  { name: "00:00", value: 120 },
-  { name: "04:00", value: 80 },
-  { name: "08:00", value: 350 },
-  { name: "12:00", value: 480 },
-  { name: "16:00", value: 420 },
-  { name: "20:00", value: 380 },
-  { name: "23:59", value: 180 },
-];
+  const raw = totalVisitors;
+  const filled: { name: string; value: number }[] = [];
+
+  // Decide granularity from the first item that has a key
+  const first = raw.find((it) => it?.day || it?.hour || it?.month);
+  if (!first) return [];
+
+  if (first.day) {
+    // ---------- WEEK (7 days) ----------
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const map = new Map<string, number>();
+    raw.forEach((it) => {
+      if (it?.day) {
+        const d = new Date(it.day);
+        map.set(days[d.getDay()], Number(it.total) || 0);
+      }
+    });
+    days.forEach((d) => filled.push({ name: d, value: map.get(d) || 0 }));
+  } else if (first.hour) {
+    // ---------- DAY (24 hours) ----------
+    const map = new Map<number, number>();
+    raw.forEach((it) => {
+      if (it?.hour)
+        map.set(new Date(it.hour).getHours(), Number(it.total) || 0);
+    });
+    Array.from({ length: 24 }, (_, h) => h).forEach((h) =>
+      filled.push({ name: `${h}:00`, value: map.get(h) || 0 })
+    );
+  } else if (first.month) {
+    // ---------- YEAR (12 months) ----------
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const map = new Map<number, number>();
+    raw.forEach((it) => {
+      if (it?.month) {
+        const str = String(it.month);
+        const m = Number(str.slice(4, 6)); // 1-12
+        map.set(m - 1, Number(it.total) || 0);
+      }
+    });
+    monthNames.forEach((name, idx) =>
+      filled.push({ name, value: map.get(idx) || 0 })
+    );
+  }
+
+  return filled;
+}
 
 const deviceData = [
   { name: "Desktop", value: 65 },
@@ -140,12 +160,33 @@ export default function Dashboard() {
     period: selectedPeriod,
   });
 
-  console.log("summary", summary);
+  // Reusable helper: turns summary.totalVisitors.current into chart-ready points
+
+  // Inside component:
+  const chartData = buildChartData(summary?.totalVisitors.current);
+  const previousChartData = buildChartData(summary?.totalVisitors?.previous);
+
+  const totalPageVisitsOvertimeChartData = buildChartData(
+    summary?.totalPageVisitsOvertime.current
+  );
+  const previousTotalPageVisitsOvertimeChartData = buildChartData(
+    summary?.totalPageVisitsOvertime?.previous
+  );
+
+  const _chartData = [
+    { name: "00:00", value: 120 },
+    { name: "04:00", value: 80 },
+    { name: "08:00", value: 350 },
+    { name: "12:00", value: 480 },
+    { name: "16:00", value: 420 },
+    { name: "20:00", value: 380 },
+    { name: "23:59", value: 180 },
+  ];
 
   const metricsData = [
     {
       title: "Total Visitors",
-      value: summary?.totalVisitors.current || "0",
+      value: summary?.totalVisitors.currentTotal || "0",
       change: summary?.totalVisitors.percentageDifference
         ? `${summary?.totalVisitors.percentageDifference?.toFixed(2)}% from last week`
         : "",
@@ -185,8 +226,6 @@ export default function Dashboard() {
       trend: [15, 20, 25, 30, 28, 35, 40],
     },
   ];
-
-  console.log("summary", summary);
 
   // Show credentials selection if no credential ID or credential not found
   if (!credentialId || (credentials && !currentCredential)) {
@@ -243,11 +282,35 @@ export default function Dashboard() {
           </div>
 
           {/* Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <div className="lg:col-span-2">
               <AnalyticsChart
                 title="Visitor Traffic"
+                selectedPeriod={selectedPeriod}
                 data={chartData}
+                previousData={previousChartData}
+                height={350}
+                type="area"
+              />
+            </div>
+            <div className="lg:col-span-2">
+              <AnalyticsChart
+                title="Page Views"
+                selectedPeriod={selectedPeriod}
+                data={totalPageVisitsOvertimeChartData}
+                previousData={previousTotalPageVisitsOvertimeChartData}
+                height={350}
+                type="area"
+              />
+            </div>
+          </div>
+          {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <AnalyticsChart
+                title="Page Views Overtime"
+                selectedPeriod={selectedPeriod}
+                data={totalPageVisitsOvertimeChartData}
+                previousData={previousTotalPageVisitsOvertimeChartData}
                 height={350}
                 type="area"
               />
@@ -255,13 +318,14 @@ export default function Dashboard() {
             <div>
               <AnalyticsChart
                 title="Device Usage"
+                selectedPeriod={selectedPeriod}
                 data={deviceData}
                 height={350}
                 color="hsl(220, 70%, 50%)"
                 type="line"
               />
             </div>
-          </div>
+          </div> */}
 
           {/* Top Actions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

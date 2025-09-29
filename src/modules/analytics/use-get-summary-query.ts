@@ -3,6 +3,35 @@ import { appConfig } from "@/lib/app-config";
 import { fetchWithToken } from "@/lib/aws-smplify/fetch-with-token";
 import { useQuery } from "@tanstack/react-query";
 
+type HourlyRecord = { hour: string; total: number };
+type DailyRecord = { day: string; total: number };
+type MonthlyRecord = { month: number; total: number };
+type TotalRecord = { total: number };
+
+type CurrentPrevious<T> = {
+  current: T[];
+  previous: T[];
+};
+
+// Discriminated union mapping period to return type
+type PeriodResultMap = {
+  last24h: CurrentPrevious<HourlyRecord>;
+  week: CurrentPrevious<DailyRecord>;
+  wtd: CurrentPrevious<DailyRecord>;
+  day: CurrentPrevious<DailyRecord>;
+  yesterday: CurrentPrevious<DailyRecord>;
+  today: CurrentPrevious<DailyRecord>;
+  month: CurrentPrevious<DailyRecord>;
+  mtd: CurrentPrevious<DailyRecord>;
+  last7d: CurrentPrevious<DailyRecord>;
+  last30d: CurrentPrevious<DailyRecord>;
+  last12m: CurrentPrevious<DailyRecord>;
+  ytd: CurrentPrevious<MonthlyRecord>;
+  year: CurrentPrevious<MonthlyRecord>;
+  all: CurrentPrevious<TotalRecord>;
+  custom: CurrentPrevious<DailyRecord>;
+};
+
 export type Page = {
   href: string;
   patternHref?: string;
@@ -16,6 +45,9 @@ export type PageVisit = {
 };
 
 export type VisitorCount = {
+  hour?: string;
+  day?: string;
+  month?: string;
   total: string;
 };
 
@@ -35,6 +67,10 @@ export type GetSummaryResponseRaw = {
     previous: PageVisit[];
   };
   totalVisitors: {
+    current: VisitorCount[];
+    previous: VisitorCount[];
+  };
+  totalPageVisitsOvertime: {
     current: VisitorCount[];
     previous: VisitorCount[];
   };
@@ -178,8 +214,10 @@ const getSummaryRawResponse = {
 
 export type GetSummaryResponse = {
   totalVisitors: {
-    current: number;
-    previous: number;
+    current: VisitorCount[];
+    previous: VisitorCount[];
+    currentTotal: number;
+    previousTotal: number;
     percentageDifference: number;
   };
   totalPageVisits: {
@@ -195,6 +233,11 @@ export type GetSummaryResponse = {
     current: number;
     previous: number;
     percentageDifference: number | null;
+  };
+
+  totalPageVisitsOvertime: {
+    current: VisitorCount[];
+    previous: VisitorCount[];
   };
 };
 export type FilterPeriod =
@@ -288,8 +331,10 @@ async function getSummary({
 
     const resp = {
       totalVisitors: {
-        current: totalCurrentVisitors,
-        previous: totalPreviousVisitors,
+        current: respRaw.totalVisitors.current,
+        previous: respRaw.totalVisitors.previous,
+        currentTotal: totalCurrentVisitors,
+        previousTotal: totalPreviousVisitors,
         percentageDifference:
           totalPreviousVisitors === 0
             ? null
@@ -315,6 +360,11 @@ async function getSummary({
         current: currentAverageSession,
         previous: previousAverageSession,
         percentageDifference: avgSessionPercDiff,
+      },
+
+      totalPageVisitsOvertime: {
+        current: respRaw?.totalPageVisitsOvertime?.current,
+        previous: respRaw?.totalPageVisitsOvertime?.previous,
       },
     };
 
