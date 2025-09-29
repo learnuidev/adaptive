@@ -28,7 +28,7 @@ const CustomTooltip = ({
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-sm bg-[hsl(200,84%,39%)]" />
+              <div className="w-3 h-3 rounded-sm bg-[hsl(40,50%,60%)]" />
               <span className="text-sm text-muted-foreground">Visitors</span>
             </div>
             <span className="font-medium text-foreground">
@@ -38,7 +38,7 @@ const CustomTooltip = ({
           {payload[1] && (
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-sm bg-[hsl(40,50%,60%)]" />
+                <div className="w-3 h-3 rounded-sm bg-[hsl(200,84%,39%)]" />
                 <span className="text-sm text-muted-foreground">Page Views</span>
               </div>
               <span className="font-medium text-foreground">
@@ -162,8 +162,8 @@ export function AnalyticsChart({
               />
               <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted) / 0.1)' }} />
               <Bar
-                yAxisId="right"
-                dataKey="secondaryValue"
+                yAxisId="left"
+                dataKey="value"
                 fill="hsl(40, 50%, 60%)"
                 radius={[4, 4, 0, 0]}
                 opacity={0.8}
@@ -189,9 +189,9 @@ export function AnalyticsChart({
                 }}
               />
               <Line
-                yAxisId="left"
+                yAxisId="right"
                 type="monotone"
-                dataKey="value"
+                dataKey="secondaryValue"
                 stroke={color}
                 strokeWidth={2}
                 dot={false}
