@@ -239,6 +239,11 @@ export type GetSummaryResponse = {
     current: VisitorCount[];
     previous: VisitorCount[];
   };
+
+  pageVisitsPerPage: {
+    current: PageVisit[];
+    previous: PageVisit[];
+  };
 };
 export type FilterPeriod =
   | "today"
@@ -365,6 +370,11 @@ async function getSummary({
       totalPageVisitsOvertime: {
         current: respRaw?.totalPageVisitsOvertime?.current,
         previous: respRaw?.totalPageVisitsOvertime?.previous,
+      },
+
+      pageVisitsPerPage: {
+        current: respRaw.totalPageVisits.current,
+        previous: respRaw.totalPageVisits.previous,
       },
     };
 

@@ -21,7 +21,7 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 function buildChartData(
   selectedPeriod: FilterPeriod,
@@ -169,6 +169,30 @@ function TopPagesList() {
   const params = useParams({ strict: false }) as { credentialId?: string };
   const credentialId = params?.credentialId;
 
+  const { selectedPeriod } = useFilterPeriodStore();
+  const { data: summary } = useGetSummaryQuery({
+    websiteId: credentialId,
+    period: selectedPeriod,
+  });
+
+  const currentPageVisitsPerPage = useMemo(
+    () =>
+      (summary?.pageVisitsPerPage.current || [])
+        ?.sort(
+          (a, b) =>
+            parseInt(b?.total || b?.visits || "0" || "0") -
+            parseInt(a?.total || a?.visits || "0" || "0")
+        )
+        .slice(0, 3)
+        ?.map((page) => {
+          return {
+            name: page?.patternHref || page?.href || "",
+            value: parseInt(page?.total || page?.visits || "0" || "0"),
+          };
+        }),
+    [summary?.pageVisitsPerPage.current]
+  );
+
   return (
     <div className="glass p-6 rounded-lg border border-border/50 hover:shadow-medium transition-all duration-300">
       <div className="flex items-center gap-3 mb-4">
@@ -178,18 +202,14 @@ function TopPagesList() {
         <h3 className="font-semibold text-foreground">Top Pages</h3>
       </div>
       <div className="space-y-3">
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-muted-foreground">/dashboard</span>
-          <span className="font-medium text-foreground">45.2k</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-muted-foreground">/analytics</span>
-          <span className="font-medium text-foreground">32.1k</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-muted-foreground">/users</span>
-          <span className="font-medium text-foreground">28.9k</span>
-        </div>
+        {currentPageVisitsPerPage?.map((page) => (
+          <div key={page.name} className="flex justify-between items-center">
+            <span className="text-sm text-muted-foreground">{page.name}</span>
+            <span className="font-medium text-foreground">
+              {page.value.toLocaleString()}
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   );
