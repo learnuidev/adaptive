@@ -55,7 +55,7 @@ export function PageAndFeaturePanel({
             parseInt(b?.total || b?.visits || "0" || "0") -
             parseInt(a?.total || a?.visits || "0" || "0")
         )
-        .slice(0, 3)
+        .slice(0, 5)
         ?.map((page) => {
           return {
             name: page?.patternHref || page?.href || "",
@@ -87,12 +87,29 @@ export function PageAndFeaturePanel({
         </TabsList>
 
         <TabContent value="page">
-          <div className="min-h-[420px]">
-            <LocationList
-              data={locationData}
-              icon="📍"
-              locationView={locationView}
-            />
+          <div className="min-h-[420px] p-6 space-y-4">
+            {currentPageVisitsPerPage && currentPageVisitsPerPage.length > 0 ? (
+              currentPageVisitsPerPage.map((page, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <span className="text-lg">📄</span>
+                    <span className="text-sm text-foreground truncate" title={page.name}>
+                      {page.name || "/"}
+                    </span>
+                  </div>
+                  <span className="text-sm font-medium text-foreground ml-2">
+                    {page.value.toLocaleString()}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                No page data available
+              </div>
+            )}
           </div>
           <DetailsButton />
         </TabContent>
