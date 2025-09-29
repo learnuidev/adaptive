@@ -1,3 +1,36 @@
+export type AnalyticsEvent = {
+  id: string;
+  visitor_id: string;
+  session_id: string;
+  identity_id: string;
+  website_id: string;
+  // Info for AI agent: ex: lovable
+  // custom here is custom event, if the custom event type is custom, check into metada to find out what the custom data is
+  type: "pageview" | "payment" | "custom";
+  event_name: string;
+  content_id: string;
+  href: string;
+  domain: string;
+  created_at: string;
+  email: string;
+  ip_address: string;
+  country: string;
+  region: string;
+  city: string;
+  latitude: number;
+  longitude: number;
+  timezone: string;
+  os_name: string;
+  os_version: string;
+  browser_name: string;
+  browser_version: string;
+  device_vendor: string;
+  device_model: string;
+  viewport_width: number;
+  viewport_height: number;
+  metadata: Record<string, string>;
+};
+
 export type FilterPeriod =
   | "today"
   | "yesterday"
