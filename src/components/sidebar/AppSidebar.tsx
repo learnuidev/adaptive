@@ -58,6 +58,12 @@ const getMainItems = (credentialId?: string) => [
     requiresCredential: true,
   },
   {
+    title: "Cohorts",
+    url: "/cohorts",
+    icon: Users,
+    requiresCredential: true,
+  },
+  {
     title: "Feature Flags",
     url: "/feature-flags",
     icon: Flag,
@@ -76,6 +82,12 @@ const getToolsItems = (credentialId?: string) => [
     title: "Goals",
     url: "/goals",
     icon: Target,
+    requiresCredential: true,
+  },
+  {
+    title: "Trends",
+    url: "/trends",
+    icon: TrendingUp,
     requiresCredential: true,
   },
   {
