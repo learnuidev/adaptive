@@ -1,4 +1,4 @@
-import { FeatureFlagCard } from "@/components/feature-flags/FeatureFlagCard";
+import { FeatureCard } from "@/components/feature-flags/FeatureCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +10,7 @@ import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list
 import { ResponsiveFilters } from "@/components/analytics/ResponsiveFilters";
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
 
-const featureFlags = [
+const features = [
   {
     id: 1,
     name: "Enhanced User Interface",
@@ -67,12 +67,12 @@ const featureFlags = [
   }
 ];
 
-export default function FeatureFlags() {
+export default function Features() {
   // Use strict: false to handle cases where params might not exist
   const params = useParams({ strict: false }) as { credentialId?: string };
   const credentialId = params?.credentialId;
   const { data: credentials } = useListUserCredentialsQuery();
-  const [flags, setFlags] = useState(featureFlags);
+  const [items, setItems] = useState(features);
   const [searchQuery, setSearchQuery] = useState("");
   
   const currentCredential = credentials?.find(cred => cred.id === credentialId);
@@ -82,19 +82,19 @@ export default function FeatureFlags() {
     return <NoCredentialsMessage />;
   }
 
-  const toggleFlag = (id: number) => {
-    setFlags(flags.map(flag => 
-      flag.id === id ? { ...flag, enabled: !flag.enabled } : flag
+  const toggleItem = (id: number) => {
+    setItems(items.map(item => 
+      item.id === id ? { ...item, enabled: !item.enabled } : item
     ));
   };
 
-  const filteredFlags = flags.filter(flag =>
-    flag.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    flag.description.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredItems = items.filter(item =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const enabledCount = flags.filter(flag => flag.enabled).length;
-  const totalUsers = flags.reduce((sum, flag) => flag.enabled ? sum + flag.usersAffected : sum, 0);
+  const enabledCount = items.filter(item => item.enabled).length;
+  const totalUsers = items.reduce((sum, item) => item.enabled ? sum + item.usersAffected : sum, 0);
 
   return (
     <div className="min-h-screen bg-background">
@@ -103,16 +103,16 @@ export default function FeatureFlags() {
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Feature Flags</h1>
+              <h1 className="text-2xl font-bold text-foreground">Features</h1>
               <p className="text-muted-foreground">
-                {currentCredential ? `Manage flags for ${currentCredential.title}` : "Manage and monitor feature releases across environments"}
+                {currentCredential ? `Manage features for ${currentCredential.title}` : "Manage and monitor feature releases across environments"}
               </p>
             </div>
             <div className="flex items-center justify-between gap-3">
               <ResponsiveFilters />
               <Button className="hidden md:flex bg-gradient-primary hover:bg-primary-glow shadow-emerald">
                 <Plus className="w-4 h-4 mr-2" />
-                Create Flag
+                Create Feature
               </Button>
             </div>
           </div>
@@ -122,11 +122,11 @@ export default function FeatureFlags() {
             <Card className="p-4 glass border-border/50">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Active Flags</p>
+                  <p className="text-sm text-muted-foreground">Active Features</p>
                   <p className="text-2xl font-bold text-foreground">{enabledCount}</p>
                 </div>
                 <Badge className="bg-primary text-primary-foreground">
-                  {Math.round((enabledCount / flags.length) * 100)}%
+                  {Math.round((enabledCount / items.length) * 100)}%
                 </Badge>
               </div>
             </Card>
@@ -144,8 +144,8 @@ export default function FeatureFlags() {
             <Card className="p-4 glass border-border/50">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Flags</p>
-                  <p className="text-2xl font-bold text-foreground">{flags.length}</p>
+                  <p className="text-sm text-muted-foreground">Total Features</p>
+                  <p className="text-2xl font-bold text-foreground">{items.length}</p>
                 </div>
                 <Badge variant="secondary">
                   All Environments
@@ -162,7 +162,7 @@ export default function FeatureFlags() {
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
-              placeholder="Search feature flags..."
+              placeholder="Search features..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9 glass border-border/50"
@@ -174,22 +174,22 @@ export default function FeatureFlags() {
           </Button>
         </div>
 
-        {/* Feature Flags Grid */}
+        {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filteredFlags.map((flag, index) => (
-            <div key={flag.id} className="animate-slide-up" style={{ animationDelay: `${index * 100}ms` }}>
-              <FeatureFlagCard 
-                {...flag}
-                onToggle={() => toggleFlag(flag.id)}
+          {filteredItems.map((item, index) => (
+            <div key={item.id} className="animate-slide-up" style={{ animationDelay: `${index * 100}ms` }}>
+              <FeatureCard 
+                {...item}
+                onToggle={() => toggleItem(item.id)}
               />
             </div>
           ))}
         </div>
 
-        {filteredFlags.length === 0 && (
+        {filteredItems.length === 0 && (
           <div className="text-center py-12">
             <div className="text-muted-foreground">
-              <p className="text-lg mb-2">No feature flags found</p>
+              <p className="text-lg mb-2">No features found</p>
               <p className="text-sm">Try adjusting your search criteria</p>
             </div>
           </div>

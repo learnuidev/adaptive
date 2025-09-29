@@ -17,7 +17,7 @@ import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
 import UserDetail from "./pages/UserDetail";
 import Cohorts from "./pages/Cohorts";
-import FeatureFlags from "./pages/FeatureFlags";
+import Features from "./pages/Features";
 import Events from "./pages/Events";
 import Goals from "./pages/Goals";
 import Trends from "./pages/Trends";
@@ -89,7 +89,7 @@ const cohortsRoute = createRoute({
 const featureFlagsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/feature-flags/$credentialId",
-  component: FeatureFlags,
+  component: Features,
 });
 
 const eventsRoute = createRoute({

@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-interface FeatureFlagCardProps {
+interface FeatureCardProps {
   name: string;
   description: string;
   enabled: boolean;
@@ -20,7 +20,7 @@ interface FeatureFlagCardProps {
   onToggle: () => void;
 }
 
-export function FeatureFlagCard({
+export function FeatureCard({
   name,
   description,
   enabled,
@@ -28,7 +28,7 @@ export function FeatureFlagCard({
   environment,
   usersAffected,
   onToggle
-}: FeatureFlagCardProps) {
+}: FeatureCardProps) {
   const environmentColors = {
     production: 'bg-primary text-primary-foreground',
     staging: 'bg-orange-500 text-white',
@@ -65,7 +65,7 @@ export function FeatureFlagCard({
                 Edit Configuration
               </DropdownMenuItem>
               <DropdownMenuItem className="text-destructive">
-                Delete Flag
+                Delete Feature
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
