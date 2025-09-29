@@ -63,15 +63,15 @@ const getMainItems = (credentialId?: string) => [
     icon: Activity,
     requiresCredential: true,
   },
+];
+
+const getToolsItems = (credentialId?: string) => [
   {
     title: "Cohorts",
     url: "/cohorts",
     icon: Users,
     requiresCredential: true,
   },
-];
-
-const getToolsItems = (credentialId?: string) => [
   {
     title: "Goals",
     url: "/goals",
