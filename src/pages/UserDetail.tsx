@@ -286,7 +286,7 @@ const UserDetail = () => {
           </Card>
         </div>
 
-        {/* Daily Activity Chart */}
+        {/* Activity Events */}
         <Card className="glass">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -294,19 +294,71 @@ const UserDetail = () => {
               Activity
             </CardTitle>
             <CardDescription>
-              User activity patterns over the selected period
+              Recent user activity and events
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-64 flex items-center justify-center text-muted-foreground">
-              <div className="text-center">
-                <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p className="text-sm">Daily activity chart coming soon</p>
-                <p className="text-xs mt-1">
-                  This will show page views, sessions, and engagement over time
-                </p>
+            {userEvents && userEvents.length > 0 ? (
+              <div className="space-y-4">
+                {userEvents.slice(0, 10).map((event) => (
+                  <div key={event.id} className="flex items-center gap-3 p-4 rounded-lg border bg-card">
+                    <div className="flex-shrink-0">
+                      {event.type === "pageview" && (
+                        <Eye className="h-5 w-5 text-blue-500" />
+                      )}
+                      {event.type === "payment" && (
+                        <div className="h-5 w-5 rounded-full bg-green-500 flex items-center justify-center">
+                          <span className="text-xs text-white font-bold">$</span>
+                        </div>
+                      )}
+                      {event.type === "custom" && (
+                        <Activity className="h-5 w-5 text-purple-500" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium text-foreground">
+                          {event.type === "pageview" && "Page View"}
+                          {event.type === "payment" && "Payment"}
+                          {event.type === "custom" && (event.event_name || "Custom Event")}
+                        </p>
+                        <time className="text-xs text-muted-foreground">
+                          {new Date(event.created_at).toLocaleString()}
+                        </time>
+                      </div>
+                      <p className="text-sm text-muted-foreground truncate">
+                        {event.type === "pageview" && event.href}
+                        {event.type === "payment" && `Payment processed`}
+                        {event.type === "custom" && event.metadata && Object.keys(event.metadata).length > 0 && (
+                          <span>
+                            {Object.entries(event.metadata).map(([key, value]) => 
+                              `${key}: ${value}`
+                            ).join(", ")}
+                          </span>
+                        )}
+                      </p>
+                      <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
+                        <span>{event.browser_name} {event.browser_version}</span>
+                        <span>{event.os_name}</span>
+                        <span>{formatLocation(event.country, event.region, event.city)}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {userEvents.length > 10 && (
+                  <p className="text-sm text-muted-foreground text-center py-2">
+                    Showing 10 of {userEvents.length} events
+                  </p>
+                )}
               </div>
-            </div>
+            ) : (
+              <div className="h-32 flex items-center justify-center text-muted-foreground">
+                <div className="text-center">
+                  <Activity className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">No activity found for this period</p>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
