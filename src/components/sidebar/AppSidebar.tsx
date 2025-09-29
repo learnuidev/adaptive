@@ -58,26 +58,20 @@ const getMainItems = (credentialId?: string) => [
     requiresCredential: true,
   },
   {
-    title: "Cohorts",
-    url: "/cohorts",
-    icon: Users,
-    requiresCredential: true,
-  },
-  {
-    title: "Feature Flags",
-    url: "/feature-flags",
-    icon: Flag,
-    requiresCredential: true,
-  },
-];
-
-const getToolsItems = (credentialId?: string) => [
-  {
     title: "Events",
     url: "/events",
     icon: Activity,
     requiresCredential: true,
   },
+  {
+    title: "Cohorts",
+    url: "/cohorts",
+    icon: Users,
+    requiresCredential: true,
+  },
+];
+
+const getToolsItems = (credentialId?: string) => [
   {
     title: "Goals",
     url: "/goals",
@@ -94,6 +88,12 @@ const getToolsItems = (credentialId?: string) => [
     title: "Insights",
     url: "/insights",
     icon: Zap,
+    requiresCredential: true,
+  },
+  {
+    title: "Feature Flags",
+    url: "/feature-flags",
+    icon: Flag,
     requiresCredential: true,
   },
   {
