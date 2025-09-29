@@ -61,8 +61,10 @@ const UserDetail = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortField, setSortField] = useState<keyof AnalyticsEvent>("created_at");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-  const [filterField, setFilterField] = useState<keyof AnalyticsEvent | "">("");
+  const [filterField, setFilterField] = useState<keyof AnalyticsEvent | "none">("none");
   const [filterValue, setFilterValue] = useState("");
+
+  console.log("FilterField state:", filterField, "Type:", typeof filterField);
 
   const currentCredential = credentials?.find(
     (cred) => cred.id === credentialId
@@ -97,8 +99,8 @@ const UserDetail = () => {
       }
       
       // Field-specific filter
-      if (filterField && filterValue) {
-        const fieldValue = event[filterField];
+      if (filterField && filterField !== "none" && filterValue) {
+        const fieldValue = event[filterField as keyof AnalyticsEvent];
         if (typeof fieldValue === 'string') {
           return fieldValue.toLowerCase().includes(filterValue.toLowerCase());
         } else if (typeof fieldValue === 'object') {
@@ -450,7 +452,7 @@ const UserDetail = () => {
                       </SelectContent>
                     </Select>
 
-                    <Select value={filterField || "none"} onValueChange={(value) => setFilterField(value === "none" ? "" : value as keyof AnalyticsEvent)}>
+                    <Select value={filterField} onValueChange={(value) => setFilterField(value as keyof AnalyticsEvent | "none")}>
                       <SelectTrigger className="w-full sm:w-48">
                         <SelectValue placeholder="Filter by field..." />
                       </SelectTrigger>
@@ -466,7 +468,7 @@ const UserDetail = () => {
                       </SelectContent>
                     </Select>
 
-                    {filterField && (
+                    {filterField && filterField !== "none" && (
                       <div className="flex-1">
                         <Input
                           placeholder={`Filter by ${filterField}...`}
