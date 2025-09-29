@@ -63,40 +63,45 @@ export function InteractiveVisitorChart({ credentialId }: InteractiveVisitorChar
           <div className="bg-card/50 border-r border-border/50 backdrop-blur-sm">
             {/* Location Tabs */}
             <div className="flex border-b border-border/50">
-              <Button
-                variant={locationView === "map" ? "secondary" : "ghost"}
-                className="rounded-none border-r border-border/50 h-12 text-sm text-muted-foreground hover:text-foreground"
-                onClick={() => setLocationView("map")}
-              >
-                Map
-              </Button>
-              <Button
-                variant={locationView === "country" ? "secondary" : "ghost"}
-                className="rounded-none border-r border-border/50 h-12 text-sm text-muted-foreground hover:text-foreground"
-                onClick={() => setLocationView("country")}
-              >
-                Country
-              </Button>
-              <Button
-                variant={locationView === "region" ? "secondary" : "ghost"}
-                className="rounded-none border-r border-border/50 h-12 text-sm text-muted-foreground hover:text-foreground"
-                onClick={() => setLocationView("region")}
-              >
-                Region
-              </Button>
-              <Button
-                variant={locationView === "city" ? "secondary" : "ghost"}
-                className="rounded-none h-12 text-sm text-muted-foreground hover:text-foreground"
-                onClick={() => setLocationView("city")}
-              >
-                City
-              </Button>
+              <div className="flex">
+                <Button
+                  variant={locationView === "map" ? "secondary" : "ghost"}
+                  className="rounded-none border-r border-border/50 h-12 text-sm text-muted-foreground hover:text-foreground"
+                  onClick={() => setLocationView("map")}
+                >
+                  Map
+                </Button>
+              </div>
+              <div className="w-px bg-border/50 mx-2" />
+              <div className="flex">
+                <Button
+                  variant={locationView === "country" ? "secondary" : "ghost"}
+                  className="rounded-none border-r border-border/50 h-12 text-sm text-muted-foreground hover:text-foreground"
+                  onClick={() => setLocationView("country")}
+                >
+                  Country
+                </Button>
+                <Button
+                  variant={locationView === "region" ? "secondary" : "ghost"}
+                  className="rounded-none border-r border-border/50 h-12 text-sm text-muted-foreground hover:text-foreground"
+                  onClick={() => setLocationView("region")}
+                >
+                  Region
+                </Button>
+                <Button
+                  variant={locationView === "city" ? "secondary" : "ghost"}
+                  className="rounded-none h-12 text-sm text-muted-foreground hover:text-foreground"
+                  onClick={() => setLocationView("city")}
+                >
+                  City
+                </Button>
+              </div>
             </div>
 
             {/* Content Area */}
             <div className="h-[548px] relative">
               {locationView === "map" ? (
-                <div className="h-full bg-slate-900">
+                <div className="h-full bg-muted/10">
                   <ComposableMap
                     projection="geoMercator"
                     projectionConfig={{
@@ -189,27 +194,32 @@ export function InteractiveVisitorChart({ credentialId }: InteractiveVisitorChar
           <div className="bg-card/50 backdrop-blur-sm">
             {/* Technology Tabs */}
             <div className="flex border-b border-border/50">
-              <Button
-                variant={techView === "browser_name" ? "secondary" : "ghost"}
-                className="rounded-none border-r border-border/50 h-12 text-sm flex-1 text-muted-foreground hover:text-foreground"
-                onClick={() => setTechView("browser_name")}
-              >
-                Browser
-              </Button>
-              <Button
-                variant={techView === "os_name" ? "secondary" : "ghost"}
-                className="rounded-none border-r border-border/50 h-12 text-sm flex-1 text-muted-foreground hover:text-foreground"
-                onClick={() => setTechView("os_name")}
-              >
-                OS
-              </Button>
-              <Button
-                variant="ghost"
-                className="rounded-none h-12 text-sm flex-1 text-muted-foreground/50"
-                disabled
-              >
-                Device
-              </Button>
+              <div className="flex">
+                <Button
+                  variant={techView === "browser_name" ? "secondary" : "ghost"}
+                  className="rounded-none border-r border-border/50 h-12 text-sm flex-1 text-muted-foreground hover:text-foreground"
+                  onClick={() => setTechView("browser_name")}
+                >
+                  Browser
+                </Button>
+                <Button
+                  variant={techView === "os_name" ? "secondary" : "ghost"}
+                  className="rounded-none border-r border-border/50 h-12 text-sm flex-1 text-muted-foreground hover:text-foreground"
+                  onClick={() => setTechView("os_name")}
+                >
+                  OS
+                </Button>
+              </div>
+              <div className="w-px bg-border/50 mx-2" />
+              <div className="flex">
+                <Button
+                  variant="ghost"
+                  className="rounded-none h-12 text-sm flex-1 text-muted-foreground/50"
+                  disabled
+                >
+                  Device
+                </Button>
+              </div>
             </div>
 
             {/* Technology Content */}
