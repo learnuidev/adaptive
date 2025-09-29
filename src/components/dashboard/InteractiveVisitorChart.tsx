@@ -4,18 +4,10 @@ import { Button } from "@/components/ui/button";
 import { useGetTotalVisitorsByQuery } from "@/modules/analytics/use-get-total-visitors-by";
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
 import { Chrome, Monitor, Smartphone, RefreshCw } from "lucide-react";
-import {
-  ComposableMap,
-  Geographies,
-  Geography,
-  ZoomableGroup,
-} from "react-simple-maps";
 
 interface InteractiveVisitorChartProps {
   credentialId: string;
 }
-
-const geoUrl = "https://unpkg.com/world-atlas@3/countries-110m.json";
 
 export function InteractiveVisitorChart({ credentialId }: InteractiveVisitorChartProps) {
   const [locationView, setLocationView] = useState<"map" | "country" | "region" | "city">("map");
