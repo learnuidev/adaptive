@@ -26,6 +26,7 @@ import { useGetSummaryQuery } from "@/modules/analytics/use-get-summary-query";
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
 import { WithNewEvents } from "@/components/with-new-events";
+import { ResponsiveFilters } from "@/components/analytics/ResponsiveFilters";
 
 const UserDetail = () => {
   const params = useParams({ strict: false }) as { 
@@ -130,6 +131,7 @@ const UserDetail = () => {
               </p>
             </div>
           </div>
+          <ResponsiveFilters />
         </div>
 
         {/* User Profile Card */}
