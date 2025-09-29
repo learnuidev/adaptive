@@ -12,7 +12,46 @@ import {
   AreaChart,
   ComposedChart,
   Bar,
+  Tooltip,
+  TooltipProps,
 } from "recharts";
+
+const CustomTooltip = ({
+  active,
+  payload,
+  label,
+}: TooltipProps<number, string>) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="glass p-4 rounded-lg border border-border/50 shadow-lg min-w-[200px]">
+        <p className="font-semibold text-foreground mb-3">{label}</p>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-sm bg-[hsl(200,84%,39%)]" />
+              <span className="text-sm text-muted-foreground">Visitors</span>
+            </div>
+            <span className="font-medium text-foreground">
+              {payload[0]?.value?.toLocaleString()}
+            </span>
+          </div>
+          {payload[1] && (
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-sm bg-[hsl(40,50%,60%)]" />
+                <span className="text-sm text-muted-foreground">Page Views</span>
+              </div>
+              <span className="font-medium text-foreground">
+                {payload[1]?.value?.toLocaleString()}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
 
 function formatPeriodSubtitle(period: FilterPeriod): string {
   switch (period) {
@@ -121,6 +160,7 @@ export function AnalyticsChart({
                 tickLine={false}
                 tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
               />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted) / 0.1)' }} />
               <Bar
                 yAxisId="right"
                 dataKey="secondaryValue"
