@@ -44,7 +44,7 @@ export function CredentialSelector({ onCredentialChange }: CredentialSelectorPro
 
   return (
     <div className="flex items-center gap-2">
-      <Select value={credentialId || ""} onValueChange={handleCredentialChange}>
+      <Select value={credentialId || undefined} onValueChange={handleCredentialChange}>
         <SelectTrigger className="min-w-[200px] bg-card/50 border-border/50">
           <SelectValue 
             placeholder="Select credential"
