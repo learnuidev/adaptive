@@ -4,6 +4,14 @@ import { Button } from "@/components/ui/button";
 import { useGetTotalVisitorsByQuery } from "@/modules/analytics/use-get-total-visitors-by";
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
 import { Chrome, Monitor, Smartphone, RefreshCw } from "lucide-react";
+import {
+  ComposableMap,
+  Geographies,
+  Geography,
+  ZoomableGroup,
+} from "react-simple-maps";
+
+const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@3/countries-110m.json";
 
 interface InteractiveVisitorChartProps {
   credentialId: string;
@@ -93,30 +101,67 @@ export function InteractiveVisitorChart({ credentialId }: InteractiveVisitorChar
             {/* Content Area */}
             <div className="h-[548px] relative">
               {locationView === "map" ? (
-                <div className="h-full bg-muted/10 flex items-center justify-center">
-                  <div className="text-center space-y-4">
-                    <div className="w-32 h-32 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
-                      <svg viewBox="0 0 24 24" className="w-16 h-16 text-primary">
-                        <path fill="currentColor" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                      </svg>
+                <div className="h-full bg-muted/10 relative">
+                  <ComposableMap
+                    projection="geoMercator"
+                    projectionConfig={{
+                      scale: 120,
+                    }}
+                    className="w-full h-full"
+                  >
+                    <ZoomableGroup>
+                      <Geographies geography={geoUrl}>
+                        {({ geographies }) =>
+                          geographies.map((geo) => {
+                            const countryName = geo.properties.NAME;
+                            const countryData = locationData?.find(
+                              (item) => item.name === countryName
+                            );
+                            const visitors = countryData ? parseInt(countryData.visitors) : 0;
+                            const maxVisitors = locationData?.reduce(
+                              (max, item) => Math.max(max, parseInt(item.visitors)), 
+                              0
+                            ) || 1;
+                            const intensity = visitors / maxVisitors;
+
+                            return (
+                              <Geography
+                                key={geo.rsmKey}
+                                geography={geo}
+                                fill={
+                                  visitors > 0
+                                    ? `hsl(var(--primary) / ${0.2 + intensity * 0.6})`
+                                    : "hsl(var(--muted) / 0.3)"
+                                }
+                                stroke="hsl(var(--border))"
+                                strokeWidth={0.5}
+                                style={{
+                                  default: { outline: "none" },
+                                  hover: { 
+                                    fill: `hsl(var(--primary) / ${0.4 + intensity * 0.4})`,
+                                    outline: "none" 
+                                  },
+                                  pressed: { outline: "none" },
+                                }}
+                              />
+                            );
+                          })
+                        }
+                      </Geographies>
+                    </ZoomableGroup>
+                  </ComposableMap>
+                  
+                  {/* Legend */}
+                  <div className="absolute bottom-4 left-4 bg-card/90 backdrop-blur-sm rounded p-3 border border-border/50">
+                    <p className="text-xs font-medium text-foreground mb-2">Visitors</p>
+                    <div className="flex items-center gap-2 text-xs">
+                      <div className="w-3 h-3 rounded" style={{ backgroundColor: "hsl(var(--muted) / 0.3)" }}></div>
+                      <span className="text-muted-foreground">No data</span>
                     </div>
-                    <div>
-                      <p className="text-lg font-semibold text-foreground">Interactive World Map</p>
-                      <p className="text-sm text-muted-foreground">Geographic visitor distribution</p>
+                    <div className="flex items-center gap-2 text-xs mt-1">
+                      <div className="w-3 h-3 rounded" style={{ backgroundColor: "hsl(var(--primary) / 0.8)" }}></div>
+                      <span className="text-muted-foreground">High traffic</span>
                     </div>
-                    {locationData && locationData.length > 0 && (
-                      <div className="space-y-2 max-w-sm">
-                        {locationData.slice(0, 3).map((item, index) => (
-                          <div
-                            key={item.name}
-                            className="flex items-center justify-between p-2 bg-card/50 rounded text-sm"
-                          >
-                            <span className="font-medium">{item.name}</span>
-                            <span className="text-primary">{item.visitors}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 </div>
               ) : (
