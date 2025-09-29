@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+import { FilterPeriod } from "@/modules/analytics/use-get-summary-query";
 // import { FilterPeriod } from "@/modules/analytics/use-get-summary-query";
 import {
   LineChart,
@@ -10,33 +11,6 @@ import {
   Area,
   AreaChart,
 } from "recharts";
-
-type FilterPeriod =
-  | "today"
-  | "yesterday"
-  | "day"
-  | "week"
-  | "month"
-  | "year"
-  | "last24h"
-  | "last7d"
-  | "last30d"
-  | "last12m"
-  | "wtd"
-  | "mtd"
-  | "ytd"
-  | "all"
-  | "custom";
-
-interface AnalyticsChartProps {
-  title: string;
-  selectedPeriod: FilterPeriod;
-  data: Array<{ name: string; value: number; [key: string]: any }>;
-  previousData?: Array<{ name: string; value: number; [key: string]: any }>;
-  height?: number;
-  color?: string;
-  type?: "line" | "area";
-}
 
 function formatPeriodSubtitle(period: FilterPeriod): string {
   switch (period) {
@@ -74,16 +48,38 @@ function formatPeriodSubtitle(period: FilterPeriod): string {
       return "";
   }
 }
+interface AnalyticsChartProps {
+  title: string;
+  colorPalette: "green" | "orange" | "blue";
+  selectedPeriod: FilterPeriod;
+  data: Array<{ name: string; value: number; [key: string]: any }>;
+  previousData?: Array<{ name: string; value: number; [key: string]: any }>;
+  height?: number;
+  color?: string;
+  type?: "line" | "area";
+  chartKey: string;
+}
+
 export function AnalyticsChart({
   title,
   selectedPeriod,
   previousData,
+  colorPalette,
+  chartKey,
   data,
   height = 300,
-  color = "hsl(160, 84%, 39%)",
+
   type = "area",
 }: AnalyticsChartProps) {
   const subtitle = formatPeriodSubtitle(selectedPeriod);
+
+  const colorPaletteMap = {
+    green: "hsl(160, 84%, 39%)",
+    orange: "hsl(40, 50%, 60%)",
+    blue: "hsl(200, 84%, 39%)",
+  };
+
+  const color = colorPaletteMap[colorPalette];
 
   const previousDataColor = "hsl(40, 50%, 60%)";
 
@@ -98,7 +94,7 @@ export function AnalyticsChart({
           {type === "area" ? (
             <AreaChart data={data}>
               <defs>
-                <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id={chartKey} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor={color} stopOpacity={0.3} />
                   <stop offset="95%" stopColor={color} stopOpacity={0.05} />
                 </linearGradient>
@@ -135,7 +131,7 @@ export function AnalyticsChart({
                 dataKey="value"
                 stroke={color}
                 fillOpacity={1}
-                fill="url(#colorValue)"
+                fill={`url(#${chartKey})`}
                 strokeWidth={2}
               />
             </AreaChart>

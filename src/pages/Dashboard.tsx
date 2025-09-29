@@ -5,6 +5,7 @@ import { MetricsCard } from "@/components/dashboard/MetricsCard";
 import { FeatureFlagCard } from "@/components/feature-flags/FeatureFlagCard";
 import { WithNewEvents } from "@/components/with-new-events";
 import {
+  FilterPeriod,
   useGetSummaryQuery,
   VisitorCount,
 } from "@/modules/analytics/use-get-summary-query";
@@ -22,7 +23,10 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-function buildChartData(totalVisitors: VisitorCount[]) {
+function buildChartData(
+  selectedPeriod: FilterPeriod,
+  totalVisitors: VisitorCount[]
+) {
   if (!totalVisitors) return [];
 
   const raw = totalVisitors;
@@ -34,12 +38,15 @@ function buildChartData(totalVisitors: VisitorCount[]) {
 
   if (first.day) {
     // ---------- WEEK (7 days) ----------
-    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    // Reorder days so Monday is first and Sunday is last
+    const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
     const map = new Map<string, number>();
     raw.forEach((it) => {
       if (it?.day) {
         const d = new Date(it.day);
-        map.set(days[d.getDay()], Number(it.total) || 0);
+        // Adjust day index so Monday (1) maps to 0
+        const dayIndex = (d.getDay() + 6) % 7;
+        map.set(days[dayIndex], Number(it.total) || 0);
       }
     });
     days.forEach((d) => filled.push({ name: d, value: map.get(d) || 0 }));
@@ -82,9 +89,44 @@ function buildChartData(totalVisitors: VisitorCount[]) {
     );
   }
 
+  // If selectedPeriod is 'month', override labels to "Month Day"
+  if (["month", "last30d"].includes(selectedPeriod) && first.day) {
+    const dayMap = new Map<string, number>();
+    raw.forEach((it) => {
+      if (it?.day) {
+        const d = new Date(it.day);
+        const iso = d.toISOString().slice(0, 10); // YYYY-MM-DD
+        dayMap.set(iso, Number(it.total) || 0);
+      }
+    });
+
+    // Build array in chronological order
+    const sorted = Array.from(dayMap.keys()).sort();
+
+    // Fill missing days with 0
+    const filledMonth: { name: string; value: number }[] = [];
+    if (sorted.length > 0) {
+      const firstDate = new Date(sorted[0]);
+      const lastDate = new Date(sorted[sorted.length - 1]);
+      const dayMs = 24 * 60 * 60 * 1000;
+      for (
+        let d = new Date(firstDate);
+        d <= lastDate;
+        d.setTime(d.getTime() + dayMs)
+      ) {
+        const iso = d.toISOString().slice(0, 10);
+        const monthName = d.toLocaleString("en-US", { month: "long" });
+        const day = d.getDate();
+        const label = `${monthName} ${day}`;
+        const value = dayMap.get(iso) || 0;
+        filledMonth.push({ name: label, value });
+      }
+    }
+    return filledMonth;
+  }
+
   return filled;
 }
-
 const deviceData = [
   { name: "Desktop", value: 65 },
   { name: "Mobile", value: 85 },
@@ -122,6 +164,36 @@ const featureFlags = [
 ];
 
 import { GetSummaryResponse } from "@/modules/analytics/use-get-summary-query";
+
+function TopPagesList() {
+  const params = useParams({ strict: false }) as { credentialId?: string };
+  const credentialId = params?.credentialId;
+
+  return (
+    <div className="glass p-6 rounded-lg border border-border/50 hover:shadow-medium transition-all duration-300">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="p-2 bg-primary-soft rounded-lg">
+          <MousePointer className="w-5 h-5 text-primary" />
+        </div>
+        <h3 className="font-semibold text-foreground">Top Pages</h3>
+      </div>
+      <div className="space-y-3">
+        <div className="flex justify-between items-center">
+          <span className="text-sm text-muted-foreground">/dashboard</span>
+          <span className="font-medium text-foreground">45.2k</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="text-sm text-muted-foreground">/analytics</span>
+          <span className="font-medium text-foreground">32.1k</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="text-sm text-muted-foreground">/users</span>
+          <span className="font-medium text-foreground">28.9k</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const formatSessionTime = (summary: GetSummaryResponse) => {
   const totalSeconds = summary?.averageSession.current || 0;
@@ -163,25 +235,23 @@ export default function Dashboard() {
   // Reusable helper: turns summary.totalVisitors.current into chart-ready points
 
   // Inside component:
-  const chartData = buildChartData(summary?.totalVisitors.current);
-  const previousChartData = buildChartData(summary?.totalVisitors?.previous);
+  const chartData = buildChartData(
+    selectedPeriod,
+    summary?.totalVisitors.current
+  );
+  const previousChartData = buildChartData(
+    selectedPeriod,
+    summary?.totalVisitors?.previous
+  );
 
   const totalPageVisitsOvertimeChartData = buildChartData(
+    selectedPeriod,
     summary?.totalPageVisitsOvertime.current
   );
   const previousTotalPageVisitsOvertimeChartData = buildChartData(
+    selectedPeriod,
     summary?.totalPageVisitsOvertime?.previous
   );
-
-  const _chartData = [
-    { name: "00:00", value: 120 },
-    { name: "04:00", value: 80 },
-    { name: "08:00", value: 350 },
-    { name: "12:00", value: 480 },
-    { name: "16:00", value: 420 },
-    { name: "20:00", value: 380 },
-    { name: "23:59", value: 180 },
-  ];
 
   const metricsData = [
     {
@@ -285,7 +355,9 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <div className="lg:col-span-2">
               <AnalyticsChart
-                title="Visitor Traffic"
+                chartKey="uniqueVisitorTraffic"
+                title="Unique Visitor Traffic"
+                colorPalette={"green"}
                 selectedPeriod={selectedPeriod}
                 data={chartData}
                 previousData={previousChartData}
@@ -295,6 +367,8 @@ export default function Dashboard() {
             </div>
             <div className="lg:col-span-2">
               <AnalyticsChart
+                chartKey="pageViews"
+                colorPalette={"blue"}
                 title="Page Views"
                 selectedPeriod={selectedPeriod}
                 data={totalPageVisitsOvertimeChartData}
@@ -329,32 +403,7 @@ export default function Dashboard() {
 
           {/* Top Actions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="glass p-6 rounded-lg border border-border/50 hover:shadow-medium transition-all duration-300">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-primary-soft rounded-lg">
-                  <MousePointer className="w-5 h-5 text-primary" />
-                </div>
-                <h3 className="font-semibold text-foreground">Top Pages</h3>
-              </div>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">
-                    /dashboard
-                  </span>
-                  <span className="font-medium text-foreground">45.2k</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">
-                    /analytics
-                  </span>
-                  <span className="font-medium text-foreground">32.1k</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">/users</span>
-                  <span className="font-medium text-foreground">28.9k</span>
-                </div>
-              </div>
-            </div>
+            <TopPagesList />
 
             <div className="glass p-6 rounded-lg border border-border/50 hover:shadow-medium transition-all duration-300">
               <div className="flex items-center gap-3 mb-4">
