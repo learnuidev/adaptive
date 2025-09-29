@@ -11,6 +11,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerClose,
+} from "@/components/ui/drawer";
+import {
   ArrowLeft,
   MapPin,
   Clock,
@@ -381,20 +388,198 @@ const UserDetail = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {selectedEvent ? (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-medium">Event Details</h3>
+            {/* Filters and Sorting */}
+            <div className="space-y-4 mb-6">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search events..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-2">
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    onClick={() => setSelectedEvent(null)}
+                    onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}
                     className="gap-2"
                   >
-                    <X className="h-4 w-4" />
-                    Close
+                    {sortDirection === 'asc' ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
+                    Sort
                   </Button>
                 </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Select value={sortField} onValueChange={(value) => setSortField(value as keyof AnalyticsEvent)}>
+                  <SelectTrigger className="w-full sm:w-48">
+                    <SelectValue placeholder="Sort by..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="created_at">Created At</SelectItem>
+                    <SelectItem value="type">Event Type</SelectItem>
+                    <SelectItem value="event_name">Event Name</SelectItem>
+                    <SelectItem value="href">Page URL</SelectItem>
+                    <SelectItem value="domain">Domain</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select 
+                  value={filterField} 
+                  onValueChange={(value) => {
+                    console.log("Filter field changed to:", value, "Type:", typeof value);
+                    setFilterField(value === "none" ? "none" : value as keyof AnalyticsEvent);
+                    if (value === "none") {
+                      setFilterValue("");
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-full sm:w-48">
+                    <SelectValue placeholder="Filter by..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No filter</SelectItem>
+                    <SelectItem value="type">Event Type</SelectItem>
+                    <SelectItem value="event_name">Event Name</SelectItem>
+                    <SelectItem value="domain">Domain</SelectItem>
+                    <SelectItem value="country">Country</SelectItem>
+                    <SelectItem value="city">City</SelectItem>
+                    <SelectItem value="browser_name">Browser</SelectItem>
+                    <SelectItem value="os_name">OS</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {filterField && filterField !== "none" && (
+                  <div className="flex gap-2 items-center">
+                    <Input
+                      placeholder={`Filter ${filterField}...`}
+                      value={filterValue}
+                      onChange={(e) => setFilterValue(e.target.value)}
+                      className="w-full sm:w-48"
+                    />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setFilterField("none");
+                        setFilterValue("");
+                      }}
+                      className="shrink-0"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Events List */}
+            {filteredAndSortedEvents.length === 0 ? (
+              <div className="text-center py-12">
+                <Activity className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium text-foreground mb-2">
+                  No Activity Found
+                </h3>
+                <p className="text-muted-foreground">
+                  {searchQuery || filterValue
+                    ? "No events match your current filters"
+                    : "This user hasn't performed any tracked actions yet"}
+                </p>
+                {(searchQuery || filterValue) && (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setSearchQuery("");
+                      setFilterField("none");
+                      setFilterValue("");
+                    }}
+                    className="mt-4"
+                  >
+                    Clear Filters
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredAndSortedEvents
+                  .slice(0, visibleCount)
+                  .map((event, index) => (
+                    <div
+                      key={`${event.id}-${index}`}
+                      className="flex items-center justify-between p-4 rounded-lg border bg-card/50 hover:bg-card cursor-pointer transition-colors"
+                      onClick={() => setSelectedEvent(event)}
+                    >
+                      <div className="flex items-center space-x-4">
+                        <Badge 
+                          variant={
+                            event.type === 'pageview' ? 'default' : 
+                            event.type === 'payment' ? 'secondary' : 
+                            'outline'
+                          }
+                        >
+                          {event.type}
+                        </Badge>
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium leading-none">
+                            {event.event_name || event.type}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {event.href}
+                          </p>
+                          {event.domain && (
+                            <p className="text-xs text-muted-foreground">
+                              Domain: {event.domain}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-right space-y-1">
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(event.created_at).toLocaleDateString()}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(event.created_at).toLocaleTimeString()}
+                        </p>
+                        <ChevronDown className="h-4 w-4 text-muted-foreground ml-auto" />
+                      </div>
+                    </div>
+                  ))}
+
+                {visibleCount < filteredAndSortedEvents.length && (
+                  <div className="text-center pt-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => setVisibleCount(prev => prev + 20)}
+                    >
+                      Load More ({filteredAndSortedEvents.length - visibleCount} remaining)
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Event Details Drawer */}
+        <Drawer open={selectedEvent !== null} onOpenChange={(open) => !open && setSelectedEvent(null)}>
+          <DrawerContent className="max-h-[80vh]">
+            <DrawerHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <DrawerTitle>Event Details</DrawerTitle>
+                <DrawerClose asChild>
+                  <Button variant="ghost" size="sm" className="gap-2">
+                    <X className="h-4 w-4" />
+                  </Button>
+                </DrawerClose>
+              </div>
+            </DrawerHeader>
+            <div className="px-4 pb-6 overflow-auto">
+              {selectedEvent && (
                 <div className="rounded-lg border bg-card p-4">
                   <JsonView 
                     value={selectedEvent} 
@@ -406,165 +591,10 @@ const UserDetail = () => {
                     displayDataTypes={false}
                   />
                 </div>
-              </div>
-            ) : (
-              <>
-                {/* Filters and Sorting */}
-                <div className="space-y-4 mb-6">
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="flex-1">
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          placeholder="Search events..."
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="pl-10"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}
-                        className="gap-2"
-                      >
-                        {sortDirection === 'asc' ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
-                        Sort
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <Select value={sortField} onValueChange={(value) => setSortField(value as keyof AnalyticsEvent)}>
-                      <SelectTrigger className="w-full sm:w-48">
-                        <SelectValue placeholder="Sort by..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="created_at">Created At</SelectItem>
-                        <SelectItem value="type">Event Type</SelectItem>
-                        <SelectItem value="event_name">Event Name</SelectItem>
-                        <SelectItem value="href">URL</SelectItem>
-                        <SelectItem value="browser_name">Browser</SelectItem>
-                        <SelectItem value="os_name">OS</SelectItem>
-                        <SelectItem value="country">Country</SelectItem>
-                      </SelectContent>
-                    </Select>
-
-                    <Select value={filterField} onValueChange={(value) => setFilterField(value as keyof AnalyticsEvent | "none")}>
-                      <SelectTrigger className="w-full sm:w-48">
-                        <SelectValue placeholder="Filter by field..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">No filter</SelectItem>
-                        <SelectItem value="type">Event Type</SelectItem>
-                        <SelectItem value="event_name">Event Name</SelectItem>
-                        <SelectItem value="domain">Domain</SelectItem>
-                        <SelectItem value="browser_name">Browser</SelectItem>
-                        <SelectItem value="os_name">OS</SelectItem>
-                        <SelectItem value="country">Country</SelectItem>
-                        <SelectItem value="city">City</SelectItem>
-                      </SelectContent>
-                    </Select>
-
-                    {filterField && filterField !== "none" && (
-                      <div className="flex-1">
-                        <Input
-                          placeholder={`Filter by ${filterField}...`}
-                          value={filterValue}
-                          onChange={(e) => setFilterValue(e.target.value)}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {filteredAndSortedEvents.length > 0 ? (
-                  <div className="space-y-4">
-                    {filteredAndSortedEvents.slice(0, visibleCount).map((event) => (
-                      <div 
-                        key={event.id} 
-                        className="flex items-center gap-3 p-4 rounded-lg border bg-card hover:bg-accent/50 cursor-pointer transition-colors"
-                        onClick={() => setSelectedEvent(event)}
-                      >
-                        <div className="flex-shrink-0">
-                          {event.type === "pageview" && (
-                            <Eye className="h-5 w-5 text-blue-500" />
-                          )}
-                          {event.type === "payment" && (
-                            <div className="h-5 w-5 rounded-full bg-green-500 flex items-center justify-center">
-                              <span className="text-xs text-white font-bold">$</span>
-                            </div>
-                          )}
-                          {event.type === "custom" && (
-                            <Activity className="h-5 w-5 text-purple-500" />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm font-medium text-foreground">
-                              {event.type === "pageview" && "Page View"}
-                              {event.type === "payment" && "Payment"}
-                              {event.type === "custom" && (event.event_name || "Custom Event")}
-                            </p>
-                            <time className="text-xs text-muted-foreground">
-                              {new Date(event.created_at).toLocaleString()}
-                            </time>
-                          </div>
-                          <p className="text-sm text-muted-foreground truncate">
-                            {event.type === "pageview" && event.href}
-                            {event.type === "payment" && `Payment processed`}
-                            {event.type === "custom" && event.metadata && Object.keys(event.metadata).length > 0 && (
-                              <span>
-                                {Object.entries(event.metadata).map(([key, value]) => 
-                                  `${key}: ${value}`
-                                ).join(", ")}
-                              </span>
-                            )}
-                          </p>
-                          <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
-                            <span>{event.browser_name} {event.browser_version}</span>
-                            <span>{event.os_name}</span>
-                            <span>{formatLocation(event.country, event.region, event.city)}</span>
-                          </div>
-                        </div>
-                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                    ))}
-                    
-                    {visibleCount < filteredAndSortedEvents.length && (
-                      <div className="text-center py-4">
-                        <Button 
-                          variant="outline" 
-                          onClick={() => setVisibleCount(prev => prev + 20)}
-                          className="gap-2"
-                        >
-                          Load More ({filteredAndSortedEvents.length - visibleCount} remaining)
-                        </Button>
-                      </div>
-                    )}
-                    
-                    {visibleCount >= filteredAndSortedEvents.length && filteredAndSortedEvents.length > 20 && (
-                      <p className="text-sm text-muted-foreground text-center py-2">
-                        Showing all {filteredAndSortedEvents.length} events
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <div className="h-32 flex items-center justify-center text-muted-foreground">
-                    <div className="text-center">
-                      <Activity className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                      <p className="text-sm">
-                        {searchQuery || filterValue ? "No events match your filters" : "No activity found for this period"}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-          </CardContent>
-        </Card>
+              )}
+            </div>
+          </DrawerContent>
+        </Drawer>
       </div>
     </WithNewEvents>
   );
