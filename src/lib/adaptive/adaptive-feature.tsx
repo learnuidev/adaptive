@@ -5,11 +5,10 @@ import React, { createContext, useContext } from "react";
 
 export function useIsFeatureEnabled(featureKey: string) {
   const adaptive = useAdaptive();
-  // return adaptive.isFeatureFlagEnabled(featureKey)
 
   return useQuery<boolean>({
-    queryKey: ["isFeatureFlagEnabled", featureKey],
-    queryFn: () => adaptive.isFeatureFlagEnabled(featureKey),
+    queryKey: ["is-feature-enabled", featureKey],
+    queryFn: () => adaptive.isFeatureEnabled(featureKey),
   });
 }
 type IAdaptiveFeatureContext = {
@@ -62,7 +61,6 @@ export function AdaptiveFeature({
   }
 
   if (data === true) {
-    console.log("YAYY ITS ENABLED", data);
     const adaptiveFeature = { featureKey };
 
     return (
