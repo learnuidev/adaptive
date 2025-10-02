@@ -79,7 +79,6 @@ export function CredentialSelector({ onCredentialChange }: CredentialSelectorPro
       
       <Button
         variant="outline"
-        size="sm"
         onClick={() => setShowAddDialog(true)}
         className="flex items-center gap-2 bg-card/50 border-border/50"
       >
