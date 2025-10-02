@@ -83,7 +83,8 @@ const CohortDetail = () => {
                 {cohortUsers.map((user, index) => (
                   <div
                     key={index}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-background/50 border border-border/50 hover:border-primary/20 transition-colors"
+                    onClick={() => navigate({ to: `/users/${cohort.websiteId}/${user.visitor_id}` })}
+                    className="flex items-center gap-3 p-3 rounded-lg bg-background/50 border border-border/50 hover:border-primary/20 transition-colors cursor-pointer"
                   >
                     <Mail className="w-4 h-4 text-muted-foreground" />
                     <span className="text-sm text-foreground">
