@@ -356,7 +356,8 @@ export default function Trends() {
   return (
     <AdaptiveFeature
       featureKey="trends-feature"
-      featureVersionId={"01K6HJ19HXH65S9QE05M3DC15K"}
+      // featureVersionId={"01K6HJ19HXH65S9QE05M3DC15K"}
+      featureVersionId={"01K6HJC9PB5XASJCZ8KWAC7R8T"}
     >
       <TrendsFeature />
     </AdaptiveFeature>
