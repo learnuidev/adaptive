@@ -45,7 +45,7 @@ export function CredentialSelector({ onCredentialChange }: CredentialSelectorPro
   return (
     <div className="flex items-center gap-2">
       <Select value={credentialId || undefined} onValueChange={handleCredentialChange}>
-        <SelectTrigger className="min-w-[200px] bg-card/50 border-border/50">
+        <SelectTrigger className="min-w-[200px] glass border-white/10 bg-card/50 backdrop-blur-md">
           <SelectValue 
             placeholder="Select credential"
             className="text-sm"
@@ -60,9 +60,9 @@ export function CredentialSelector({ onCredentialChange }: CredentialSelectorPro
             )}
           </SelectValue>
         </SelectTrigger>
-        <SelectContent className="bg-popover border-border">
+        <SelectContent className="glass border-white/10 bg-card/95 backdrop-blur-md">
           {credentials?.map((credential) => (
-            <SelectItem key={credential.id} value={credential.id}>
+            <SelectItem key={credential.id} value={credential.id} className="hover:bg-white/5">
               <div className="flex items-center gap-2">
                 <Database className="w-4 h-4" />
                 <div>
@@ -80,7 +80,7 @@ export function CredentialSelector({ onCredentialChange }: CredentialSelectorPro
       <Button
         variant="outline"
         onClick={() => setShowAddDialog(true)}
-        className="flex items-center gap-2 bg-card/50 border-border/50"
+        className="flex items-center gap-2 glass border-white/10 bg-card/50 backdrop-blur-md"
       >
         <Plus className="w-4 h-4" />
         Add
