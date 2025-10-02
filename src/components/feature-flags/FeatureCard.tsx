@@ -2,14 +2,27 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Feature } from "@/modules/feature/feature.types";
 import { format } from "date-fns";
+import { useNavigate, useParams } from "@tanstack/react-router";
 
 interface FeatureCardProps {
   feature: Feature;
 }
 
 export function FeatureCard({ feature }: FeatureCardProps) {
+  const navigate = useNavigate();
+  const params = useParams({ strict: false }) as { credentialId?: string };
+  
+  const handleClick = () => {
+    navigate({ 
+      to: `/features/${params.credentialId}/${feature.id}` 
+    });
+  };
+
   return (
-    <Card className="p-4 bg-gradient-card border-border/50 hover:shadow-medium transition-all duration-300 glass">
+    <Card 
+      onClick={handleClick}
+      className="p-4 bg-gradient-card border-border/50 hover:shadow-medium transition-all duration-300 glass cursor-pointer"
+    >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-foreground truncate">{feature.name}</h3>

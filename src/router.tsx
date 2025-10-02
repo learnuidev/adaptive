@@ -18,6 +18,7 @@ import Users from "./pages/Users";
 import UserDetail from "./pages/UserDetail";
 import Cohorts from "./pages/Cohorts";
 import Features from "./pages/Features";
+import FeatureDetail from "./pages/FeatureDetail";
 import Events from "./pages/Events";
 import Goals from "./pages/Goals";
 import Trends from "./pages/Trends";
@@ -92,6 +93,12 @@ const featureFlagsRoute = createRoute({
   component: Features,
 });
 
+const featureDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/features/$credentialId/$featureId",
+  component: FeatureDetail,
+});
+
 const eventsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/events/$credentialId",
@@ -129,6 +136,7 @@ const routeTree = rootRoute.addChildren([
   userDetailRoute,
   cohortsRoute,
   featureFlagsRoute,
+  featureDetailRoute,
   eventsRoute,
   goalsRoute,
   trendsRoute,
