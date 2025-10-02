@@ -16,7 +16,7 @@ const getFeatureDetails = async (
     `${appConfig.apiUrl}/v1/analytics/get-feature-details`,
     {
       method: "POST",
-      body: JSON.stringify({ featureId }),
+      body: JSON.stringify({ id: featureId }),
     }
   );
 
