@@ -108,8 +108,8 @@ const getSummaryRawResponse = {
       patternHref: "https://www.adaptive.fyi/events/[param]",
     },
     {
-      href: "https://www.adaptive.fyi/feature-flags/01K66XSK34CXMV0TT8ATS953W0",
-      patternHref: "https://www.adaptive.fyi/feature-flags/[param]",
+      href: "https://www.adaptive.fyi/features/01K66XSK34CXMV0TT8ATS953W0",
+      patternHref: "https://www.adaptive.fyi/features/[param]",
     },
     {
       href: "https://www.adaptive.fyi/goals/01K66XSK34CXMV0TT8ATS953W0",
@@ -163,9 +163,9 @@ const getSummaryRawResponse = {
         patternHref: "https://www.adaptive.fyi/dashboard/[param]",
       },
       {
-        href: "https://www.adaptive.fyi/feature-flags/01K66XSK34CXMV0TT8ATS953W0",
+        href: "https://www.adaptive.fyi/features/01K66XSK34CXMV0TT8ATS953W0",
         visits: "5",
-        patternHref: "https://www.adaptive.fyi/feature-flags/[param]",
+        patternHref: "https://www.adaptive.fyi/features/[param]",
       },
       {
         href: "https://www.adaptive.fyi/users/01K66XSK34CXMV0TT8ATS953W0",

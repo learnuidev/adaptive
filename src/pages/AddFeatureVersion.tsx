@@ -10,9 +10,9 @@ import { Card } from "@/components/ui/card";
 import { useAddFeatureVersionMutation } from "@/modules/feature/use-add-feature-version-mutation";
 import { useGetAuthUserQuery } from "@/modules/auth/use-get-auth-user-query";
 import { useToast } from "@/hooks/use-toast";
-import { RolloutRuleBuilder } from "@/components/feature-flags/RolloutRuleBuilder";
+import { RolloutRuleBuilder } from "@/components/features/RolloutRuleBuilder";
 import { ArrowLeft } from "lucide-react";
-// import { RolloutRuleGroup } from "@/components/feature-flags/AddFeatureVersionDialog";
+
 interface AddFeatureVersionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;

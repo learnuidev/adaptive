@@ -1,4 +1,4 @@
-import { FeatureCard } from "@/components/feature-flags/FeatureCard";
+import { FeatureCard } from "@/components/features/FeatureCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,13 +10,15 @@ import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
 import { WithGlow } from "@/components/with-glow";
 import { useListFeaturesQuery } from "@/modules/feature/use-list-features-query";
-import { AddFeatureDialog } from "@/components/feature-flags/AddFeatureDialog";
+import { AddFeatureDialog } from "@/components/features/AddFeatureDialog";
 
 export default function Features() {
   const params = useParams({ strict: false }) as { credentialId?: string };
   const credentialId = params?.credentialId;
   const { data: credentials } = useListUserCredentialsQuery();
-  const { data: features, isLoading } = useListFeaturesQuery(credentialId || "");
+  const { data: features, isLoading } = useListFeaturesQuery(
+    credentialId || ""
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
@@ -29,9 +31,12 @@ export default function Features() {
     return <NoCredentialsMessage />;
   }
 
-  const filteredFeatures = (features || []).filter((feature) =>
-    feature.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (feature.description?.toLowerCase() || "").includes(searchQuery.toLowerCase())
+  const filteredFeatures = (features || []).filter(
+    (feature) =>
+      feature.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (feature.description?.toLowerCase() || "").includes(
+        searchQuery.toLowerCase()
+      )
   );
 
   return (
@@ -49,7 +54,7 @@ export default function Features() {
               </p>
             </div>
             <WithGlow>
-              <Button 
+              <Button
                 onClick={() => setIsAddDialogOpen(true)}
                 className="bg-gradient-primary hover:bg-primary-glow shadow-emerald"
               >
@@ -87,12 +92,16 @@ export default function Features() {
 
         {/* Features List */}
         {isLoading ? (
-          <div className="text-center py-12 text-muted-foreground">Loading...</div>
+          <div className="text-center py-12 text-muted-foreground">
+            Loading...
+          </div>
         ) : filteredFeatures.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-muted-foreground">
               <p className="text-lg mb-2">No features yet</p>
-              <p className="text-sm">Create your first feature to get started</p>
+              <p className="text-sm">
+                Create your first feature to get started
+              </p>
             </div>
           </div>
         ) : (
@@ -103,8 +112,8 @@ export default function Features() {
           </div>
         )}
       </div>
-      
-      <AddFeatureDialog 
+
+      <AddFeatureDialog
         open={isAddDialogOpen}
         onOpenChange={setIsAddDialogOpen}
         credentialId={credentialId || ""}

@@ -90,7 +90,7 @@ const cohortsRoute = createRoute({
 
 const featureFlagsRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/feature-flags/$credentialId",
+  path: "/features/$credentialId",
   component: Features,
 });
 

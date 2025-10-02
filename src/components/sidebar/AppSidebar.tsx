@@ -99,7 +99,7 @@ const getToolsItems = (credentialId?: string) => [
   },
   {
     title: "Features",
-    url: "/feature-flags",
+    url: "/features",
     icon: Flag,
     requiresCredential: true,
   },
