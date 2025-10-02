@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { useGetFeatureDetailsQuery } from "@/modules/feature/use-get-feature-details-query";
 import { Button } from "@/components/ui/button";
@@ -6,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AddFeatureVersionDialog } from "@/components/feature-flags/AddFeatureVersionDialog";
 
 export default function FeatureDetail() {
   const params = useParams({ strict: false }) as { 
@@ -14,6 +16,7 @@ export default function FeatureDetail() {
   };
   const navigate = useNavigate();
   const { data: featureDetails, isLoading } = useGetFeatureDetailsQuery(params.featureId || "");
+  const [addVersionOpen, setAddVersionOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -68,7 +71,10 @@ export default function FeatureDetail() {
                 ))}
               </div>
             </div>
-            <Button className="bg-gradient-primary hover:bg-primary-glow shadow-emerald">
+            <Button 
+              className="bg-gradient-primary hover:bg-primary-glow shadow-emerald"
+              onClick={() => setAddVersionOpen(true)}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Add Version
             </Button>
@@ -117,6 +123,14 @@ export default function FeatureDetail() {
           </Card>
         )}
       </div>
+
+      {/* Add Version Dialog */}
+      <AddFeatureVersionDialog
+        open={addVersionOpen}
+        onOpenChange={setAddVersionOpen}
+        featureId={params.featureId || ""}
+        websiteId={params.credentialId || ""}
+      />
     </div>
   );
 }
