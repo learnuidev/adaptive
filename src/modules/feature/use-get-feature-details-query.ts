@@ -28,11 +28,11 @@ const getFeatureDetails = async (
   return resp;
 };
 
-export const listFeaturesQueryKey = "list-features";
+export const getFeatureDetailsQueryKey = "get-feature-details";
 
 export function useGetFeatureDetailsQuery(featureId: string) {
   return useQuery({
-    queryKey: [listFeaturesQueryKey, featureId],
+    queryKey: [getFeatureDetailsQueryKey, featureId],
     queryFn: () => getFeatureDetails(featureId),
   });
 }
