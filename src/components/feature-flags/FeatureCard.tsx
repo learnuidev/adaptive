@@ -1,96 +1,36 @@
 import { Card } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Users, Eye } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Feature } from "@/modules/feature/feature.types";
+import { format } from "date-fns";
 
 interface FeatureCardProps {
-  name: string;
-  description: string;
-  enabled: boolean;
-  rolloutPercentage: number;
-  environment: 'production' | 'staging' | 'development';
-  usersAffected: number;
-  onToggle: () => void;
+  feature: Feature;
 }
 
-export function FeatureCard({
-  name,
-  description,
-  enabled,
-  rolloutPercentage,
-  environment,
-  usersAffected,
-  onToggle
-}: FeatureCardProps) {
-  const environmentColors = {
-    production: 'bg-primary text-primary-foreground',
-    staging: 'bg-orange-500 text-white',
-    development: 'bg-blue-500 text-white'
-  };
-
+export function FeatureCard({ feature }: FeatureCardProps) {
   return (
-    <Card className="p-6 bg-gradient-card border-border/50 hover:shadow-medium transition-all duration-300 animate-fade-in glass">
-      <div className="flex items-start justify-between mb-4">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-foreground">{name}</h3>
-            <Badge className={environmentColors[environment]}>
-              {environment}
+    <Card className="p-4 bg-gradient-card border-border/50 hover:shadow-medium transition-all duration-300 glass">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold text-foreground truncate">{feature.name}</h3>
+          {feature.description && (
+            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+              {feature.description}
+            </p>
+          )}
+          <div className="flex items-center gap-2 mt-2 flex-wrap">
+            <Badge variant="secondary" className="text-xs font-mono">
+              {feature.featureKey}
             </Badge>
+            {feature.tags?.map((tag) => (
+              <Badge key={tag} variant="outline" className="text-xs">
+                {tag}
+              </Badge>
+            ))}
           </div>
-          <p className="text-sm text-muted-foreground">{description}</p>
         </div>
-        
-        <div className="flex items-center gap-2">
-          <Switch checked={enabled} onCheckedChange={onToggle} />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm">
-                <MoreHorizontal className="w-4 h-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="glass">
-              <DropdownMenuItem>
-                <Eye className="w-4 h-4 mr-2" />
-                View Details
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                Edit Configuration
-              </DropdownMenuItem>
-              <DropdownMenuItem className="text-destructive">
-                Delete Feature
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
-      
-      <div className="space-y-3">
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">Rollout</span>
-          <span className="font-medium text-foreground">{rolloutPercentage}%</span>
-        </div>
-        
-        <div className="w-full bg-muted/30 rounded-full h-2">
-          <div 
-            className="bg-primary rounded-full h-2 transition-all duration-500"
-            style={{ width: `${rolloutPercentage}%` }}
-          />
-        </div>
-        
-        <div className="flex items-center justify-between text-sm">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Users className="w-4 h-4" />
-            <span>Users affected</span>
-          </div>
-          <span className="font-medium text-foreground">{usersAffected.toLocaleString()}</span>
+        <div className="text-xs text-muted-foreground whitespace-nowrap">
+          {format(new Date(feature.createdAt), "MMM d, yyyy")}
         </div>
       </div>
     </Card>

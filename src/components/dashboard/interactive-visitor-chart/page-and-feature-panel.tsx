@@ -7,28 +7,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ExternalLink } from "lucide-react";
-import {
-  LocationView,
-  useGetTotalVisitorsByQuery,
-} from "@/modules/analytics/use-get-total-visitors-by";
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
 import { useMemo, useState } from "react";
 import {
-  ComposableMap,
-  Geographies,
-  Geography,
-  ZoomableGroup,
-} from "react-simple-maps";
-import {
   DetailsButton,
-  LocationList,
-  MapLegend,
   TabContent,
 } from "./interactive-visitor-chart.components";
 import { useGetSummaryQuery } from "@/modules/analytics/use-get-summary-query";
-import { useParams } from "@tanstack/react-router";
-
-const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@3/countries-110m.json";
+import { useListFeaturesQuery } from "@/modules/feature/use-list-features-query";
 
 interface InteractiveVisitorChartProps {
   credentialId: string;
@@ -37,22 +23,15 @@ interface InteractiveVisitorChartProps {
 export function PageAndFeaturePanel({
   credentialId,
 }: InteractiveVisitorChartProps) {
-  const [locationView, setLocationView] = useState<LocationView>("page");
+  const [currentTab, setCurrentTab] = useState<"page" | "feature">("page");
   const { selectedPeriod } = useFilterPeriodStore();
-
-  const { data: locationData } = useGetTotalVisitorsByQuery({
-    websiteId: credentialId,
-    period: selectedPeriod,
-    groupBy: locationView === "map" ? "country" : locationView,
-  });
-
-  const params = useParams({ strict: false }) as { credentialId?: string };
-  // const credentialId = params?.credentialId;
 
   const { data: summary } = useGetSummaryQuery({
     websiteId: credentialId,
     period: selectedPeriod,
   });
+
+  const { data: features } = useListFeaturesQuery(credentialId);
 
   const currentPageVisitsPerPage = useMemo(
     () =>
@@ -87,8 +66,8 @@ export function PageAndFeaturePanel({
   return (
     <Card className="bg-gradient-card border-border/50 hover:shadow-medium transition-all duration-300 animate-fade-in glass">
       <Tabs
-        value={locationView}
-        onValueChange={(v) => setLocationView(v as any)}
+        value={currentTab}
+        onValueChange={(v) => setCurrentTab(v as "page" | "feature")}
       >
         <TabsList className="w-full rounded-none border-b border-border/50 bg-transparent p-0 h-12">
           <TabsTrigger
@@ -98,10 +77,10 @@ export function PageAndFeaturePanel({
             Page
           </TabsTrigger>
           <TabsTrigger
-            value="city"
+            value="feature"
             className="rounded-none data-[state=active]:bg-secondary data-[state=active]:text-foreground text-muted-foreground"
           >
-            Feature
+            Features
           </TabsTrigger>
         </TabsList>
 
@@ -179,11 +158,37 @@ export function PageAndFeaturePanel({
 
         <TabContent value="feature">
           <div className="min-h-[420px]">
-            <LocationList
-              data={locationData}
-              icon="📍"
-              locationView={locationView}
-            />
+            <div className="p-4 border-b border-border/50">
+              <div className="flex items-center justify-between text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <span>Feature</span>
+                <span>Count</span>
+              </div>
+            </div>
+            <div className="p-4 space-y-2">
+              {features && features.length > 0 ? (
+                features.map((feature, index) => (
+                  <div key={feature.id} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">
+                        {feature.name}
+                      </p>
+                      {feature.description && (
+                        <p className="text-xs text-muted-foreground truncate">
+                          {feature.description}
+                        </p>
+                      )}
+                    </div>
+                    <span className="text-sm font-mono text-muted-foreground ml-4">
+                      {feature.featureKey}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="flex items-center justify-center h-[360px] text-muted-foreground">
+                  No features yet
+                </div>
+              )}
+            </div>
           </div>
           <DetailsButton />
         </TabContent>
