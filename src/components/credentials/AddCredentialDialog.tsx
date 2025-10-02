@@ -29,8 +29,22 @@ import { useToast } from "@/hooks/use-toast";
 interface AddCredentialDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess?: (credential: { id: string; title: string; accessKeyId: string; secretKey: string }) => void;
+  onSuccess?: (credential: {
+    id: string;
+    title: string;
+    accessKeyId: string;
+    secretKey: string;
+  }) => void;
 }
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { timezones } from "./timezones";
 
 export function AddCredentialDialog({
   open,
@@ -46,6 +60,7 @@ export function AddCredentialDialog({
       title: "",
       description: "",
       domain: "",
+      timeZone: "America/Montreal",
       scopes: [],
     },
   });
@@ -126,6 +141,33 @@ export function AddCredentialDialog({
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="timeZone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Time Zone</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a timezone" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {timezones.map((tz) => (
+                        <SelectItem key={tz.name} value={tz.name}>
+                          {tz.name} ({tz.offsetStr})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="scopes"

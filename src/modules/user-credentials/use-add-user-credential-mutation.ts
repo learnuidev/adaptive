@@ -25,6 +25,7 @@ export const addUserCredentialParamSchema = z.object({
   description: z.string().min(1),
   domain: z.string().min(1),
   scopes: z.array(z.enum(["read", "write", "*"])),
+  timeZone: z.string().min(1),
 });
 
 export type AddUserCredentialParam = z.infer<
