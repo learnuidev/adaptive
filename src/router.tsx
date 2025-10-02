@@ -17,6 +17,7 @@ import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
 import UserDetail from "./pages/UserDetail";
 import Cohorts from "./pages/Cohorts";
+import AddCohort from "./pages/AddCohort";
 import Features from "./pages/Features";
 import FeatureDetail from "./pages/FeatureDetail";
 import AddFeatureVersion from "./pages/AddFeatureVersion";
@@ -88,6 +89,12 @@ const cohortsRoute = createRoute({
   component: Cohorts,
 });
 
+const addCohortRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/cohorts/$credentialId/add",
+  component: AddCohort,
+});
+
 const featureFlagsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/features/$credentialId",
@@ -142,6 +149,7 @@ const routeTree = rootRoute.addChildren([
   usersRoute,
   userDetailRoute,
   cohortsRoute,
+  addCohortRoute,
   featureFlagsRoute,
   featureDetailRoute,
   addFeatureVersionRoute,

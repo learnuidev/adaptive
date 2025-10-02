@@ -3,21 +3,20 @@ import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { useParams } from "@tanstack/react-router";
+import { useParams, useNavigate } from "@tanstack/react-router";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
 import { WithGlow } from "@/components/with-glow";
 import { useListCohortsQuery } from "@/modules/cohort/use-list-cohorts-query";
 import { CohortCard } from "@/components/cohorts/CohortCard";
-import { AddCohortDialog } from "@/components/cohorts/AddCohortDialog";
 
 const Cohorts = () => {
   const params = useParams({ strict: false }) as { credentialId?: string };
   const credentialId = params?.credentialId;
+  const navigate = useNavigate();
   const { data: credentials } = useListUserCredentialsQuery();
   const { data: cohorts, isLoading } = useListCohortsQuery(credentialId || "");
   const [searchQuery, setSearchQuery] = useState("");
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   const currentCredential = credentials?.find(
     (cred) => cred.id === credentialId
@@ -48,7 +47,7 @@ const Cohorts = () => {
             </div>
             <WithGlow>
               <Button
-                onClick={() => setIsAddDialogOpen(true)}
+                onClick={() => navigate({ to: `/cohorts/${credentialId}/add` })}
                 className="bg-gradient-primary hover:bg-primary-glow shadow-emerald"
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -105,12 +104,6 @@ const Cohorts = () => {
           </div>
         )}
       </div>
-
-      <AddCohortDialog
-        open={isAddDialogOpen}
-        onOpenChange={setIsAddDialogOpen}
-        websiteId={credentialId || ""}
-      />
     </div>
   );
 };
