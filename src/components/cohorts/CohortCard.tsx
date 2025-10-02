@@ -17,6 +17,7 @@ import { Cohort } from "@/modules/cohort/cohort.types";
 import { format } from "date-fns";
 import { useDeleteCohortMutation } from "@/modules/cohort/use-delete-cohort-mutation";
 import { toast } from "sonner";
+import { useNavigate } from "@tanstack/react-router";
 
 interface CohortCardProps {
   cohort: Cohort;
@@ -26,6 +27,7 @@ interface CohortCardProps {
 export function CohortCard({ cohort, websiteId }: CohortCardProps) {
   const ruleCount = cohort.cohortRules?.length || 0;
   const deleteCohortMutation = useDeleteCohortMutation();
+  const navigate = useNavigate();
 
   const handleDelete = async () => {
     try {
@@ -40,7 +42,10 @@ export function CohortCard({ cohort, websiteId }: CohortCardProps) {
   };
 
   return (
-    <Card className="glass border-border/50 hover:border-primary/20 transition-all">
+    <Card 
+      className="glass border-border/50 hover:border-primary/20 transition-all cursor-pointer"
+      onClick={() => navigate({ to: `/cohorts/${websiteId}/${cohort.id}` })}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
@@ -57,7 +62,12 @@ export function CohortCard({ cohort, websiteId }: CohortCardProps) {
           </div>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-8 w-8"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <Trash2 className="w-4 h-4 text-destructive" />
               </Button>
             </AlertDialogTrigger>
