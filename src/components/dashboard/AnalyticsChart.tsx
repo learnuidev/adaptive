@@ -1,5 +1,10 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { FilterPeriod } from "@/modules/analytics/analytics.types";
+import { Button } from "@/components/ui/button";
+import { StickyNote, MessageSquare } from "lucide-react";
+import { ChartNoteDialog } from "./ChartNoteDialog";
+import { useChartNotesStore } from "@/stores/chart-notes-store";
 
 import {
   LineChart,
@@ -16,15 +21,51 @@ import {
   TooltipProps,
 } from "recharts";
 
+interface CustomTooltipProps extends TooltipProps<number, string> {
+  chartKey: string;
+  onAddNote?: (dataPoint: string, label: string) => void;
+}
+
 const CustomTooltip = ({
   active,
   payload,
   label,
-}: TooltipProps<number, string>) => {
+  chartKey,
+  onAddNote,
+}: CustomTooltipProps) => {
+  const { getNoteForPoint } = useChartNotesStore();
+  const existingNote = getNoteForPoint(chartKey, label || "");
+
   if (active && payload && payload.length) {
     return (
       <div className="glass p-4 rounded-lg border border-border/50 shadow-lg min-w-[200px]">
-        <p className="font-semibold text-foreground mb-3">{label}</p>
+        <div className="flex items-start justify-between gap-3 mb-3">
+          <p className="font-semibold text-foreground">{label}</p>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 w-6 p-0 hover:bg-white/10"
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddNote?.(label || "", label || "");
+            }}
+          >
+            {existingNote ? (
+              <MessageSquare className="h-4 w-4 text-primary fill-primary/20" />
+            ) : (
+              <StickyNote className="h-4 w-4 text-muted-foreground hover:text-primary" />
+            )}
+          </Button>
+        </div>
+        
+        {existingNote && (
+          <div className="mb-3 p-2 rounded bg-primary/10 border border-primary/20">
+            <p className="text-xs text-muted-foreground line-clamp-2">
+              {existingNote.note}
+            </p>
+          </div>
+        )}
+        
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
@@ -116,6 +157,13 @@ export function AnalyticsChart({
   secondaryLabel,
 }: AnalyticsChartProps) {
   const subtitle = formatPeriodSubtitle(selectedPeriod);
+  const [noteDialogOpen, setNoteDialogOpen] = useState(false);
+  const [selectedDataPoint, setSelectedDataPoint] = useState<{ dataPoint: string; label: string }>({ dataPoint: "", label: "" });
+
+  const handleAddNote = (dataPoint: string, label: string) => {
+    setSelectedDataPoint({ dataPoint, label });
+    setNoteDialogOpen(true);
+  };
 
   const colorPaletteMap = {
     green: "hsl(160, 84%, 39%)",
@@ -128,11 +176,12 @@ export function AnalyticsChart({
   const previousDataColor = "hsl(40, 50%, 60%)";
 
   return (
-    <Card className="p-6 bg-gradient-card border-border/50 hover:shadow-medium transition-all duration-300 animate-fade-in glass">
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-foreground">{title}</h3>
-        <p className="text-sm text-muted-foreground">{subtitle}</p>
-      </div>
+    <>
+      <Card className="p-6 bg-gradient-card border-border/50 hover:shadow-medium transition-all duration-300 animate-fade-in glass">
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+          <p className="text-sm text-muted-foreground">{subtitle}</p>
+        </div>
       <div style={{ height }}>
         <ResponsiveContainer width="100%" height="100%">
           {type === "composed" ? (
@@ -163,7 +212,10 @@ export function AnalyticsChart({
                 tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
                 allowDecimals={false}
               />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted) / 0.1)' }} />
+              <Tooltip 
+                content={<CustomTooltip chartKey={chartKey} onAddNote={handleAddNote} />} 
+                cursor={{ fill: 'hsl(var(--muted) / 0.1)' }} 
+              />
               <Bar
                 yAxisId="left"
                 dataKey="value"
@@ -247,6 +299,10 @@ export function AnalyticsChart({
                 domain={[1, 'auto']}
                 allowDecimals={false}
               />
+              <Tooltip 
+                content={<CustomTooltip chartKey={chartKey} onAddNote={handleAddNote} />} 
+                cursor={{ fill: 'hsl(var(--muted) / 0.1)' }} 
+              />
               {previousData && (
                 <Line
                   type="monotone"
@@ -287,6 +343,10 @@ export function AnalyticsChart({
                 domain={[1, 'auto']}
                 allowDecimals={false}
               />
+              <Tooltip 
+                content={<CustomTooltip chartKey={chartKey} onAddNote={handleAddNote} />} 
+                cursor={{ fill: 'hsl(var(--muted) / 0.1)' }} 
+              />
               {previousData && (
                 <Line
                   type="monotone"
@@ -312,5 +372,14 @@ export function AnalyticsChart({
         </ResponsiveContainer>
       </div>
     </Card>
+    
+    <ChartNoteDialog
+      open={noteDialogOpen}
+      onOpenChange={setNoteDialogOpen}
+      chartKey={chartKey}
+      dataPoint={selectedDataPoint.dataPoint}
+      dataPointLabel={selectedDataPoint.label}
+    />
+    </>
   );
 }
