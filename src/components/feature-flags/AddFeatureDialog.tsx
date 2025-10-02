@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,18 +19,22 @@ interface AddFeatureDialogProps {
   credentialId: string;
 }
 
-export function AddFeatureDialog({ open, onOpenChange, credentialId }: AddFeatureDialogProps) {
+export function AddFeatureDialog({
+  open,
+  onOpenChange,
+  credentialId,
+}: AddFeatureDialogProps) {
   const [name, setName] = useState("");
   const [featureKey, setFeatureKey] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState("");
-  
+
   const { data: authUser } = useGetAuthUserQuery();
   const addFeatureMutation = useAddFeatureMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!authUser?.email) {
       toast.error("User email not found");
       return;
@@ -39,12 +48,17 @@ export function AddFeatureDialog({ open, onOpenChange, credentialId }: AddFeatur
         userId: authUser.email,
         websiteId: credentialId,
         featureKeyAndWebsiteId: `${featureKey}#${credentialId}`,
-        tags: tags ? tags.split(",").map(t => t.trim()).filter(Boolean) : undefined,
+        tags: tags
+          ? tags
+              .split(",")
+              .map((t) => t.trim())
+              .filter(Boolean)
+          : undefined,
       });
-      
+
       toast.success("Feature created");
       onOpenChange(false);
-      
+
       // Reset form
       setName("");
       setFeatureKey("");
@@ -61,14 +75,19 @@ export function AddFeatureDialog({ open, onOpenChange, credentialId }: AddFeatur
         <DialogHeader>
           <DialogTitle>Create Feature</DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input
               id="name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+
+                setName(val);
+                setFeatureKey(val?.split(" ").join("-").toLowerCase());
+              }}
               placeholder="Dark Mode"
               required
               className="glass"
@@ -108,7 +127,9 @@ export function AddFeatureDialog({ open, onOpenChange, credentialId }: AddFeatur
               placeholder="ui, theme, accessibility"
               className="glass"
             />
-            <p className="text-xs text-muted-foreground">Separate tags with commas</p>
+            <p className="text-xs text-muted-foreground">
+              Separate tags with commas
+            </p>
           </div>
 
           <div className="flex justify-end gap-2 pt-4">

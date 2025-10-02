@@ -12,7 +12,22 @@ import { useGetAuthUserQuery } from "@/modules/auth/use-get-auth-user-query";
 import { useToast } from "@/hooks/use-toast";
 import { RolloutRuleBuilder } from "@/components/feature-flags/RolloutRuleBuilder";
 import { ArrowLeft } from "lucide-react";
-import { RolloutRuleGroup } from "@/components/feature-flags/AddFeatureVersionDialog";
+// import { RolloutRuleGroup } from "@/components/feature-flags/AddFeatureVersionDialog";
+interface AddFeatureVersionDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  featureId: string;
+  websiteId: string;
+}
+
+export type RolloutRuleGroup = {
+  type: "and" | "or";
+  fields: Array<{
+    field: string;
+    op: string;
+    value: string;
+  }>;
+};
 
 export default function AddFeatureVersion() {
   const params = useParams({ strict: false }) as {
@@ -21,6 +36,7 @@ export default function AddFeatureVersion() {
   };
   const navigate = useNavigate();
   const [version, setVersion] = useState("");
+  const [description, setDescription] = useState("");
   const [configJson, setConfigJson] = useState("{}");
   const [isActive, setIsActive] = useState(false);
   const [rolloutPercentage, setRolloutPercentage] = useState<number>(100);
@@ -52,15 +68,6 @@ export default function AddFeatureVersion() {
       return;
     }
 
-    if (!user?.id) {
-      toast({
-        title: "Error",
-        description: "User not authenticated",
-        variant: "destructive",
-      });
-      return;
-    }
-
     if (!params.featureId) {
       toast({
         title: "Error",
@@ -72,13 +79,13 @@ export default function AddFeatureVersion() {
 
     addVersion(
       {
+        description,
         featureId: params.featureId,
         version,
         config,
         isActive,
         rolloutPercentage,
         rolloutRules: rolloutRules.length > 0 ? rolloutRules : null,
-        createdBy: user.id,
       },
       {
         onSuccess: () => {
@@ -132,6 +139,19 @@ export default function AddFeatureVersion() {
       {/* Form */}
       <div className="p-6 max-w-4xl mx-auto">
         <Card className="p-6 space-y-6">
+          {/* Version */}
+          <div className="space-y-2">
+            <Label htmlFor="version">Description</Label>
+            <Input
+              id="version"
+              placeholder="Add a description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              A sample description for this version (e.g., "Add a new feature")
+            </p>
+          </div>
           {/* Version */}
           <div className="space-y-2">
             <Label htmlFor="version">Version *</Label>

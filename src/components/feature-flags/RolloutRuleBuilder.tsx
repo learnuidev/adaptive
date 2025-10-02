@@ -1,12 +1,24 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Plus, Trash2, Info } from "lucide-react";
-import { RolloutRuleGroup } from "./AddFeatureVersionDialog";
+// import { RolloutRuleGroup } from "./AddFeatureVersionDialog";
 import { useListMetadatasByWebsiteIdQuery } from "@/modules/analytics/list-metadatas-by-website-id.query";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { RolloutRuleGroup } from "@/pages/AddFeatureVersion";
 
 interface RolloutRuleBuilderProps {
   rules: RolloutRuleGroup[];
@@ -44,7 +56,11 @@ const EVENT_FIELDS = [
   "href",
 ];
 
-export function RolloutRuleBuilder({ rules, onChange, websiteId }: RolloutRuleBuilderProps) {
+export function RolloutRuleBuilder({
+  rules,
+  onChange,
+  websiteId,
+}: RolloutRuleBuilderProps) {
   const { data: metadatas } = useListMetadatasByWebsiteIdQuery({ websiteId });
 
   const addRuleGroup = () => {
@@ -69,13 +85,19 @@ export function RolloutRuleBuilder({ rules, onChange, websiteId }: RolloutRuleBu
 
   const addFieldToGroup = (groupIndex: number) => {
     const newRules = [...rules];
-    newRules[groupIndex].fields.push({ field: "event_name", op: "=", value: "" });
+    newRules[groupIndex].fields.push({
+      field: "event_name",
+      op: "=",
+      value: "",
+    });
     onChange(newRules);
   };
 
   const removeFieldFromGroup = (groupIndex: number, fieldIndex: number) => {
     const newRules = [...rules];
-    newRules[groupIndex].fields = newRules[groupIndex].fields.filter((_, i) => i !== fieldIndex);
+    newRules[groupIndex].fields = newRules[groupIndex].fields.filter(
+      (_, i) => i !== fieldIndex
+    );
     onChange(newRules);
   };
 
@@ -101,7 +123,9 @@ export function RolloutRuleBuilder({ rules, onChange, websiteId }: RolloutRuleBu
         <Card key={groupIndex} className="p-4 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Rule Group {groupIndex + 1}</span>
+              <span className="text-sm font-medium">
+                Rule Group {groupIndex + 1}
+              </span>
               <Select
                 value={group.type}
                 onValueChange={(value: "and" | "or") =>

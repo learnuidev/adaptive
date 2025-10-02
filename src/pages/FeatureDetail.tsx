@@ -8,12 +8,14 @@ import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function FeatureDetail() {
-  const params = useParams({ strict: false }) as { 
-    credentialId?: string; 
+  const params = useParams({ strict: false }) as {
+    credentialId?: string;
     featureId?: string;
   };
   const navigate = useNavigate();
-  const { data: featureDetails, isLoading } = useGetFeatureDetailsQuery(params.featureId || "");
+  const { data: featureDetails, isLoading } = useGetFeatureDetailsQuery(
+    params.featureId || ""
+  );
 
   if (isLoading) {
     return (
@@ -68,11 +70,13 @@ export default function FeatureDetail() {
                 ))}
               </div>
             </div>
-            <Button 
+            <Button
               className="bg-gradient-primary hover:bg-primary-glow shadow-emerald"
-              onClick={() => navigate({ 
-                to: `/features/${params.credentialId}/${params.featureId}/add-version` 
-              })}
+              onClick={() =>
+                navigate({
+                  to: `/features/${params.credentialId}/${params.featureId}/add-version`,
+                })
+              }
             >
               <Plus className="w-4 h-4 mr-2" />
               Add Version
@@ -88,26 +92,30 @@ export default function FeatureDetail() {
       {/* Versions */}
       <div className="p-6">
         <h2 className="text-lg font-semibold text-foreground mb-4">Versions</h2>
-        
+
         {featureDetails.versions && featureDetails.versions.length > 0 ? (
           <div className="space-y-3">
             {featureDetails.versions.map((version) => (
-              <Card key={version.version} className="p-4 glass border-border/50">
+              <Card
+                key={version.version}
+                className="p-4 glass border-border/50"
+              >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="font-semibold text-foreground">
-                        v{version.version}
+                        {version?.description} - v{version.version}
                       </h3>
                       {version.isActive && (
                         <Badge variant="default">Active</Badge>
                       )}
                     </div>
-                    {version.rolloutPercentage !== null && version.rolloutPercentage !== undefined && (
-                      <p className="text-sm text-muted-foreground">
-                        Rollout: {version.rolloutPercentage}%
-                      </p>
-                    )}
+                    {version.rolloutPercentage !== null &&
+                      version.rolloutPercentage !== undefined && (
+                        <p className="text-sm text-muted-foreground">
+                          Rollout: {version.rolloutPercentage}%
+                        </p>
+                      )}
                   </div>
                 </div>
               </Card>

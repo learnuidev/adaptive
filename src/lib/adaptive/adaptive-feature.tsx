@@ -5,16 +5,19 @@ import React, { createContext, useContext } from "react";
 
 export function useIsFeatureEnabled({
   featureKey,
+  websiteId,
   featureVersionId,
 }: {
   featureKey: string;
+  websiteId?: string;
   featureVersionId?: string;
 }) {
   const adaptive = useAdaptive();
 
   return useQuery<boolean>({
-    queryKey: ["is-feature-enabled", featureKey, featureVersionId],
-    queryFn: () => adaptive.isFeatureEnabled({ featureKey, featureVersionId }),
+    queryKey: ["is-feature-enabled", featureKey, websiteId, featureVersionId],
+    queryFn: () =>
+      adaptive.isFeatureEnabled({ featureKey, featureVersionId, websiteId }),
   });
 }
 type IAdaptiveFeatureContext = {
@@ -51,12 +54,14 @@ export function useTrackFeature() {
 
 export function AdaptiveFeature({
   featureKey,
+  websiteId,
   featureVersionId,
   LoadingComponent,
   FallbackComponent,
   children,
 }: {
   featureKey: string;
+  websiteId?: string;
   featureVersionId?: string;
   LoadingComponent?: () => React.ReactNode;
   FallbackComponent?: () => React.ReactNode;
@@ -64,6 +69,7 @@ export function AdaptiveFeature({
 }) {
   const { data, isLoading } = useIsFeatureEnabled({
     featureKey,
+    websiteId,
     featureVersionId,
   });
 

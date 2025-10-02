@@ -62,13 +62,19 @@ const addFeatureVersion = async (
   input: AddFeatureVersionParam
 ): Promise<FeatureVersion> => {
   // Validate input against schema before posting
-  addFeatureVersionSchema.parse(input);
+  const parseResp = addFeatureVersionSchema.safeParse(input);
+
+  if (!parseResp.success) {
+    throw Error(parseResp.error.message);
+  }
+
+  console.log("parse resp", parseResp);
 
   const res = await fetchWithToken(
     `${appConfig.apiUrl}/v1/analytics/add-feature-version`,
     {
       method: "POST",
-      body: JSON.stringify(input),
+      body: JSON.stringify(parseResp.data),
     }
   );
 
