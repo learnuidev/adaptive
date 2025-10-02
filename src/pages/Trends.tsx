@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, ShieldOff } from "lucide-react";
 import { useParams } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { TrendTypeSelector } from "@/components/trends/TrendTypeSelector";
@@ -25,6 +25,7 @@ import {
 } from "@/lib/adaptive/adaptive-feature";
 import { useAdaptive } from "@/lib/adaptive/adaptive-core-provider";
 import { WithGlow } from "@/components/with-glow";
+import { FeatureNotEnabled } from "@/components/feature-not-enabled";
 
 type ViewState = "list" | "selector" | "form";
 
@@ -356,8 +357,8 @@ export default function Trends() {
   return (
     <AdaptiveFeature
       featureKey="trends-feature"
-      // featureVersionId={"01K6HJ19HXH65S9QE05M3DC15K"}
       featureVersionId={"01K6HJC9PB5XASJCZ8KWAC7R8T"}
+      FallbackComponent={FeatureNotEnabled}
     >
       <TrendsFeature />
     </AdaptiveFeature>
