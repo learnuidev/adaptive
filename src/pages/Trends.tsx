@@ -354,7 +354,10 @@ const TrendsFeature = () => {
 
 export default function Trends() {
   return (
-    <AdaptiveFeature featureKey="trends-feature">
+    <AdaptiveFeature
+      featureKey="trends-feature"
+      featureVersionId={"01K6HJ19HXH65S9QE05M3DC15K"}
+    >
       <TrendsFeature />
     </AdaptiveFeature>
   );
