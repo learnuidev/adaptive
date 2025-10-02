@@ -65,3 +65,8 @@ export const filterPeriods: Record<FilterPeriod, FilterPeriod> = {
   all: "all",
   custom: "custom",
 };
+
+export type MetadataItem = {
+  key: string;
+  values: string[];
+};
