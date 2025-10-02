@@ -152,6 +152,7 @@ export function AnalyticsChart({
                 axisLine={false}
                 tickLine={false}
                 tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                domain={[1, 'auto']}
               />
               <YAxis
                 yAxisId="right"
@@ -241,6 +242,7 @@ export function AnalyticsChart({
                 axisLine={false}
                 tickLine={false}
                 tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                domain={[1, 'auto']}
               />
               {previousData && (
                 <Line
@@ -279,6 +281,7 @@ export function AnalyticsChart({
                 axisLine={false}
                 tickLine={false}
                 tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                domain={[1, 'auto']}
               />
               {previousData && (
                 <Line
