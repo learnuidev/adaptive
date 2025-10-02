@@ -19,6 +19,7 @@ import UserDetail from "./pages/UserDetail";
 import Cohorts from "./pages/Cohorts";
 import Features from "./pages/Features";
 import FeatureDetail from "./pages/FeatureDetail";
+import AddFeatureVersion from "./pages/AddFeatureVersion";
 import Events from "./pages/Events";
 import Goals from "./pages/Goals";
 import Trends from "./pages/Trends";
@@ -129,6 +130,12 @@ const settingsRoute = createRoute({
   component: Settings,
 });
 
+const addFeatureVersionRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/features/$credentialId/$featureId/add-version",
+  component: AddFeatureVersion,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   dashboardRoute,
@@ -137,6 +144,7 @@ const routeTree = rootRoute.addChildren([
   cohortsRoute,
   featureFlagsRoute,
   featureDetailRoute,
+  addFeatureVersionRoute,
   eventsRoute,
   goalsRoute,
   trendsRoute,
