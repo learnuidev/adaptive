@@ -153,6 +153,7 @@ export function AnalyticsChart({
                 tickLine={false}
                 tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
                 domain={[1, 'auto']}
+                allowDecimals={false}
               />
               <YAxis
                 yAxisId="right"
@@ -160,6 +161,7 @@ export function AnalyticsChart({
                 axisLine={false}
                 tickLine={false}
                 tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                allowDecimals={false}
               />
               <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted) / 0.1)' }} />
               <Bar
@@ -243,6 +245,7 @@ export function AnalyticsChart({
                 tickLine={false}
                 tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
                 domain={[1, 'auto']}
+                allowDecimals={false}
               />
               {previousData && (
                 <Line
@@ -282,6 +285,7 @@ export function AnalyticsChart({
                 tickLine={false}
                 tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
                 domain={[1, 'auto']}
+                allowDecimals={false}
               />
               {previousData && (
                 <Line
