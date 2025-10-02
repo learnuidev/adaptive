@@ -28,36 +28,56 @@ import Trends from "./pages/Trends";
 import Insights from "./pages/Insights";
 import Settings from "./pages/Settings";
 import CredentialsList from "./pages/CredentialsList";
+import Documentation from "./pages/Documentation";
 
 const queryClient = new QueryClient();
 
+// Main root route with conditional authentication
 const rootRoute = createRootRoute({
-  component: () => (
-    <QueryClientProvider client={queryClient}>
-      <Authenticated>
-        <AdapiveProvider>
+  component: () => {
+    const path = window.location.pathname;
+    const isPublicRoute = path.startsWith('/doc');
+    
+    if (isPublicRoute) {
+      return (
+        <QueryClientProvider client={queryClient}>
           <ThemeProvider>
             <TooltipProvider>
-              <SidebarProvider>
-                <div className="flex h-screen w-full bg-background">
-                  <AppSidebar />
-                  <main className="flex-1 flex flex-col">
-                    <header className="flex h-12 items-center border-b bg-background px-4">
-                      <SidebarTrigger />
-                    </header>
-                    <div className="flex-1 overflow-auto p-4">
-                      <Outlet />
-                    </div>
-                    <Toaster />
-                  </main>
-                </div>
-              </SidebarProvider>
+              <Outlet />
+              <Toaster />
             </TooltipProvider>
           </ThemeProvider>
-        </AdapiveProvider>
-      </Authenticated>
-    </QueryClientProvider>
-  ),
+        </QueryClientProvider>
+      );
+    }
+    
+    return (
+      <QueryClientProvider client={queryClient}>
+        <Authenticated>
+          <AdapiveProvider>
+            <ThemeProvider>
+              <TooltipProvider>
+                <SidebarProvider>
+                  <div className="flex h-screen w-full bg-background">
+                    <AppSidebar />
+                    <main className="flex-1 flex flex-col">
+                      <header className="flex h-12 items-center border-b bg-background px-4">
+                        <SidebarTrigger />
+                      </header>
+                      <div className="flex-1 overflow-auto p-4">
+                        <Outlet />
+                      </div>
+                      <Toaster />
+                    </main>
+                  </div>
+                </SidebarProvider>
+              </TooltipProvider>
+            </ThemeProvider>
+          </AdapiveProvider>
+        </Authenticated>
+      </QueryClientProvider>
+    );
+  },
 });
 
 const indexRoute = createRoute({
@@ -150,6 +170,13 @@ const addFeatureVersionRoute = createRoute({
   component: AddFeatureVersion,
 });
 
+// Public documentation route (no authentication required)
+const documentationRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/doc",
+  component: Documentation,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   dashboardRoute,
@@ -166,6 +193,7 @@ const routeTree = rootRoute.addChildren([
   trendsRoute,
   insightsRoute,
   settingsRoute,
+  documentationRoute,
 ]);
 
 // @ts-ignore - Temporary fix for router type issues
