@@ -4,9 +4,7 @@ import { appConfig } from "@/lib/app-config";
 import { fetchWithToken } from "@/lib/aws-smplify/fetch-with-token";
 
 export interface CohortUser {
-  id: string;
   email?: string;
-  createdAt: string;
 }
 
 const listCohortUsers = async (cohortId: string): Promise<CohortUser[]> => {
