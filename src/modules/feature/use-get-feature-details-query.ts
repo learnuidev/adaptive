@@ -3,9 +3,15 @@ import { useQuery } from "@tanstack/react-query";
 import { appConfig } from "@/lib/app-config";
 import { fetchWithToken } from "@/lib/aws-smplify/fetch-with-token";
 
-import { Feature } from "./feature.types";
+import { Feature, FeatureVersion } from "./feature.types";
 
-const getFeatureDetails = async (featureId: string): Promise<Feature[]> => {
+type FeatureDetails = Feature & {
+  versions: FeatureVersion[];
+};
+
+const getFeatureDetails = async (
+  featureId: string
+): Promise<FeatureDetails> => {
   const res = await fetchWithToken(
     `${appConfig.apiUrl}/v1/analytics/get-feature-details`,
     {
@@ -19,7 +25,7 @@ const getFeatureDetails = async (featureId: string): Promise<Feature[]> => {
   }
 
   const resp = await res.json();
-  return resp as Feature[];
+  return resp;
 };
 
 export const listFeaturesQueryKey = "list-features";
