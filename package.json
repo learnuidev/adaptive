@@ -44,7 +44,7 @@
     "@tanstack/react-router": "^1.132.7",
     "@uiw/react-json-view": "^2.0.0-alpha.39",
     "adaptive-engine": "^2025.9.2-6.2.12",
-    "adaptive.fyi": "^2025.9.3-0.15.35",
+    "adaptive.fyi": "^2025.9.3-0.18.18",
     "aws-amplify": "^6.15.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

@@ -24,6 +24,7 @@ import {
   useTrackFeature,
 } from "@/lib/adaptive/adaptive-feature";
 import { useAdaptive } from "@/lib/adaptive/adaptive-core-provider";
+import { WithGlow } from "@/components/with-glow";
 
 type ViewState = "list" | "selector" | "form";
 
@@ -295,16 +296,18 @@ const TrendsFeature = () => {
               <p className="text-muted-foreground mb-4">
                 No trends created yet
               </p>
-              <Button
-                onClick={() => {
-                  track("create-new-trend");
+              <WithGlow>
+                <Button
+                  onClick={() => {
+                    track("create-new-trend");
 
-                  setViewState("selector");
-                }}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Create Your First Trend
-              </Button>
+                    setViewState("selector");
+                  }}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Your First Trend
+                </Button>
+              </WithGlow>
             </div>
           ) : (
             <div className="grid gap-6">

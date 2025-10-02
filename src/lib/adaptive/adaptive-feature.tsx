@@ -3,16 +3,23 @@ import { useAdaptive } from "./adaptive-core-provider";
 
 import React, { createContext, useContext } from "react";
 
-export function useIsFeatureEnabled(featureKey: string) {
+export function useIsFeatureEnabled({
+  featureKey,
+  featureVersionId,
+}: {
+  featureKey: string;
+  featureVersionId?: string;
+}) {
   const adaptive = useAdaptive();
 
   return useQuery<boolean>({
-    queryKey: ["is-feature-enabled", featureKey],
-    queryFn: () => adaptive.isFeatureEnabled(featureKey),
+    queryKey: ["is-feature-enabled", featureKey, featureVersionId],
+    queryFn: () => adaptive.isFeatureEnabled({ featureKey, featureVersionId }),
   });
 }
 type IAdaptiveFeatureContext = {
   featureKey: string;
+  featureVersionId: string;
 };
 
 const AdaptiveFeatureContext = createContext<
@@ -29,12 +36,13 @@ export const useFeatureKey = () => {
 
 export function useTrackFeature() {
   const adaptive = useAdaptive();
-  const { featureKey } = useFeatureKey();
+  const { featureKey, featureVersionId } = useFeatureKey();
 
   const track = (eventName: string, payload?: any) => {
     adaptive.adaptive(eventName, {
       ...payload,
       featureKey,
+      featureVersionId,
     });
   };
 
@@ -43,14 +51,21 @@ export function useTrackFeature() {
 
 export function AdaptiveFeature({
   featureKey,
+  featureVersionId,
   LoadingComponent,
+  FallbackComponent,
   children,
 }: {
   featureKey: string;
+  featureVersionId?: string;
   LoadingComponent?: () => React.ReactNode;
+  FallbackComponent?: () => React.ReactNode;
   children: React.ReactNode;
 }) {
-  const { data, isLoading } = useIsFeatureEnabled(featureKey);
+  const { data, isLoading } = useIsFeatureEnabled({
+    featureKey,
+    featureVersionId,
+  });
 
   if (isLoading) {
     if (LoadingComponent) {
@@ -61,7 +76,7 @@ export function AdaptiveFeature({
   }
 
   if (data === true) {
-    const adaptiveFeature = { featureKey };
+    const adaptiveFeature = { featureKey, featureVersionId };
 
     return (
       <div adaptive-feature-key={featureKey}>
@@ -70,6 +85,10 @@ export function AdaptiveFeature({
         </AdaptiveFeatureContext.Provider>
       </div>
     );
+  }
+
+  if (FallbackComponent) {
+    return <FallbackComponent />;
   }
 
   return null;
