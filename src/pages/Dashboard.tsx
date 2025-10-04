@@ -219,7 +219,7 @@ export default function Dashboard() {
     secondaryValue: totalPageVisitsOvertimeChartData[index]?.value || 0,
   }));
 
-  const [metricsEnabled, setMetricsEnabled] = useState([true, true]);
+  const [metricsEnabled, setMetricsEnabled] = useState([true, true, true]);
 
   const metricsData = [
     {
@@ -230,10 +230,17 @@ export default function Dashboard() {
       showCheckbox: true,
     },
     {
+      label: "Page Views",
+      value: summary?.totalPageVisits.current || 0,
+      change: summary?.totalPageVisits.percentageDifference || 0,
+      enabled: metricsEnabled[1],
+      showCheckbox: true,
+    },
+    {
       label: "Session time",
       value: summary?.averageSession.current ? formatSessionTime(summary) : "0",
       change: summary?.averageSession.percentageDifference || 0,
-      enabled: metricsEnabled[1],
+      enabled: metricsEnabled[2],
       showCheckbox: false,
     },
   ];
