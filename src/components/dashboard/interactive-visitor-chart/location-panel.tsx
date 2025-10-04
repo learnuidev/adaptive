@@ -19,7 +19,9 @@ import {
   TabContent,
 } from "./interactive-visitor-chart.components";
 
-const geoUrl = "/world.json";
+// const geoUrl = "/world.json";
+const geoUrl =
+  "https://nomadmethod-api-dev-assetsbucket-2u2iqsv5nizc.s3.amazonaws.com/01K6R1ZYAFM3E05H0C8GEXF0PV.json";
 
 interface InteractiveVisitorChartProps {
   credentialId: string;
