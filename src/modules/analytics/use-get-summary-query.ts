@@ -84,6 +84,15 @@ export type GetSummaryResponseRaw = {
     current: number;
     previous: number;
   };
+
+  goals: {
+    created_at: string;
+    email: string;
+    goalName: string;
+    id: string;
+  }[];
+
+  goalsCount: { goal: string; count: string }[];
 };
 
 const getSummaryRawResponse = {
@@ -246,6 +255,15 @@ export type GetSummaryResponse = {
     current: PageVisit[];
     previous: PageVisit[];
   };
+
+  goals: {
+    created_at: string;
+    email: string;
+    goalName: string;
+    id: string;
+  }[];
+
+  goalsCount: { goal: string; count: string }[];
 };
 
 async function getSummary({
@@ -342,6 +360,9 @@ async function getSummary({
         current: respRaw.totalPageVisits.current,
         previous: respRaw.totalPageVisits.previous,
       },
+
+      goals: respRaw.goals,
+      goalsCount: respRaw.goalsCount,
     };
 
     return resp;

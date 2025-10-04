@@ -2,7 +2,12 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { FilterPeriod } from "@/modules/analytics/analytics.types";
 import { Button } from "@/components/ui/button";
-import { StickyNote, MessageSquare, TrendingUp, TrendingDown } from "lucide-react";
+import {
+  StickyNote,
+  MessageSquare,
+  TrendingUp,
+  TrendingDown,
+} from "lucide-react";
 import { ChartNoteDialog } from "./ChartNoteDialog";
 import { useChartNotesStore } from "@/stores/chart-notes-store";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -56,7 +61,7 @@ const CustomTooltip = ({
             )}
           </Button>
         </div>
-        
+
         {existingNote && (
           <div className="mb-3 p-2 rounded bg-primary/10 border border-primary/20">
             <p className="text-xs text-muted-foreground line-clamp-2">
@@ -64,7 +69,7 @@ const CustomTooltip = ({
             </p>
           </div>
         )}
-        
+
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
@@ -79,7 +84,9 @@ const CustomTooltip = ({
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-sm bg-[hsl(200,84%,39%)]" />
-                <span className="text-sm text-muted-foreground">Page Views</span>
+                <span className="text-sm text-muted-foreground">
+                  Page Views
+                </span>
               </div>
               <span className="font-medium text-foreground">
                 {payload[1]?.value?.toLocaleString()}
@@ -122,9 +129,12 @@ export function UnifiedAnalyticsCard({
   showPageViews = true,
 }: UnifiedAnalyticsCardProps) {
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
-  const [selectedDataPoint, setSelectedDataPoint] = useState<{ dataPoint: string; label: string }>({ 
-    dataPoint: "", 
-    label: "" 
+  const [selectedDataPoint, setSelectedDataPoint] = useState<{
+    dataPoint: string;
+    label: string;
+  }>({
+    dataPoint: "",
+    label: "",
   });
 
   const handleAddNote = (dataPoint: string, label: string) => {
@@ -133,7 +143,7 @@ export function UnifiedAnalyticsCard({
   };
 
   const formatValue = (value: string | number): string => {
-    if (typeof value === 'number') {
+    if (typeof value === "number") {
       if (value >= 1000) {
         return `${(value / 1000).toFixed(1)}k`;
       }
@@ -151,7 +161,7 @@ export function UnifiedAnalyticsCard({
             <div key={index} className="flex-shrink-0">
               <div className="flex items-center gap-2 mb-1.5">
                 {metric.showCheckbox && (
-                  <Checkbox 
+                  <Checkbox
                     checked={metric.enabled}
                     onCheckedChange={() => onToggleMetric?.(index)}
                     className="h-4 w-4 rounded border-2"
@@ -164,15 +174,20 @@ export function UnifiedAnalyticsCard({
               <div className="text-2xl font-bold text-foreground mb-0.5">
                 {formatValue(metric.value)}
               </div>
-              <div className={`flex items-center gap-1 text-sm ${
-                metric.change >= 0 ? 'text-green-500' : 'text-red-500'
-              }`}>
+              <div
+                className={`flex items-center gap-1 text-sm ${
+                  metric.change >= 0 ? "text-green-500" : "text-red-500"
+                }`}
+              >
                 {metric.change >= 0 ? (
                   <TrendingUp className="h-3.5 w-3.5" />
                 ) : (
                   <TrendingDown className="h-3.5 w-3.5" />
                 )}
-                <span>{metric.change >= 0 ? '+' : ''}{metric.change.toFixed(1)}%</span>
+                <span>
+                  {metric.change >= 0 ? "+" : ""}
+                  {metric.change.toFixed(1)}%
+                </span>
               </div>
             </div>
           ))}
@@ -183,9 +198,23 @@ export function UnifiedAnalyticsCard({
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={data}>
               <defs>
-                <linearGradient id={`${chartKey}-gradient`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(200, 84%, 39%)" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="hsl(200, 84%, 39%)" stopOpacity={0} />
+                <linearGradient
+                  id={`${chartKey}-gradient`}
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop
+                    offset="5%"
+                    stopColor="hsl(200, 84%, 39%)"
+                    stopOpacity={0.3}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="hsl(200, 84%, 39%)"
+                    stopOpacity={0}
+                  />
                 </linearGradient>
               </defs>
               <CartesianGrid
@@ -204,7 +233,7 @@ export function UnifiedAnalyticsCard({
                 axisLine={false}
                 tickLine={false}
                 tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
-                domain={[0, 'auto']}
+                domain={[0, "auto"]}
                 allowDecimals={false}
               />
               <YAxis
@@ -214,11 +243,16 @@ export function UnifiedAnalyticsCard({
                 tickLine={false}
                 tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
                 allowDecimals={false}
-                domain={[0, 'auto']}
+                domain={[0, "auto"]}
               />
-              <Tooltip 
-                content={<CustomTooltip chartKey={chartKey} onAddNote={handleAddNote} />} 
-                cursor={{ fill: 'hsl(var(--muted) / 0.1)' }} 
+              <Tooltip
+                content={
+                  <CustomTooltip
+                    chartKey={chartKey}
+                    onAddNote={handleAddNote}
+                  />
+                }
+                cursor={{ fill: "hsl(var(--muted) / 0.1)" }}
               />
               {showVisitors && (
                 <Bar
@@ -232,9 +266,23 @@ export function UnifiedAnalyticsCard({
               {showPageViews && (
                 <>
                   <defs>
-                    <linearGradient id={`${chartKey}-area`} x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(200, 84%, 39%)" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="hsl(200, 84%, 39%)" stopOpacity={0} />
+                    <linearGradient
+                      id={`${chartKey}-area`}
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="5%"
+                        stopColor="hsl(200, 84%, 39%)"
+                        stopOpacity={0.2}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor="hsl(200, 84%, 39%)"
+                        stopOpacity={0}
+                      />
                     </linearGradient>
                   </defs>
                   <Area
@@ -252,12 +300,12 @@ export function UnifiedAnalyticsCard({
                     stroke="hsl(200, 84%, 39%)"
                     strokeWidth={2}
                     dot={false}
-                    activeDot={{ 
-                      r: 6, 
+                    activeDot={{
+                      r: 6,
                       fill: "hsl(200, 84%, 39%)",
-                      filter: 'drop-shadow(0 0 6px hsl(200, 84%, 39%))',
-                      stroke: 'hsl(var(--background))',
-                      strokeWidth: 2
+                      filter: "drop-shadow(0 0 6px hsl(200, 84%, 39%))",
+                      stroke: "hsl(var(--background))",
+                      strokeWidth: 2,
                     }}
                   />
                 </>
@@ -266,7 +314,7 @@ export function UnifiedAnalyticsCard({
           </ResponsiveContainer>
         </div>
       </Card>
-      
+
       <ChartNoteDialog
         open={noteDialogOpen}
         onOpenChange={setNoteDialogOpen}
