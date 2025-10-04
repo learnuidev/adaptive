@@ -35,6 +35,8 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
     groupBy: locationView === "map" ? "country" : locationView,
   });
 
+  console.log("LOCATION DATA", locationData);
+
   return (
     <Card className="bg-gradient-card border-border/50 hover:shadow-medium transition-all duration-300 animate-fade-in glass">
       <Tabs
@@ -81,8 +83,9 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
                     console.log("GEOS", geographies);
                     return geographies.map((geo) => {
                       const countryName = geo.properties.NAME;
+                      const countryNameISO = geo.properties.ISO_A2;
                       const countryData = locationData?.find(
-                        (item) => item.name === countryName
+                        (item) => item.name === countryNameISO
                       );
                       const visitors = countryData
                         ? parseInt(countryData.visitors)
@@ -95,6 +98,9 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
                       const intensity = visitors / maxVisitors;
                       return (
                         <Geography
+                          onClick={() => {
+                            alert("yoo");
+                          }}
                           key={geo.rsmKey}
                           geography={geo}
                           fill={
