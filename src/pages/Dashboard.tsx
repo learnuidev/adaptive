@@ -1,18 +1,15 @@
 import { ResponsiveFilters } from "@/components/analytics/ResponsiveFilters";
 import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
-import { AnalyticsChart } from "@/components/dashboard/AnalyticsChart";
-import { MetricsCard } from "@/components/dashboard/MetricsCard";
+import { UnifiedAnalyticsCard } from "@/components/dashboard/UnifiedAnalyticsCard";
 import { InteractiveVisitorChart } from "@/components/dashboard/interactive-visitor-chart/interactive-visitor-chart";
 import { WithNewEvents } from "@/components/with-new-events";
 import {
-  // FilterPeriod,
   useGetSummaryQuery,
   VisitorCount,
 } from "@/modules/analytics/use-get-summary-query";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
 import { useParams } from "@tanstack/react-router";
-import { Clock, Eye, TrendingUp, Users } from "lucide-react";
 import { useState } from "react";
 
 function buildChartData(
@@ -222,49 +219,60 @@ export default function Dashboard() {
     secondaryValue: totalPageVisitsOvertimeChartData[index]?.value || 0,
   }));
 
+  const [metricsEnabled, setMetricsEnabled] = useState([true, true, true, true, true, true, true]);
+
   const metricsData = [
     {
-      title: "Total Visitors",
-      value: summary?.totalVisitors.currentTotal || "0",
-      change: summary?.totalVisitors.percentageDifference
-        ? `${summary?.totalVisitors.percentageDifference?.toFixed(2)}% from last week`
-        : "",
-      changeType: "positive" as const,
-      icon: Users,
-      trend: [20, 35, 25, 45, 30, 55, 40],
+      label: "Visitors",
+      value: summary?.totalVisitors.currentTotal || 0,
+      change: summary?.totalVisitors.percentageDifference || 0,
+      enabled: metricsEnabled[0],
     },
     {
-      title: "Page Views",
-      value: summary?.totalPageVisits.current || "0",
-      change: summary?.totalPageVisits.percentageDifference
-        ? `${summary?.totalPageVisits.percentageDifference?.toFixed(2)}% from last week`
-        : "",
-      changeType: "positive" as const,
-      icon: Eye,
-      trend: [40, 35, 50, 45, 60, 55, 65],
+      label: "Revenue",
+      value: "$0",
+      change: 0,
+      enabled: metricsEnabled[1],
     },
     {
-      title: "Avg Session",
+      label: "Conversion rate",
+      value: "0%",
+      change: 0,
+      enabled: metricsEnabled[2],
+    },
+    {
+      label: "Revenue/visitor",
+      value: "$0",
+      change: 0,
+      enabled: metricsEnabled[3],
+    },
+    {
+      label: "Bounce rate",
+      value: "0%",
+      change: 0,
+      enabled: metricsEnabled[4],
+    },
+    {
+      label: "Session time",
       value: summary?.averageSession.current ? formatSessionTime(summary) : "0",
-      change: summary?.averageSession.percentageDifference
-        ? `${summary?.averageSession.percentageDifference?.toFixed(2)}% from last week`
-        : "",
-      changeType:
-        summary?.averageSession.current - summary?.averageSession?.previous < 0
-          ? ("negative" as const)
-          : ("positive" as const),
-      icon: Clock,
-      trend: [60, 55, 50, 45, 50, 40, 35],
+      change: summary?.averageSession.percentageDifference || 0,
+      enabled: metricsEnabled[5],
     },
     {
-      title: "Conversion Rate",
-      value: "3.24%",
-      change: "+0.8% from last week",
-      changeType: "positive" as const,
-      icon: TrendingUp,
-      trend: [15, 20, 25, 30, 28, 35, 40],
+      label: "Visitors now",
+      value: 0,
+      change: 0,
+      enabled: metricsEnabled[6],
     },
   ];
+
+  const handleToggleMetric = (index: number) => {
+    setMetricsEnabled(prev => {
+      const newState = [...prev];
+      newState[index] = !newState[index];
+      return newState;
+    });
+  };
 
   // Show credentials selection if no credential ID or credential not found
   if (!credentialId || (credentials && !currentCredential)) {
@@ -302,37 +310,15 @@ export default function Dashboard() {
         </div>
 
         <div className="p-6 space-y-8">
-          {/* Metrics Grid */}
-          <div>
-            <h2 className="text-lg font-semibold text-foreground mb-4">
-              Key Metrics
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {metricsData.map((metric, index) => (
-                <div
-                  key={metric.title}
-                  className="animate-slide-up"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <MetricsCard {...metric} />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Charts Section */}
-          <div className="grid grid-cols-1 gap-6">
-            <AnalyticsChart
-              chartKey="visitorTraffic"
-              title="Visitors & Page Views"
-              colorPalette={"blue"}
-              selectedPeriod={selectedPeriod}
-              data={combinedChartData}
-              height={400}
-              type="composed"
-              secondaryLabel="Page Views"
-            />
-          </div>
+          {/* Unified Analytics */}
+          <UnifiedAnalyticsCard
+            metrics={metricsData}
+            data={combinedChartData}
+            selectedPeriod={selectedPeriod}
+            chartKey="visitorTraffic"
+            height={400}
+            onToggleMetric={handleToggleMetric}
+          />
 
           {/* Interactive Visitor Analytics */}
           <InteractiveVisitorChart credentialId={credentialId} />
