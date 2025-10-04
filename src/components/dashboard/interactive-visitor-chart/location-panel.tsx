@@ -19,7 +19,7 @@ import {
   TabContent,
 } from "./interactive-visitor-chart.components";
 
-const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@3/countries-110m.json";
+const geoUrl = "/world.json";
 
 interface InteractiveVisitorChartProps {
   credentialId: string;
@@ -77,8 +77,9 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
             >
               <ZoomableGroup>
                 <Geographies geography={geoUrl}>
-                  {({ geographies }) =>
-                    geographies.map((geo) => {
+                  {({ geographies }) => {
+                    console.log("GEOS", geographies);
+                    return geographies.map((geo) => {
                       const countryName = geo.properties.NAME;
                       const countryData = locationData?.find(
                         (item) => item.name === countryName
@@ -113,8 +114,8 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
                           }}
                         />
                       );
-                    })
-                  }
+                    });
+                  }}
                 </Geographies>
               </ZoomableGroup>
             </ComposableMap>
