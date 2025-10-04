@@ -297,6 +297,8 @@ export default function Dashboard() {
             chartKey="visitorTraffic"
             height={400}
             onToggleMetric={handleToggleMetric}
+            showVisitors={metricsEnabled[0]}
+            showPageViews={metricsEnabled[1]}
           />
 
           {/* Interactive Visitor Analytics */}

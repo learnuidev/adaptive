@@ -11,6 +11,7 @@ import {
   ComposedChart,
   Bar,
   Line,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -107,6 +108,8 @@ interface UnifiedAnalyticsCardProps {
   chartKey: string;
   height?: number;
   onToggleMetric?: (index: number) => void;
+  showVisitors?: boolean;
+  showPageViews?: boolean;
 }
 
 export function UnifiedAnalyticsCard({
@@ -115,6 +118,8 @@ export function UnifiedAnalyticsCard({
   chartKey,
   height = 400,
   onToggleMetric,
+  showVisitors = true,
+  showPageViews = true,
 }: UnifiedAnalyticsCardProps) {
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
   const [selectedDataPoint, setSelectedDataPoint] = useState<{ dataPoint: string; label: string }>({ 
@@ -177,6 +182,12 @@ export function UnifiedAnalyticsCard({
         <div style={{ height }}>
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={data}>
+              <defs>
+                <linearGradient id={`${chartKey}-gradient`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(200, 84%, 39%)" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="hsl(200, 84%, 39%)" stopOpacity={0} />
+                </linearGradient>
+              </defs>
               <CartesianGrid
                 strokeDasharray="3 3"
                 stroke="hsl(var(--border))"
@@ -209,28 +220,48 @@ export function UnifiedAnalyticsCard({
                 content={<CustomTooltip chartKey={chartKey} onAddNote={handleAddNote} />} 
                 cursor={{ fill: 'hsl(var(--muted) / 0.1)' }} 
               />
-              <Bar
-                yAxisId="left"
-                dataKey="value"
-                fill="hsl(40, 50%, 60%)"
-                radius={[4, 4, 0, 0]}
-                opacity={0.8}
-              />
-              <Line
-                yAxisId="right"
-                type="monotone"
-                dataKey="secondaryValue"
-                stroke="hsl(200, 84%, 39%)"
-                strokeWidth={2}
-                dot={false}
-                activeDot={{ 
-                  r: 6, 
-                  fill: "hsl(200, 84%, 39%)",
-                  filter: 'drop-shadow(0 0 6px hsl(200, 84%, 39%))',
-                  stroke: 'hsl(var(--background))',
-                  strokeWidth: 2
-                }}
-              />
+              {showVisitors && (
+                <Bar
+                  yAxisId="left"
+                  dataKey="value"
+                  fill="hsl(40, 50%, 60%)"
+                  radius={[4, 4, 0, 0]}
+                  opacity={0.8}
+                />
+              )}
+              {showPageViews && (
+                <>
+                  <defs>
+                    <linearGradient id={`${chartKey}-area`} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(200, 84%, 39%)" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="hsl(200, 84%, 39%)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <Area
+                    yAxisId="right"
+                    type="monotone"
+                    dataKey="secondaryValue"
+                    fill={`url(#${chartKey}-area)`}
+                    stroke="none"
+                    fillOpacity={1}
+                  />
+                  <Line
+                    yAxisId="right"
+                    type="monotone"
+                    dataKey="secondaryValue"
+                    stroke="hsl(200, 84%, 39%)"
+                    strokeWidth={2}
+                    dot={false}
+                    activeDot={{ 
+                      r: 6, 
+                      fill: "hsl(200, 84%, 39%)",
+                      filter: 'drop-shadow(0 0 6px hsl(200, 84%, 39%))',
+                      stroke: 'hsl(var(--background))',
+                      strokeWidth: 2
+                    }}
+                  />
+                </>
+              )}
             </ComposedChart>
           </ResponsiveContainer>
         </div>
