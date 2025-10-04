@@ -1,15 +1,17 @@
 import { z } from "zod";
 
 export const AddNoteInputSchema = z.object({
-  userId: z.string(),
   websiteId: z.string(),
+  dataPoint: z.string(),
   text: z.string(),
-  createdAt: z.number().optional(),
-  updatedAt: z.number().optional(),
 });
 
 export type AddNoteInput = z.infer<typeof AddNoteInputSchema>;
 
 export type Note = AddNoteInput & {
   id: string;
+  //   gets added when note is created
+  createdAt: number;
+  updatedAt: number;
+  userId: string;
 };
