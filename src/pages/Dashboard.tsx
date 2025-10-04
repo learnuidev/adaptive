@@ -219,7 +219,7 @@ export default function Dashboard() {
     secondaryValue: totalPageVisitsOvertimeChartData[index]?.value || 0,
   }));
 
-  const [metricsEnabled, setMetricsEnabled] = useState([true, true, true, true, true, true, true]);
+  const [metricsEnabled, setMetricsEnabled] = useState([true, true]);
 
   const metricsData = [
     {
@@ -227,42 +227,14 @@ export default function Dashboard() {
       value: summary?.totalVisitors.currentTotal || 0,
       change: summary?.totalVisitors.percentageDifference || 0,
       enabled: metricsEnabled[0],
-    },
-    {
-      label: "Revenue",
-      value: "$0",
-      change: 0,
-      enabled: metricsEnabled[1],
-    },
-    {
-      label: "Conversion rate",
-      value: "0%",
-      change: 0,
-      enabled: metricsEnabled[2],
-    },
-    {
-      label: "Revenue/visitor",
-      value: "$0",
-      change: 0,
-      enabled: metricsEnabled[3],
-    },
-    {
-      label: "Bounce rate",
-      value: "0%",
-      change: 0,
-      enabled: metricsEnabled[4],
+      showCheckbox: true,
     },
     {
       label: "Session time",
       value: summary?.averageSession.current ? formatSessionTime(summary) : "0",
       change: summary?.averageSession.percentageDifference || 0,
-      enabled: metricsEnabled[5],
-    },
-    {
-      label: "Visitors now",
-      value: 0,
-      change: 0,
-      enabled: metricsEnabled[6],
+      enabled: metricsEnabled[1],
+      showCheckbox: false,
     },
   ];
 

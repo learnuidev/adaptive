@@ -97,6 +97,7 @@ interface MetricData {
   value: string | number;
   change: number;
   enabled: boolean;
+  showCheckbox?: boolean;
 }
 
 interface UnifiedAnalyticsCardProps {
@@ -140,29 +141,31 @@ export function UnifiedAnalyticsCard({
     <>
       <Card className="p-6 bg-gradient-card border-border/50 hover:shadow-medium transition-all duration-300 animate-fade-in glass">
         {/* Metrics Row */}
-        <div className="flex items-start gap-8 mb-8 pb-6 border-b border-border/20 overflow-x-auto">
+        <div className="flex items-start gap-12 mb-6 pb-4 border-b border-border/20">
           {metrics.map((metric, index) => (
-            <div key={index} className="flex-shrink-0 min-w-[120px]">
-              <div className="flex items-center gap-2 mb-2">
-                <Checkbox 
-                  checked={metric.enabled}
-                  onCheckedChange={() => onToggleMetric?.(index)}
-                  className="h-4 w-4 rounded border-2"
-                />
-                <label className="text-sm text-muted-foreground whitespace-nowrap cursor-pointer">
+            <div key={index} className="flex-shrink-0">
+              <div className="flex items-center gap-2 mb-1.5">
+                {metric.showCheckbox && (
+                  <Checkbox 
+                    checked={metric.enabled}
+                    onCheckedChange={() => onToggleMetric?.(index)}
+                    className="h-4 w-4 rounded border-2"
+                  />
+                )}
+                <label className="text-sm text-muted-foreground whitespace-nowrap">
                   {metric.label}
                 </label>
               </div>
-              <div className="text-3xl font-bold text-foreground mb-1">
+              <div className="text-2xl font-bold text-foreground mb-0.5">
                 {formatValue(metric.value)}
               </div>
-              <div className={`flex items-center gap-1 text-sm font-medium ${
+              <div className={`flex items-center gap-1 text-sm ${
                 metric.change >= 0 ? 'text-green-500' : 'text-red-500'
               }`}>
                 {metric.change >= 0 ? (
-                  <TrendingUp className="h-4 w-4" />
+                  <TrendingUp className="h-3.5 w-3.5" />
                 ) : (
-                  <TrendingDown className="h-4 w-4" />
+                  <TrendingDown className="h-3.5 w-3.5" />
                 )}
                 <span>{metric.change >= 0 ? '+' : ''}{metric.change.toFixed(1)}%</span>
               </div>
