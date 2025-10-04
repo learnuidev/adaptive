@@ -154,6 +154,7 @@ const featureFlags = [
 
 import { FilterPeriod } from "@/modules/analytics/analytics.types";
 import { GetSummaryResponse } from "@/modules/analytics/use-get-summary-query";
+import { GoalsPanel } from "@/components/dashboard/interactive-visitor-chart/goals-panel";
 
 const formatSessionTime = (summary: GetSummaryResponse) => {
   const totalSeconds = summary?.averageSession.current || 0;
@@ -290,6 +291,8 @@ export default function Dashboard() {
 
           {/* Interactive Visitor Analytics */}
           <InteractiveVisitorChart credentialId={credentialId} />
+
+          <GoalsPanel credentialId={credentialId} />
         </div>
       </div>
     </WithNewEvents>

@@ -1,31 +1,21 @@
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  GetTotalVisitorsByResponse,
-  useGetTotalVisitorsByQuery,
-} from "@/modules/analytics/use-get-total-visitors-by";
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
-import {
-  Chrome,
-  Monitor,
-  RefreshCw,
-  Smartphone,
-  TargetIcon,
-} from "lucide-react";
+import { Monitor, TargetIcon } from "lucide-react";
 import { useState } from "react";
 
+import { useGetSummaryQuery } from "@/modules/analytics/use-get-summary-query";
 import {
   DetailsButton,
   TabContent,
   TechList,
 } from "./interactive-visitor-chart.components";
-import { useGetSummaryQuery } from "@/modules/analytics/use-get-summary-query";
 
 interface InteractiveVisitorChartProps {
   credentialId: string;
 }
 
-export function GoalsPanel({ credentialId }: InteractiveVisitorChartProps) {
+export function UsersPanel({ credentialId }: InteractiveVisitorChartProps) {
   const [techView, setTechView] = useState<"goals">("goals");
   const { selectedPeriod } = useFilterPeriodStore();
 
@@ -56,38 +46,50 @@ export function GoalsPanel({ credentialId }: InteractiveVisitorChartProps) {
       <Tabs value={techView} onValueChange={(v) => setTechView(v as any)}>
         <TabsList className="w-full rounded-none border-b border-border/50 bg-transparent p-0 h-12">
           <TabsTrigger
-            value="goals"
+            value="users"
             className="rounded-none border-r border-border/50 data-[state=active]:bg-secondary data-[state=active]:text-foreground text-muted-foreground"
           >
-            Goals
+            Users
           </TabsTrigger>
           <TabsTrigger
-            value="journeys"
+            value="cohorts"
             className="rounded-none border-r border-border/50 data-[state=active]:bg-secondary data-[state=active]:text-foreground text-muted-foreground"
           >
-            Journeys
+            Cohorts
           </TabsTrigger>
           <TabsTrigger
-            value="funnels"
+            value="trends"
             className="rounded-none border-r border-border/50 data-[state=active]:bg-secondary data-[state=active]:text-foreground text-muted-foreground"
           >
-            Funnels
+            Trends
+          </TabsTrigger>
+          <TabsTrigger
+            value="insights"
+            className="rounded-none border-r border-border/50 data-[state=active]:bg-secondary data-[state=active]:text-foreground text-muted-foreground"
+          >
+            Insights
           </TabsTrigger>
         </TabsList>
 
-        <TabContent value="goals">
+        <TabContent value="users">
           <div className="min-h-[420px]">
             <TechList data={goalsIntoVisitors || []} icon={getIcon("target")} />
           </div>
           <DetailsButton />
         </TabContent>
-        <TabContent value="journeys">
+        <TabContent value="cohorts">
           <div className="min-h-[420px]">
             <TechList data={goalsIntoVisitors || []} icon={getIcon("target")} />
           </div>
           <DetailsButton />
         </TabContent>
-        <TabContent value="funnels">
+        <TabContent value="trends">
+          <div className="min-h-[420px]">
+            <TechList data={goalsIntoVisitors || []} icon={getIcon("target")} />
+          </div>
+          <DetailsButton />
+        </TabContent>
+        <TabContent value="insights">
           <div className="min-h-[420px]">
             <TechList data={goalsIntoVisitors || []} icon={getIcon("target")} />
           </div>

@@ -74,17 +74,18 @@ const getToolsItems = (credentialId?: string) => [
     requiresCredential: true,
   },
   {
-    title: "User Journeys",
-    url: "/user-journeys",
-    icon: Route,
-    requiresCredential: true,
-  },
-  {
     title: "Goals",
     url: "/goals",
     icon: Target,
     requiresCredential: true,
   },
+  {
+    title: "Journeys",
+    url: "/user-journeys",
+    icon: Route,
+    requiresCredential: true,
+  },
+
   {
     title: "Trends",
     url: "/trends",
