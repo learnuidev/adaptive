@@ -1,3 +1,4 @@
+import { GoalsPanel } from "./goals-panel";
 import { LocationPanel } from "./location-panel";
 import { PageAndFeaturePanel } from "./page-and-feature-panel";
 import { TechPanel } from "./tech-panel";
@@ -19,6 +20,7 @@ export function InteractiveVisitorChart({
 
         {/* Right Panel - Technology */}
         <TechPanel credentialId={credentialId} />
+        <GoalsPanel credentialId={credentialId} />
       </div>
     </>
   );
