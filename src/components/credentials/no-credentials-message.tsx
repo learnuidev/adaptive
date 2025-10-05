@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Database, Plus } from "lucide-react";
-import { AddCredentialDialog } from "./AddCredentialDialog";
-import { CredentialSuccessDialog } from "./CredentialSuccessDialog";
+import { AddCredentialDialog } from "./add-credential-dialog";
+import { CredentialSuccessDialog } from "./credential-success-dialog";
 import { useNavigate } from "@tanstack/react-router";
 
 export function NoCredentialsMessage() {

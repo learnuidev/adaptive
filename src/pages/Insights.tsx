@@ -3,8 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { Zap, TrendingUp, AlertTriangle, CheckCircle, Info } from "lucide-react";
 import { useParams } from "@tanstack/react-router";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
-import { ResponsiveFilters } from "@/components/analytics/ResponsiveFilters";
-import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
+import { ResponsiveFilters } from "@/components/analytics/responsive-filters";
+import { NoCredentialsMessage } from "@/components/credentials/no-credentials-message";
 
 const Insights = () => {
   // Use strict: false to handle cases where params might not exist

@@ -7,28 +7,28 @@ import {
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { SidebarProvider, SidebarTrigger } from "./components/ui/sidebar";
-import { AppSidebar } from "./components/sidebar/AppSidebar";
+import { AppSidebar } from "./components/sidebar/app-sidebar";
 import { Toaster } from "./components/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Authenticated } from "./components/authenticated";
 import { AdapiveProvider } from "./lib/adaptive/adaptive-provider";
 
-import Dashboard from "./pages/Dashboard";
-import Users from "./pages/Users";
-import UserDetail from "./pages/UserDetail";
-import Cohorts from "./pages/Cohorts";
-import AddCohort from "./pages/AddCohort";
-import CohortDetail from "./pages/CohortDetail";
-import Features from "./pages/Features";
-import FeatureDetail from "./pages/FeatureDetail";
-import AddFeatureVersion from "./pages/AddFeatureVersion";
-import Events from "./pages/Events";
-import Goals from "./pages/Goals";
-import Trends from "./pages/Trends";
-import Insights from "./pages/Insights";
-import Settings from "./pages/Settings";
-import CredentialsList from "./pages/CredentialsList";
-import Documentation from "./pages/Documentation";
+import Dashboard from "./pages/dashboard";
+import Users from "./pages/users";
+import UserDetail from "./pages/user-detail";
+import Cohorts from "./pages/cohorts";
+import AddCohort from "./pages/add-cohort";
+import CohortDetail from "./pages/cohort-detail";
+import Features from "./pages/features";
+import FeatureDetail from "./pages/feature-detail";
+import AddFeatureVersion from "./pages/add-feature-version";
+import Events from "./pages/events";
+import Goals from "./pages/goals";
+import Trends from "./pages/trends";
+import Insights from "./pages/insights";
+import Settings from "./pages/settings";
+import CredentialsList from "./pages/credentials-list";
+import Documentation from "./pages/documentation";
 
 const queryClient = new QueryClient();
 

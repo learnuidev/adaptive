@@ -18,7 +18,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { RolloutRuleGroup } from "@/pages/AddFeatureVersion";
+import { RolloutRuleGroup } from "@/pages/add-feature-version";
 import { MultiSelectWithInput } from "@/components/ui/multi-select-with-input";
 
 interface RolloutRuleBuilderProps {

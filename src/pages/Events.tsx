@@ -9,8 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Activity, MousePointer, Eye, UserPlus } from "lucide-react";
 import { useParams } from "@tanstack/react-router";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
-import { ResponsiveFilters } from "@/components/analytics/ResponsiveFilters";
-import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
+import { ResponsiveFilters } from "@/components/analytics/responsive-filters";
+import { NoCredentialsMessage } from "@/components/credentials/no-credentials-message";
 import { WithNewEvents } from "@/components/with-new-events";
 
 const Events = () => {

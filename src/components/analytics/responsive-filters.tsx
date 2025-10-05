@@ -1,5 +1,5 @@
-import { MobileFilterSheet } from "./MobileFilterSheet";
-import { DesktopFilters } from "./DesktopFilters";
+import { MobileFilterSheet } from "./mobile-filter-sheet";
+import { DesktopFilters } from "./desktop-filters";
 
 export function ResponsiveFilters() {
   return (

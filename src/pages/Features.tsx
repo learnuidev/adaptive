@@ -1,4 +1,4 @@
-import { FeatureCard } from "@/components/features/FeatureCard";
+import { FeatureCard } from "@/components/features/feature-card";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,10 +7,10 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useParams } from "@tanstack/react-router";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
-import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
+import { NoCredentialsMessage } from "@/components/credentials/no-credentials-message";
 import { WithGlow } from "@/components/with-glow";
 import { useListFeaturesQuery } from "@/modules/feature/use-list-features-query";
-import { AddFeatureDialog } from "@/components/features/AddFeatureDialog";
+import { AddFeatureDialog } from "@/components/features/add-feature-dialog";
 
 export default function Features() {
   const params = useParams({ strict: false }) as { credentialId?: string };

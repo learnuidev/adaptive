@@ -18,9 +18,9 @@ import { useParams, useNavigate } from "@tanstack/react-router";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
 import { useGetSummaryQuery } from "@/modules/analytics/use-get-summary-query";
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
-import { ResponsiveFilters } from "@/components/analytics/ResponsiveFilters";
-import { CredentialSelector } from "@/components/credentials/CredentialSelector";
-import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
+import { ResponsiveFilters } from "@/components/analytics/responsive-filters";
+import { CredentialSelector } from "@/components/credentials/credential-selector";
+import { NoCredentialsMessage } from "@/components/credentials/no-credentials-message";
 import { WithNewEvents } from "@/components/with-new-events";
 
 const Users = () => {

@@ -11,9 +11,9 @@ import {
   Key 
 } from "lucide-react";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
-import { AddCredentialDialog } from "@/components/credentials/AddCredentialDialog";
-import { CredentialSuccessDialog } from "@/components/credentials/CredentialSuccessDialog";
-import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
+import { AddCredentialDialog } from "@/components/credentials/add-credential-dialog";
+import { CredentialSuccessDialog } from "@/components/credentials/credential-success-dialog";
+import { NoCredentialsMessage } from "@/components/credentials/no-credentials-message";
 import { useNavigate } from "@tanstack/react-router";
 import { formatDistanceToNow } from "date-fns";
 import { useCredentialStore } from "@/stores/credential-store";

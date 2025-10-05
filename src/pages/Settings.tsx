@@ -3,8 +3,8 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CredentialSelector } from "@/components/credentials/CredentialSelector";
-import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
+import { CredentialSelector } from "@/components/credentials/credential-selector";
+import { NoCredentialsMessage } from "@/components/credentials/no-credentials-message";
 import { CodeBlock } from "@/components/ui/code-block";
 import {
   Tooltip,

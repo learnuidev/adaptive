@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAddCohortMutation } from "@/modules/cohort/use-add-cohort-mutation";
 import { toast } from "sonner";
-import { RolloutRuleBuilder } from "@/components/features/RolloutRuleBuilder";
+import { RolloutRuleBuilder } from "@/components/features/rollout-rule-builder";
 import { ArrowLeft } from "lucide-react";
 
 const AddCohort = () => {

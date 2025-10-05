@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { FilterPeriod } from "@/modules/analytics/analytics.types";
 import { Button } from "@/components/ui/button";
 import { StickyNote, MessageSquare } from "lucide-react";
-import { ChartNoteDialog } from "./ChartNoteDialog";
+import { ChartNoteDialog } from "./chart-note-dialog";
 import { useChartNotesStore } from "@/stores/chart-notes-store";
 
 import {

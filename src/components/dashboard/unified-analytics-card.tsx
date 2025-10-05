@@ -8,7 +8,7 @@ import {
   TrendingUp,
   TrendingDown,
 } from "lucide-react";
-import { ChartNoteDialog } from "./ChartNoteDialog";
+import { ChartNoteDialog } from "./chart-note-dialog";
 import { useChartNotesStore } from "@/stores/chart-notes-store";
 import { Checkbox } from "@/components/ui/checkbox";
 

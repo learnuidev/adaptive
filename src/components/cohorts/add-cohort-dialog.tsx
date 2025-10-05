@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAddCohortMutation } from "@/modules/cohort/use-add-cohort-mutation";
 import { toast } from "sonner";
-import { RolloutRuleBuilder } from "@/components/features/RolloutRuleBuilder";
+import { RolloutRuleBuilder } from "@/components/features/rollout-rule-builder";
 
 interface AddCohortDialogProps {
   open: boolean;

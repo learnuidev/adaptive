@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, Database } from "lucide-react";
-import { AddCredentialDialog } from "./AddCredentialDialog";
+import { AddCredentialDialog } from "./add-credential-dialog";
 
 interface CredentialSelectorProps {
   onCredentialChange?: (credentialId: string) => void;

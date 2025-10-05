@@ -1,6 +1,6 @@
-import { ResponsiveFilters } from "@/components/analytics/ResponsiveFilters";
-import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
-import { UnifiedAnalyticsCard } from "@/components/dashboard/UnifiedAnalyticsCard";
+import { ResponsiveFilters } from "@/components/analytics/responsive-filters";
+import { NoCredentialsMessage } from "@/components/credentials/no-credentials-message";
+import { UnifiedAnalyticsCard } from "@/components/dashboard/unified-analytics-card";
 import { InteractiveVisitorChart } from "@/components/dashboard/interactive-visitor-chart/interactive-visitor-chart";
 import { WithNewEvents } from "@/components/with-new-events";
 import {

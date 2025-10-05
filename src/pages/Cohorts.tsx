@@ -5,10 +5,10 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
-import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
+import { NoCredentialsMessage } from "@/components/credentials/no-credentials-message";
 import { WithGlow } from "@/components/with-glow";
 import { useListCohortsQuery } from "@/modules/cohort/use-list-cohorts-query";
-import { CohortCard } from "@/components/cohorts/CohortCard";
+import { CohortCard } from "@/components/cohorts/cohort-card";
 
 const Cohorts = () => {
   const params = useParams({ strict: false }) as { credentialId?: string };

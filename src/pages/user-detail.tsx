@@ -43,14 +43,14 @@ import {
   ChevronUp,
   ExternalLink,
 } from "lucide-react";
-import { DeviceUsageChart } from "@/components/dashboard/DeviceUsageChart";
+import { DeviceUsageChart } from "@/components/dashboard/device-usage-chart";
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
 import { useGetSummaryQuery } from "@/modules/analytics/use-get-summary-query";
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
-import { NoCredentialsMessage } from "@/components/credentials/NoCredentialsMessage";
+import { NoCredentialsMessage } from "@/components/credentials/no-credentials-message";
 import { WithNewEvents } from "@/components/with-new-events";
-import { ResponsiveFilters } from "@/components/analytics/ResponsiveFilters";
+import { ResponsiveFilters } from "@/components/analytics/responsive-filters";
 import { useListEventsByEmailQuery } from "@/modules/analytics/use-list-events-by-email-query";
 import { useState, useMemo } from "react";
 import { AnalyticsEvent } from "@/modules/analytics/analytics.types";
