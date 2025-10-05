@@ -27,6 +27,8 @@ import { flags } from "@/lib/flags";
 import { countryNames } from "@/lib/country-names";
 import type { VisitorsBarDatum } from "./interactive-visitor-chart.components";
 
+const OFFSET_VALUE = 300;
+
 // const geoUrl = "/world.json";
 const geoUrl =
   "https://nomadmethod-api-dev-assetsbucket-2u2iqsv5nizc.s3.amazonaws.com/01K6R1ZYAFM3E05H0C8GEXF0PV.json";
@@ -81,8 +83,8 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
           prev
             ? {
                 ...prev,
-                x: event.clientX - 300,
-                y: event.clientY - 300,
+                x: event.clientX - OFFSET_VALUE,
+                y: event.clientY - OFFSET_VALUE,
               }
             : null
         );
@@ -406,8 +408,16 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
                       return (
                         <Geography
                           key={geo.rsmKey}
-                          onClick={() => {
-                            alert("yoo");
+                          onClick={(event) => {
+                            // alert("yoo");
+
+                            setHoveredCountry({
+                              name: countryName,
+                              iso: countryNameISO,
+                              visitors,
+                              x: event.clientX - OFFSET_VALUE,
+                              y: event.clientY - OFFSET_VALUE,
+                            });
                           }}
                           geography={geo}
                           onMouseEnter={(event) => {
