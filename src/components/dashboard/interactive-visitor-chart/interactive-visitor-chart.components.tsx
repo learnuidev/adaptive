@@ -182,7 +182,7 @@ export function VisitorsBarChart({
         ? "hsl(var(--primary-foreground) / 0.7)"
         : "hsl(var(--muted-foreground))";
 
-      const primaryContent = [labelPrefix, labelText]
+      const primaryContent = [labelPrefix, labelText, props?.id]
         .filter(Boolean)
         .join(" ")
         .trim();
@@ -404,6 +404,7 @@ export function VisitorsBarChart({
             onMouseLeave={() => setHoveredIndex(null)}
           >
             <LabelList
+              className="text-foreground"
               position="insideLeft"
               dataKey="label"
               content={renderPrimaryLabel}
