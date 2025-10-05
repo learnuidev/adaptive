@@ -136,10 +136,21 @@ export function UnifiedAnalyticsCard({
     dataPoint: "",
     label: "",
   });
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const handleAddNote = (dataPoint: string, label: string) => {
     setSelectedDataPoint({ dataPoint, label });
     setNoteDialogOpen(true);
+  };
+
+  const handleMouseMove = (data: any) => {
+    if (data && data.activeTooltipIndex !== undefined) {
+      setHoveredIndex(data.activeTooltipIndex);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredIndex(null);
   };
 
   const formatValue = (value: string | number): string => {
@@ -196,7 +207,11 @@ export function UnifiedAnalyticsCard({
         {/* Chart */}
         <div style={{ height }}>
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={data}>
+            <ComposedChart 
+              data={data}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+            >
               <defs>
                 <linearGradient
                   id={`${chartKey}-gradient`}
@@ -260,7 +275,38 @@ export function UnifiedAnalyticsCard({
                   dataKey="value"
                   fill="hsl(40, 50%, 60%)"
                   radius={[4, 4, 0, 0]}
-                  opacity={0.8}
+                  shape={(props: any) => {
+                    const { x, y, width, height, index } = props;
+                    const isHovered = hoveredIndex === index;
+                    const isDimmed = hoveredIndex !== null && !isHovered;
+                    
+                    return (
+                      <g>
+                        {isHovered && (
+                          <rect
+                            x={x - 2}
+                            y={y - 2}
+                            width={width + 4}
+                            height={height + 4}
+                            fill="hsl(40, 50%, 60%)"
+                            opacity={0.3}
+                            rx={6}
+                            filter="blur(8px)"
+                          />
+                        )}
+                        <rect
+                          x={x}
+                          y={y}
+                          width={width}
+                          height={height}
+                          fill="hsl(40, 50%, 60%)"
+                          opacity={isDimmed ? 0.3 : (isHovered ? 1 : 0.8)}
+                          rx={4}
+                          ry={4}
+                        />
+                      </g>
+                    );
+                  }}
                 />
               )}
               {showPageViews && (
@@ -291,7 +337,7 @@ export function UnifiedAnalyticsCard({
                     dataKey="secondaryValue"
                     fill={`url(#${chartKey}-area)`}
                     stroke="none"
-                    fillOpacity={1}
+                    fillOpacity={hoveredIndex !== null ? 0.3 : 1}
                   />
                   <Line
                     yAxisId="right"
@@ -299,14 +345,50 @@ export function UnifiedAnalyticsCard({
                     dataKey="secondaryValue"
                     stroke="hsl(200, 84%, 39%)"
                     strokeWidth={2}
-                    dot={false}
-                    activeDot={{
-                      r: 6,
-                      fill: "hsl(200, 84%, 39%)",
-                      filter: "drop-shadow(0 0 6px hsl(200, 84%, 39%))",
-                      stroke: "hsl(var(--background))",
-                      strokeWidth: 2,
+                    dot={(props: any) => {
+                      const { cx, cy, index, payload } = props;
+                      const isHovered = hoveredIndex === index;
+                      if (!isHovered) return null;
+                      
+                      return (
+                        <g>
+                          {/* Area glow effect */}
+                          <defs>
+                            <radialGradient id={`area-glow-${index}`}>
+                              <stop offset="0%" stopColor="hsl(200, 84%, 39%)" stopOpacity={0.3} />
+                              <stop offset="100%" stopColor="hsl(200, 84%, 39%)" stopOpacity={0} />
+                            </radialGradient>
+                          </defs>
+                          <ellipse
+                            cx={cx}
+                            cy={cy}
+                            rx={60}
+                            ry={40}
+                            fill={`url(#area-glow-${index})`}
+                            filter="blur(12px)"
+                          />
+                          {/* Line glow effect */}
+                          <circle
+                            cx={cx}
+                            cy={cy}
+                            r={12}
+                            fill="hsl(200, 84%, 39%)"
+                            opacity={0.3}
+                            filter="blur(8px)"
+                          />
+                          {/* Main dot */}
+                          <circle
+                            cx={cx}
+                            cy={cy}
+                            r={6}
+                            fill="hsl(200, 84%, 39%)"
+                            stroke="hsl(var(--background))"
+                            strokeWidth={2}
+                          />
+                        </g>
+                      );
                     }}
+                    opacity={hoveredIndex !== null ? 0.3 : 1}
                   />
                 </>
               )}
