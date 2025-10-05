@@ -5,7 +5,7 @@ import {
   useGetTotalVisitorsByQuery,
 } from "@/modules/analytics/use-get-total-visitors-by";
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ComposableMap,
   Geographies,
@@ -13,11 +13,16 @@ import {
   ZoomableGroup,
 } from "react-simple-maps";
 import {
+  AnalyticsDetailsDialog,
   DetailsButton,
-  LocationList,
   MapLegend,
   TabContent,
+  VisitorsBarChart,
+  formatVisitorsValue,
+  getLocationDisplayName,
+  getLocationIcon,
 } from "./interactive-visitor-chart.components";
+import type { VisitorsBarDatum } from "./interactive-visitor-chart.components";
 
 // const geoUrl = "/world.json";
 const geoUrl =
@@ -29,6 +34,9 @@ interface InteractiveVisitorChartProps {
 
 export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
   const [locationView, setLocationView] = useState<LocationView>("map");
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [detailsSearch, setDetailsSearch] = useState("");
+  const [locationSortDirection, setLocationSortDirection] = useState<"asc" | "desc">("desc");
   const { selectedPeriod } = useFilterPeriodStore();
 
   const { data: locationData } = useGetTotalVisitorsByQuery({
@@ -39,11 +47,250 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
 
   console.log("LOCATION DATA", locationData);
 
+  const activeLocationView = locationView === "map" ? "country" : locationView;
+
+  useEffect(() => {
+    if (!isDetailsOpen) {
+      setDetailsSearch("");
+    }
+  }, [isDetailsOpen]);
+
+  useEffect(() => {
+    if (locationView === "map") {
+      setIsDetailsOpen(false);
+    }
+    setDetailsSearch("");
+  }, [locationView]);
+
+  const orderedLocationDetails = useMemo(() => {
+    const entries = Array.isArray(locationData) ? locationData : [];
+
+    const mapped = entries
+      .map((item, index) => {
+        const visitorsValue = Number.parseInt(item?.visitors ?? "0", 10);
+        const numericVisitors = Number.isNaN(visitorsValue) ? 0 : visitorsValue;
+        const rawName = item?.name ?? `location-${index}`;
+        const displayName =
+          getLocationDisplayName(rawName, activeLocationView) || rawName || "Unknown";
+        const iconNode = getLocationIcon(rawName || "", activeLocationView);
+        const icon = typeof iconNode === "string" ? iconNode : "";
+        return {
+          id: rawName || `location-${index}`,
+          rawName,
+          displayName,
+          icon,
+          value: numericVisitors,
+        };
+      })
+      .sort((a, b) => b.value - a.value);
+
+    return locationSortDirection === "asc" ? [...mapped].reverse() : mapped;
+  }, [locationData, locationSortDirection, activeLocationView]);
+
+  const filteredLocationDetails = useMemo(() => {
+    const query = detailsSearch.trim().toLowerCase();
+
+    if (!query) {
+      return orderedLocationDetails;
+    }
+
+    return orderedLocationDetails.filter((item) => {
+      return (
+        item.displayName.toLowerCase().includes(query) ||
+        item.rawName.toLowerCase().includes(query)
+      );
+    });
+  }, [detailsSearch, orderedLocationDetails]);
+
+  const totalLocationCount = orderedLocationDetails.length;
+  const filteredLocationCount = filteredLocationDetails.length;
+
+  const locationEntityLabel =
+    activeLocationView === "country"
+      ? "countries"
+      : activeLocationView === "region"
+        ? "regions"
+        : "cities";
+
+  const locationChartData = useMemo<VisitorsBarDatum[]>(
+    () =>
+      orderedLocationDetails.slice(0, 5).map((item) => ({
+        id: item.id,
+        label: item.displayName,
+        value: item.value,
+        labelPrefix: item.icon,
+        labelDescription:
+          item.rawName && item.rawName !== item.displayName ? item.rawName : undefined,
+        secondaryLabel:
+          item.rawName && item.rawName !== item.displayName
+            ? item.rawName
+            : undefined,
+      })),
+    [orderedLocationDetails]
+  );
+
+  const locationChartEmptyState = `No ${locationEntityLabel} data available`;
+
+  const handleOpenDetails = useCallback(() => {
+    if (locationView === "map") {
+      return;
+    }
+    setDetailsSearch("");
+    setIsDetailsOpen(true);
+  }, [locationView]);
+
+  const handleLocationSortToggle = useCallback(() => {
+    setLocationSortDirection((prev) => (prev === "desc" ? "asc" : "desc"));
+  }, []);
+
+  const locationChartTooltip = useCallback((datum: VisitorsBarDatum) => {
+    const primary = [datum.labelPrefix, datum.label].filter(Boolean).join(" ").trim();
+    const secondary = datum.labelDescription || datum.secondaryLabel;
+
+    return (
+      <div className="rounded-md border border-border/60 bg-background/95 px-3 py-2 shadow-lg backdrop-blur">
+        <p className="text-sm font-semibold">{primary || datum.label}</p>
+        {secondary ? (
+          <p className="text-xs text-muted-foreground">{secondary}</p>
+        ) : null}
+        <p className="text-xs text-muted-foreground">
+          {formatVisitorsValue(datum.value)} visitors
+        </p>
+      </div>
+    );
+  }, []);
+
+  const renderLocationChartSection = useCallback(
+    (title: string) => (
+      <div className="min-h-[420px]">
+        <div className="border-b border-border/50 p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              {title}
+            </span>
+            <button
+              type="button"
+              onClick={handleLocationSortToggle}
+              className="flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              aria-label={`Sort visitors ${locationSortDirection === "desc" ? "ascending" : "descending"}`}
+              title="Toggle visitor sort order"
+            >
+              <span>Visitors</span>
+              <span className="flex items-center gap-[2px] text-[0.65rem] leading-none font-semibold">
+                <span
+                  className={
+                    locationSortDirection === "asc"
+                      ? "text-foreground"
+                      : "text-muted-foreground"
+                  }
+                >
+                  ↑
+                </span>
+                <span
+                  className={
+                    locationSortDirection === "desc"
+                      ? "text-foreground"
+                      : "text-muted-foreground"
+                  }
+                >
+                  ↓
+                </span>
+              </span>
+            </button>
+          </div>
+        </div>
+        <div className="h-[360px] p-4">
+          <VisitorsBarChart
+            data={locationChartData}
+            tooltipRenderer={locationChartTooltip}
+            emptyState={locationChartEmptyState}
+          />
+        </div>
+      </div>
+    ),
+    [handleLocationSortToggle, locationChartData, locationChartEmptyState, locationChartTooltip, locationSortDirection]
+  );
+
+  const locationDetailsHeader = (
+    <div className="grid grid-cols-[56px_minmax(0,1fr)_auto] items-center px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+      <span>Rank</span>
+      <span>{activeLocationView === "country" ? "Country" : activeLocationView === "region" ? "Region" : "City"}</span>
+      <button
+        type="button"
+        onClick={handleLocationSortToggle}
+        className="flex items-center justify-end gap-1 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        aria-label={`Sort visitors ${locationSortDirection === "desc" ? "ascending" : "descending"}`}
+      >
+        <span>Visitors</span>
+        <span className="flex items-center gap-[2px] text-[0.65rem] leading-none font-semibold">
+          <span
+            className={
+              locationSortDirection === "asc"
+                ? "text-foreground"
+                : "text-muted-foreground"
+            }
+          >
+            ↑
+          </span>
+          <span
+            className={
+              locationSortDirection === "desc"
+                ? "text-foreground"
+                : "text-muted-foreground"
+            }
+          >
+            ↓
+          </span>
+        </span>
+      </button>
+    </div>
+  );
+
+  const locationDetailsContent = filteredLocationDetails.length ? (
+    <div className="divide-y divide-border/40">
+      {filteredLocationDetails.map((item, index) => {
+        const secondary = item.rawName !== item.displayName ? item.rawName : undefined;
+        return (
+          <div
+            key={`${item.id}-${index}`}
+            className="grid grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-4 px-4 py-3"
+          >
+            <span className="w-10 shrink-0 text-xs font-mono text-muted-foreground">
+              #{index + 1}
+            </span>
+            <div className="flex min-w-0 items-center gap-3">
+              {item.icon ? (
+                <span className="text-lg" aria-hidden="true">
+                  {item.icon}
+                </span>
+              ) : null}
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-foreground">
+                  {item.displayName}
+                </p>
+                {secondary ? (
+                  <p className="truncate text-xs text-muted-foreground">{secondary}</p>
+                ) : null}
+              </div>
+            </div>
+            <span className="text-right text-xs font-semibold text-muted-foreground">
+              {formatVisitorsValue(item.value)}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  ) : (
+    <div className="flex h-40 items-center justify-center px-4 text-sm text-muted-foreground">
+      No {locationEntityLabel} found.
+    </div>
+  );
+
   return (
     <Card className="bg-gradient-card border-border/50 hover:shadow-medium transition-all duration-300 animate-fade-in glass">
       <Tabs
         value={locationView}
-        onValueChange={(v) => setLocationView(v as any)}
+        onValueChange={(value) => setLocationView(value as LocationView)}
       >
         <TabsList className="w-full rounded-none border-b border-border/50 bg-transparent p-0 h-12">
           <TabsTrigger
@@ -132,34 +379,35 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
         </TabContent>
 
         <TabContent value="country">
-          <div className="min-h-[420px]">
-            <LocationList data={locationData} locationView={locationView} />
-          </div>
-          <DetailsButton />
+          {renderLocationChartSection("Country")}
+          <DetailsButton onClick={handleOpenDetails} />
         </TabContent>
 
         <TabContent value="region">
-          <div className="min-h-[420px]">
-            <LocationList
-              data={locationData}
-              icon="📍"
-              locationView={locationView}
-            />
-          </div>
-          <DetailsButton />
+          {renderLocationChartSection("Region")}
+          <DetailsButton onClick={handleOpenDetails} />
         </TabContent>
 
         <TabContent value="city">
-          <div className="min-h-[420px]">
-            <LocationList
-              data={locationData}
-              icon="📍"
-              locationView={locationView}
-            />
-          </div>
-          <DetailsButton />
+          {renderLocationChartSection("City")}
+          <DetailsButton onClick={handleOpenDetails} />
         </TabContent>
       </Tabs>
+      <AnalyticsDetailsDialog
+        open={isDetailsOpen}
+        onOpenChange={setIsDetailsOpen}
+        title={`All ${locationEntityLabel}`}
+        description={`Review every ${locationEntityLabel} contributing visitors for this period.`}
+        searchPlaceholder={`Search ${locationEntityLabel}...`}
+        searchValue={detailsSearch}
+        onSearchChange={setDetailsSearch}
+        totalCount={totalLocationCount}
+        filteredCount={filteredLocationCount}
+        entityLabel={locationEntityLabel}
+        header={locationDetailsHeader}
+      >
+        {locationDetailsContent}
+      </AnalyticsDetailsDialog>
     </Card>
   );
 }

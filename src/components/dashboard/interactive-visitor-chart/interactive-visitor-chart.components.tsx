@@ -1,4 +1,12 @@
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { TabsContent } from "@/components/ui/tabs";
 import { cityNames } from "@/lib/city-names";
 import { countryNames } from "@/lib/country-names";
@@ -10,6 +18,21 @@ import {
   LocationView,
 } from "@/modules/analytics/use-get-total-visitors-by";
 import { ExpandIcon, Monitor } from "lucide-react";
+import * as React from "react";
+import { useCallback, useId, useMemo, useState } from "react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  LabelList,
+  ResponsiveContainer,
+  Tooltip as RechartTooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import type { LabelProps, TooltipProps } from "recharts";
+import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
 
 interface InteractiveVisitorChartProps {
   credentialId: string;
@@ -39,6 +62,286 @@ interface LocationListProps {
   data?: GetTotalVisitorsByResponse;
   icon?: React.ReactNode;
   locationView?: LocationView;
+}
+
+export const formatVisitorsValue = (value: number) =>
+  value >= 1000 ? `${(value / 1000).toFixed(1)}k` : value.toLocaleString();
+
+export interface VisitorsBarDatum {
+  id: string;
+  label: string;
+  value: number;
+  secondaryLabel?: string;
+  labelPrefix?: string;
+  labelDescription?: string;
+  meta?: unknown;
+  [key: string]: unknown;
+}
+
+type ChartMargin = {
+  top?: number;
+  right?: number;
+  bottom?: number;
+  left?: number;
+};
+
+interface VisitorsBarChartProps {
+  data: VisitorsBarDatum[];
+  onBarClick?: (datum: VisitorsBarDatum) => void;
+  tooltipRenderer?: (datum: VisitorsBarDatum) => React.ReactNode;
+  valueFormatter?: (value: number) => string;
+  emptyState?: React.ReactNode;
+  barSize?: number;
+  margin?: ChartMargin;
+  className?: string;
+  cursorFill?: string;
+}
+
+export function VisitorsBarChart({
+  data,
+  onBarClick,
+  tooltipRenderer,
+  valueFormatter = formatVisitorsValue,
+  emptyState = "No data available",
+  barSize = 34,
+  margin,
+  className,
+  cursorFill = "hsl(var(--primary)/0.08)",
+}: VisitorsBarChartProps) {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [chartSize, setChartSize] = useState({ width: 0, height: 0 });
+
+  const marginConfig = useMemo(
+    () => ({
+      top: margin?.top ?? 16,
+      right: margin?.right ?? 120,
+      bottom: margin?.bottom ?? 16,
+      left: margin?.left ?? 12,
+    }),
+    [margin]
+  );
+
+  const maxValue = useMemo(() => {
+    if (!data?.length) {
+      return 0;
+    }
+
+    return Math.max(...data.map((item) => item.value));
+  }, [data]);
+
+  const gradientBaseId = useId();
+  const gradientId = `${gradientBaseId}-bar`;
+  const gradientActiveId = `${gradientBaseId}-bar-active`;
+
+  const handleResize = useCallback((width: number, height: number) => {
+    setChartSize((prev) =>
+      prev.width === width && prev.height === height ? prev : { width, height }
+    );
+  }, []);
+
+  const renderPrimaryLabel = useCallback((props: LabelProps) => {
+    const { x = 0, y = 0, width = 0, height = 0 } = props;
+    const payload = props.payload as VisitorsBarDatum | undefined;
+    const labelText = payload?.label ?? "";
+    const labelPrefix = payload?.labelPrefix;
+    const labelDescription = payload?.labelDescription?.trim()
+      ? payload.labelDescription
+      : undefined;
+
+    const textX = Number(x) + 12;
+    const baseY = Number(y) + Number(height) / 2;
+
+    const primaryContent = [labelPrefix, labelText].filter(Boolean).join(" ").trim();
+    const hasSecondary = Boolean(labelDescription);
+    const firstLineY = hasSecondary ? baseY - 6 : baseY;
+
+    if (!primaryContent && !labelDescription) {
+      return null;
+    }
+
+    return (
+      <g>
+        {primaryContent ? (
+          <text
+            x={textX}
+            y={firstLineY}
+            fill="hsl(var(--foreground))"
+            fontSize={14}
+            fontWeight={600}
+            textAnchor="start"
+            dominantBaseline="middle"
+          >
+            {primaryContent}
+          </text>
+        ) : null}
+        {labelDescription ? (
+          <text
+            x={textX}
+            y={firstLineY + 14}
+            fill="hsl(var(--muted-foreground))"
+            fontSize={11}
+            fontWeight={500}
+            textAnchor="start"
+            dominantBaseline="middle"
+          >
+            {labelDescription}
+          </text>
+        ) : null}
+      </g>
+    );
+  }, []);
+
+  const renderValueLabel = useCallback(
+    (props: LabelProps) => {
+      const { x = 0, y = 0, width = 0, height = 0, viewBox } = props;
+      const payload = props.payload as VisitorsBarDatum | undefined;
+      const rawValue =
+        typeof props.value === "number"
+          ? props.value
+          : props.value
+            ? Number(props.value)
+            : payload?.value;
+
+      if (rawValue === undefined || rawValue === null || Number.isNaN(rawValue)) {
+        return null;
+      }
+
+      const numericValue = Number(rawValue);
+
+      const baseX =
+        (viewBox?.x ?? 0) +
+        Math.max(chartSize.width - marginConfig.right, 0) +
+        marginConfig.right * 0.6;
+      const fallbackX = Number(x) + Number(width) + marginConfig.right * 0.6;
+      const anchorX = chartSize.width ? baseX : fallbackX;
+      const textY = Number(y) + Number(height) / 2;
+
+      return (
+        <text
+          x={anchorX}
+          y={textY}
+          fill="hsl(var(--foreground))"
+          fontSize={13}
+          fontWeight={700}
+          dominantBaseline="middle"
+          textAnchor="end"
+          style={{ fontFeatureSettings: '"tnum"' }}
+        >
+          {valueFormatter(numericValue)}
+        </text>
+      );
+    },
+    [chartSize.width, marginConfig.right, valueFormatter]
+  );
+
+  const tooltipContent = useCallback(
+    ({ active, payload }: TooltipProps<ValueType, NameType>) => {
+      if (!active || !payload?.length) {
+        return null;
+      }
+
+      const datum = payload[0]?.payload as VisitorsBarDatum | undefined;
+
+      if (!datum) {
+        return null;
+      }
+
+      if (tooltipRenderer) {
+        return tooltipRenderer(datum);
+      }
+
+      return (
+        <div className="rounded-md border border-border/60 bg-background/95 px-3 py-2 shadow-lg backdrop-blur">
+          <p className="text-sm font-semibold">{datum.label}</p>
+          {datum.secondaryLabel && datum.secondaryLabel !== datum.label ? (
+            <p className="break-all text-xs text-muted-foreground">{datum.secondaryLabel}</p>
+          ) : null}
+          <p className="text-xs text-muted-foreground">
+            {valueFormatter(datum.value)} visitors
+          </p>
+        </div>
+      );
+    },
+    [tooltipRenderer, valueFormatter]
+  );
+
+  if (!data?.length) {
+    const empty =
+      typeof emptyState === "string" ? (
+        <span>{emptyState}</span>
+      ) : (
+        emptyState
+      );
+
+    return (
+      <div
+        className={`flex h-full w-full items-center justify-center text-sm text-muted-foreground${className ? ` ${className}` : ""}`}
+      >
+        {empty}
+      </div>
+    );
+  }
+
+  return (
+    <div className={`h-full w-full${className ? ` ${className}` : ""}`}>
+      <ResponsiveContainer width="100%" height="100%" onResize={handleResize}>
+        <BarChart data={data} layout="vertical" margin={marginConfig}>
+          <defs>
+            <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.85} />
+              <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.55} />
+            </linearGradient>
+            <linearGradient id={gradientActiveId} x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={1} />
+              <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.75} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid
+            horizontal={false}
+            stroke="hsl(var(--border)/0.4)"
+            strokeDasharray="3 3"
+          />
+          <XAxis
+            type="number"
+            domain={[0, maxValue ? maxValue * 1.1 : 10]}
+            axisLine={false}
+            tickLine={false}
+            tick={false}
+          />
+          <YAxis dataKey="label" type="category" width={0} axisLine={false} tickLine={false} tick={false} />
+          <RechartTooltip cursor={{ fill: cursorFill }} content={tooltipContent} />
+          <Bar
+            dataKey="value"
+            radius={[0, 999, 999, 0]}
+            barSize={barSize}
+            onClick={
+              onBarClick
+                ? (event) => {
+                    const datum = event?.payload as VisitorsBarDatum | undefined;
+                    if (datum) {
+                      onBarClick(datum);
+                    }
+                  }
+                : undefined
+            }
+            onMouseEnter={(_, index) => setHoveredIndex(index)}
+            onMouseLeave={() => setHoveredIndex(null)}
+          >
+            <LabelList position="insideLeft" dataKey="label" content={renderPrimaryLabel} />
+            <LabelList position="right" dataKey="value" content={renderValueLabel} />
+            {data.map((item, index) => (
+              <Cell
+                key={`${item.id}-${index}`}
+                cursor={onBarClick ? "pointer" : "default"}
+                fill={hoveredIndex === index ? `url(#${gradientActiveId})` : `url(#${gradientId})`}
+                fillOpacity={hoveredIndex === index ? 1 : 0.85}
+              />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
 }
 
 const getCountryFlag = (countryName: string) => {
@@ -92,6 +395,26 @@ const getFlagForLocation = (
   return "📍";
 };
 
+export const getLocationDisplayName = (
+  locationName: string,
+  locationType: LocationView
+): string => {
+  if (locationType === "country") {
+    return getCountryName(locationName || "") || locationName || "";
+  }
+
+  if (locationType === "region") {
+    return getRegionName(locationName || "") || locationName || "";
+  }
+
+  return locationName || "";
+};
+
+export const getLocationIcon = (
+  locationName: string,
+  locationType: LocationView
+) => getFlagForLocation(locationName, locationType);
+
 export function LocationList({ data, locationView }: LocationListProps) {
   return (
     <div className="flex-1 p-4 space-y-2 overflow-y-auto">
@@ -100,18 +423,9 @@ export function LocationList({ data, locationView }: LocationListProps) {
         .map((item) => (
           <LocationItem
             key={item.name}
-            name={
-              locationView === "country"
-                ? getCountryName(item.name || "")
-                : locationView === "region"
-                  ? getRegionName(item.name || "")
-                  : item.name || ""
-            }
+            name={getLocationDisplayName(item.name || "", locationView || "country")}
             visitors={item.visitors}
-            icon={getFlagForLocation(
-              item?.name || "",
-              locationView || "country"
-            )}
+            icon={getLocationIcon(item?.name || "", locationView || "country")}
           />
         ))}
       {(!data || data.length === 0) && (
@@ -212,11 +526,13 @@ export function TechList({ data, icon: Icon = Monitor }: TechListProps) {
 interface DetailsButtonProps {
   icon?: React.ElementType;
   label?: string;
+  onClick?: () => void;
 }
 
 export function DetailsButton({
   icon: Icon = ExpandIcon,
   label = "Details",
+  onClick,
 }: DetailsButtonProps) {
   return (
     <div className="p-4 border-t border-border/50">
@@ -224,10 +540,70 @@ export function DetailsButton({
         variant="ghost"
         className="w-full text-muted-foreground hover:text-foreground"
         size="sm"
+        type="button"
+        onClick={onClick}
       >
         <Icon className="w-4 h-4 mr-2" />
         <span className="uppercase">{label}</span>
       </Button>
     </div>
+  );
+}
+
+interface AnalyticsDetailsDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description?: string;
+  searchPlaceholder: string;
+  searchValue: string;
+  onSearchChange: (value: string) => void;
+  totalCount: number;
+  filteredCount: number;
+  entityLabel?: string;
+  header?: React.ReactNode;
+  children: React.ReactNode;
+}
+
+export function AnalyticsDetailsDialog({
+  open,
+  onOpenChange,
+  title,
+  description,
+  searchPlaceholder,
+  searchValue,
+  onSearchChange,
+  totalCount,
+  filteredCount,
+  entityLabel = "items",
+  header,
+  children,
+}: AnalyticsDetailsDialogProps) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="w-[min(90vw,80rem)] max-w-5xl">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          {description ? <DialogDescription>{description}</DialogDescription> : null}
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <Input
+              value={searchValue}
+              onChange={(event) => onSearchChange(event.target.value)}
+              placeholder={searchPlaceholder}
+              className="sm:max-w-xs"
+            />
+            <span className="text-xs text-muted-foreground sm:text-right">
+              Showing {filteredCount} of {totalCount} {entityLabel}
+            </span>
+          </div>
+          {header ? header : null}
+          <div className="max-h-[460px] overflow-y-auto rounded-md border border-border/50 bg-muted/10">
+            {children}
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
