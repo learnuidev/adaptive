@@ -65,3 +65,10 @@ export interface Session {
   isAuthenticated: boolean;
   isLoading: boolean;
 }
+
+// Error types
+export interface LoginError {
+  message: string;
+  code?: string;
+  type: 'invalid_credentials' | 'user_not_found' | 'user_not_confirmed' | 'too_many_attempts' | 'network' | 'unknown';
+}
