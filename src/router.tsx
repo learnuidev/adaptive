@@ -14,21 +14,21 @@ import { Authenticated } from "./components/authenticated";
 import { AdapiveProvider } from "./lib/adaptive/adaptive-provider";
 
 import Dashboard from "./pages/dashboard-page";
-import Users from "./pages/users";
+import Users from "./pages/users-page";
 import UserDetail from "./pages/user-detail";
-import Cohorts from "./pages/cohorts";
+import Cohorts from "./pages/cohorts-page";
 import AddCohort from "./pages/add-cohort";
 import CohortDetail from "./pages/cohort-detail";
-import Features from "./pages/features";
+import Features from "./pages/features-page";
 import FeatureDetail from "./pages/feature-detail";
 import AddFeatureVersion from "./pages/add-feature-version";
-import Events from "./pages/events";
-import Goals from "./pages/goals";
-import Trends from "./pages/trends";
-import Insights from "./pages/insights";
-import Settings from "./pages/settings";
+import Events from "./pages/events-page";
+import Goals from "./pages/goals-page";
+import Trends from "./pages/trends-page";
+import Insights from "./pages/insights-page";
+import Settings from "./pages/settings-page";
 import CredentialsList from "./pages/credentials-list";
-import Documentation from "./pages/documentation";
+import Documentation from "./pages/documentation-page";
 
 const queryClient = new QueryClient();
 

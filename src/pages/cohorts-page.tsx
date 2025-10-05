@@ -99,7 +99,11 @@ const Cohorts = () => {
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredCohorts.map((cohort) => (
-              <CohortCard key={cohort.id} cohort={cohort} websiteId={cohort.websiteId} />
+              <CohortCard
+                key={cohort.id}
+                cohort={cohort}
+                websiteId={cohort.websiteId}
+              />
             ))}
           </div>
         )}
