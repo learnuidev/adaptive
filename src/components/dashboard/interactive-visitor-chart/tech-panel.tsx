@@ -23,7 +23,9 @@ export function TechPanel({ credentialId }: InteractiveVisitorChartProps) {
   >("browser_name");
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [detailsSearch, setDetailsSearch] = useState("");
-  const [techSortDirection, setTechSortDirection] = useState<"asc" | "desc">("desc");
+  const [techSortDirection, setTechSortDirection] = useState<"asc" | "desc">(
+    "desc"
+  );
   const { selectedPeriod } = useFilterPeriodStore();
 
   const { data: techData } = useGetTotalVisitorsByQuery({
@@ -118,6 +120,14 @@ export function TechPanel({ credentialId }: InteractiveVisitorChartProps) {
     setTechSortDirection((prev) => (prev === "desc" ? "asc" : "desc"));
   }, []);
 
+  const dataToHeight = {
+    5: `h-[360px]`,
+    4: `h-[320px]`,
+    3: `h-[260px]`,
+    2: `h-[240px]`,
+    1: `h-[200px]`,
+  };
+
   const renderTechChartSection = useCallback(
     (title: string) => (
       <div className="min-h-[420px]">
@@ -157,12 +167,22 @@ export function TechPanel({ credentialId }: InteractiveVisitorChartProps) {
             </button>
           </div>
         </div>
-        <div className="h-[360px] p-4">
-          <VisitorsBarChart data={techChartData} emptyState={techChartEmptyState} />
+        <div
+          className={`${dataToHeight?.[techChartData.length] || `h-[360px]`} p-4`}
+        >
+          <VisitorsBarChart
+            data={techChartData}
+            emptyState={techChartEmptyState}
+          />
         </div>
       </div>
     ),
-    [handleTechSortToggle, techChartData, techChartEmptyState, techSortDirection]
+    [
+      handleTechSortToggle,
+      techChartData,
+      techChartEmptyState,
+      techSortDirection,
+    ]
   );
 
   const techDetailsHeader = (
@@ -227,7 +247,10 @@ export function TechPanel({ credentialId }: InteractiveVisitorChartProps) {
 
   return (
     <Card className="bg-gradient-card border-border/50 hover:shadow-medium transition-all duration-300 animate-fade-in glass">
-      <Tabs value={techView} onValueChange={(value) => setTechView(value as typeof techView)}>
+      <Tabs
+        value={techView}
+        onValueChange={(value) => setTechView(value as typeof techView)}
+      >
         <TabsList className="w-full rounded-none border-b border-border/50 bg-transparent p-0 h-12">
           <TabsTrigger
             value="browser_name"

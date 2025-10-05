@@ -16,7 +16,7 @@ interface InteractiveVisitorChartProps {
 }
 
 export function UsersPanel({ credentialId }: InteractiveVisitorChartProps) {
-  const [techView, setTechView] = useState<"goals">("goals");
+  const [techView, setTechView] = useState<string>("users");
   const { selectedPeriod } = useFilterPeriodStore();
 
   const getIcon = (name: string) => {
