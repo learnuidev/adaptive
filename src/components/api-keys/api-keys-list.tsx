@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { RefreshCw, Trash2, Key, Copy, Eye, EyeOff } from "lucide-react";
 import { useListApiKeysQuery } from "@/modules/api-keys/use-list-api-keys-query";
 import { useDeleteApiKeyMutation } from "@/modules/api-keys/use-delete-api-key-mutation";
@@ -90,17 +91,7 @@ export function ApiKeysList({ websiteId }: ApiKeysListProps) {
   };
 
   if (isLoading) {
-    return (
-      <div className="space-y-4">
-        {[1, 2, 3].map((i) => (
-          <Card key={i} className="p-6 animate-pulse">
-            <div className="h-4 bg-muted rounded w-3/4 mb-4"></div>
-            <div className="h-3 bg-muted rounded w-1/2 mb-2"></div>
-            <div className="h-3 bg-muted rounded w-2/3"></div>
-          </Card>
-        ))}
-      </div>
-    );
+    return <LoadingSkeleton type="list" count={3} />;
   }
 
   if (!apiKeys || apiKeys.length === 0) {

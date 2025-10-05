@@ -1,11 +1,12 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { PageLoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { Database, ExternalLink, Key, Plus } from "lucide-react";
 import { useState } from "react";
 
-import { useNavigate } from "@tanstack/react-router";
 import { formatDistanceToNow } from "date-fns";
+import { useNavigationUtils } from "@/lib/navigation-utils";
 
 import { AddWebsiteDialog } from "@/components/websites/add-website-dialog";
 import { NoWebsiteMessage } from "@/components/websites/no-website-message";
@@ -23,12 +24,12 @@ export default function CredentialsList() {
     secretKey: string;
   } | null>(null);
   const { data: websites, isLoading } = useListUserWebsitesQuery();
-  const navigate = useNavigate();
+  const { navigateToDashboard } = useNavigationUtils();
   const { setSelectedWebsite } = useWebsiteStore();
 
   const handleCredentialClick = (websiteId: string) => {
     setSelectedWebsite(websiteId);
-    navigate({ to: `/dashboard/${websiteId}` });
+    navigateToDashboard(websiteId);
   };
 
   const handleCredentialAdded = (website: {
@@ -46,29 +47,14 @@ export default function CredentialsList() {
     setIsSuccessDialogOpen(false);
     if (newWebsite) {
       setSelectedWebsite(newWebsite.id);
-      navigate({ to: `/dashboard/${newWebsite.id}` });
+      navigateToDashboard(newWebsite.id);
     }
     setNewWebsite(null);
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="p-6">
-          <h1 className="text-2xl font-bold text-foreground mb-6">
-            Your Credentials
-          </h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="p-6 animate-pulse">
-                <div className="h-4 bg-muted rounded w-3/4 mb-4"></div>
-                <div className="h-3 bg-muted rounded w-1/2 mb-2"></div>
-                <div className="h-3 bg-muted rounded w-2/3"></div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </div>
+      <PageLoadingSkeleton />
     );
   }
 

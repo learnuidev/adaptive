@@ -1,11 +1,13 @@
-import { useParams, useNavigate } from "@tanstack/react-router";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import { useGetFeatureDetailsQuery } from "@/modules/feature/use-get-feature-details-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { PageLoadingSkeleton } from "@/components/ui/loading-skeleton";
+import { NotFound } from "@/components/ui/error-boundary";
 import { ArrowLeft, Plus } from "lucide-react";
 import { format } from "date-fns";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useNavigationUtils } from "@/lib/navigation-utils";
 
 export default function FeatureDetail() {
   const params = useParams({ strict: false }) as {
@@ -13,25 +15,23 @@ export default function FeatureDetail() {
     featureId?: string;
   };
   const navigate = useNavigate();
+  const { navigateToFeatures } = useNavigationUtils();
   const { data: featureDetails, isLoading } = useGetFeatureDetailsQuery(
     params.featureId || ""
   );
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background p-6">
-        <Skeleton className="h-8 w-64 mb-4" />
-        <Skeleton className="h-32 w-full mb-4" />
-        <Skeleton className="h-64 w-full" />
-      </div>
-    );
+    return <PageLoadingSkeleton />;
   }
 
   if (!featureDetails) {
     return (
-      <div className="min-h-screen bg-background p-6">
-        <p className="text-muted-foreground">Feature not found</p>
-      </div>
+      <NotFound
+        title="Feature not found"
+        description="The feature you're looking for doesn't exist."
+        onGoBack={() => navigateToFeatures(params.websiteId)}
+        goBackText="Back to Features"
+      />
     );
   }
 
@@ -42,7 +42,7 @@ export default function FeatureDetail() {
         <div className="p-6">
           <Button
             variant="ghost"
-            onClick={() => navigate({ to: `/features/${params.websiteId}` })}
+            onClick={() => navigateToFeatures(params.websiteId)}
             className="mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />

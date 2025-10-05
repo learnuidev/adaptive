@@ -2,51 +2,34 @@ import { useParams } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { PageLoadingSkeleton } from "@/components/ui/loading-skeleton";
+import { NotFound } from "@/components/ui/error-boundary";
 import { ArrowLeft, Database, Key, Globe, Calendar } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
 
 import { formatDistanceToNow } from "date-fns";
 import { ApiKeysList } from "@/components/api-keys/api-keys-list";
 import { useListUserWebsitesQuery } from "@/modules/user-websites/use-list-user-websites-query";
+import { useNavigationUtils } from "@/lib/navigation-utils";
 
 export default function CredentialDetail() {
   const { websiteId } = useParams({ from: "/dashboard/$websiteId" });
-  const navigate = useNavigate();
+  const { navigateToWebsites } = useNavigationUtils();
   const { data: websites, isLoading } = useListUserWebsitesQuery();
 
   const website = websites?.find((c) => c.id === websiteId);
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="p-6">
-          <div className="animate-pulse">
-            <div className="h-8 bg-muted rounded w-48 mb-6"></div>
-            <div className="h-32 bg-muted rounded mb-6"></div>
-            <div className="h-64 bg-muted rounded"></div>
-          </div>
-        </div>
-      </div>
-    );
+    return <PageLoadingSkeleton />;
   }
 
   if (!website) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="p-6">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Credential Not Found</h1>
-            <p className="text-muted-foreground mb-6">
-              The website you're looking for doesn't exist or you don't have
-              access to it.
-            </p>
-            <Button onClick={() => navigate({ to: "/websites" })}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Credentials
-            </Button>
-          </div>
-        </div>
-      </div>
+      <NotFound
+        title="Credential Not Found"
+        description="The website you're looking for doesn't exist or you don't have access to it."
+        onGoBack={navigateToWebsites}
+        goBackText="Back to Credentials"
+      />
     );
   }
 
@@ -56,7 +39,7 @@ export default function CredentialDetail() {
         <div className="mb-6">
           <Button
             variant="ghost"
-            onClick={() => navigate({ to: "/websites" })}
+            onClick={navigateToWebsites}
             className="mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
