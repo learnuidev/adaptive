@@ -13,7 +13,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Authenticated } from "./components/authenticated";
 import { AdapiveProvider } from "./lib/adaptive/adaptive-provider";
 
-import Dashboard from "./pages/dashboard";
+import Dashboard from "./pages/dashboard-page";
 import Users from "./pages/users";
 import UserDetail from "./pages/user-detail";
 import Cohorts from "./pages/cohorts";
@@ -36,8 +36,8 @@ const queryClient = new QueryClient();
 const rootRoute = createRootRoute({
   component: () => {
     const path = window.location.pathname;
-    const isPublicRoute = path.startsWith('/doc');
-    
+    const isPublicRoute = path.startsWith("/doc");
+
     if (isPublicRoute) {
       return (
         <QueryClientProvider client={queryClient}>
@@ -50,7 +50,7 @@ const rootRoute = createRootRoute({
         </QueryClientProvider>
       );
     }
-    
+
     return (
       <QueryClientProvider client={queryClient}>
         <Authenticated>
