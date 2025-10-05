@@ -42,7 +42,7 @@ import { useWebsiteStore } from "@/stores/website-store";
 
 const getMainItems = (websiteId?: string) => [
   {
-    title: "Credentials",
+    title: "Web Apps",
     url: "/",
     icon: Home,
     requiresCredential: false,
