@@ -12,6 +12,7 @@ import {
   Geography,
   ZoomableGroup,
 } from "react-simple-maps";
+
 import {
   AnalyticsDetailsDialog,
   DetailsButton,
@@ -22,6 +23,8 @@ import {
   getLocationDisplayName,
   getLocationIcon,
 } from "./interactive-visitor-chart.components";
+import { flags } from "@/lib/flags";
+import { countryNames } from "@/lib/country-names";
 import type { VisitorsBarDatum } from "./interactive-visitor-chart.components";
 
 // const geoUrl = "/world.json";
@@ -36,7 +39,16 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
   const [locationView, setLocationView] = useState<LocationView>("map");
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [detailsSearch, setDetailsSearch] = useState("");
-  const [locationSortDirection, setLocationSortDirection] = useState<"asc" | "desc">("desc");
+  const [locationSortDirection, setLocationSortDirection] = useState<
+    "asc" | "desc"
+  >("desc");
+  const [hoveredCountry, setHoveredCountry] = useState<{
+    name: string;
+    iso: string;
+    visitors: number;
+    x: number;
+    y: number;
+  } | null>(null);
   const { selectedPeriod } = useFilterPeriodStore();
 
   const { data: locationData } = useGetTotalVisitorsByQuery({
@@ -62,6 +74,30 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
     setDetailsSearch("");
   }, [locationView]);
 
+  useEffect(() => {
+    const handleGlobalMouseMove = (event: MouseEvent) => {
+      if (hoveredCountry) {
+        setHoveredCountry((prev) =>
+          prev
+            ? {
+                ...prev,
+                x: event.clientX - 300,
+                y: event.clientY - 300,
+              }
+            : null
+        );
+      }
+    };
+
+    if (hoveredCountry) {
+      document.addEventListener("mousemove", handleGlobalMouseMove);
+    }
+
+    return () => {
+      document.removeEventListener("mousemove", handleGlobalMouseMove);
+    };
+  }, [hoveredCountry]);
+
   const orderedLocationDetails = useMemo(() => {
     const entries = Array.isArray(locationData) ? locationData : [];
 
@@ -71,7 +107,9 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
         const numericVisitors = Number.isNaN(visitorsValue) ? 0 : visitorsValue;
         const rawName = item?.name ?? `location-${index}`;
         const displayName =
-          getLocationDisplayName(rawName, activeLocationView) || rawName || "Unknown";
+          getLocationDisplayName(rawName, activeLocationView) ||
+          rawName ||
+          "Unknown";
         const iconNode = getLocationIcon(rawName || "", activeLocationView);
         const icon = typeof iconNode === "string" ? iconNode : "";
         return {
@@ -120,7 +158,9 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
         value: item.value,
         labelPrefix: item.icon,
         labelDescription:
-          item.rawName && item.rawName !== item.displayName ? item.rawName : undefined,
+          item.rawName && item.rawName !== item.displayName
+            ? item.rawName
+            : undefined,
         secondaryLabel:
           item.rawName && item.rawName !== item.displayName
             ? item.rawName
@@ -144,7 +184,10 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
   }, []);
 
   const locationChartTooltip = useCallback((datum: VisitorsBarDatum) => {
-    const primary = [datum.labelPrefix, datum.label].filter(Boolean).join(" ").trim();
+    const primary = [datum.labelPrefix, datum.label]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
     const secondary = datum.labelDescription || datum.secondaryLabel;
 
     return (
@@ -208,13 +251,25 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
         </div>
       </div>
     ),
-    [handleLocationSortToggle, locationChartData, locationChartEmptyState, locationChartTooltip, locationSortDirection]
+    [
+      handleLocationSortToggle,
+      locationChartData,
+      locationChartEmptyState,
+      locationChartTooltip,
+      locationSortDirection,
+    ]
   );
 
   const locationDetailsHeader = (
     <div className="grid grid-cols-[56px_minmax(0,1fr)_auto] items-center px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
       <span>Rank</span>
-      <span>{activeLocationView === "country" ? "Country" : activeLocationView === "region" ? "Region" : "City"}</span>
+      <span>
+        {activeLocationView === "country"
+          ? "Country"
+          : activeLocationView === "region"
+            ? "Region"
+            : "City"}
+      </span>
       <button
         type="button"
         onClick={handleLocationSortToggle}
@@ -249,7 +304,8 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
   const locationDetailsContent = filteredLocationDetails.length ? (
     <div className="divide-y divide-border/40">
       {filteredLocationDetails.map((item, index) => {
-        const secondary = item.rawName !== item.displayName ? item.rawName : undefined;
+        const secondary =
+          item.rawName !== item.displayName ? item.rawName : undefined;
         return (
           <div
             key={`${item.id}-${index}`}
@@ -269,7 +325,9 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
                   {item.displayName}
                 </p>
                 {secondary ? (
-                  <p className="truncate text-xs text-muted-foreground">{secondary}</p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {secondary}
+                  </p>
                 ) : null}
               </div>
             </div>
@@ -347,11 +405,34 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
                       const intensity = visitors / maxVisitors;
                       return (
                         <Geography
+                          key={geo.rsmKey}
                           onClick={() => {
                             alert("yoo");
                           }}
-                          key={geo.rsmKey}
                           geography={geo}
+                          onMouseEnter={(event) => {
+                            setHoveredCountry({
+                              name: countryName,
+                              iso: countryNameISO,
+                              visitors,
+                              x: event.clientX,
+                              y: event.clientY,
+                            });
+                          }}
+                          onMouseMove={(event) => {
+                            setHoveredCountry((prev) =>
+                              prev && prev.name === countryName
+                                ? {
+                                    ...prev,
+                                    x: event.clientX,
+                                    y: event.clientY,
+                                  }
+                                : null
+                            );
+                          }}
+                          onMouseLeave={() => {
+                            setHoveredCountry(null);
+                          }}
                           fill={
                             visitors > 0
                               ? `hsl(var(--primary) / ${0.2 + intensity * 0.6})`
@@ -375,6 +456,44 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
               </ZoomableGroup>
             </ComposableMap>
             <MapLegend />
+            {hoveredCountry && (
+              <div
+                className="fixed z-50 pointer-events-none rounded-lg border border-border/60 bg-background/95 px-4 py-3 shadow-lg backdrop-blur"
+                style={{
+                  left: hoveredCountry.x + 8,
+                  top: hoveredCountry.y + 8,
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">
+                    {flags[hoveredCountry.iso] || "🌍"}
+                  </span>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <p className="font-semibold text-foreground text-sm">
+                        {hoveredCountry.name}
+                      </p>
+                      <span className="text-xs text-muted-foreground">
+                        ({hoveredCountry.iso})
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <span>👥</span>
+                      <span>
+                        {formatVisitorsValue(hoveredCountry.visitors)} visitors
+                      </span>
+                    </div>
+                    {countryNames[hoveredCountry.iso] &&
+                      countryNames[hoveredCountry.iso] !==
+                        hoveredCountry.name && (
+                        <div className="text-xs text-muted-foreground italic">
+                          {countryNames[hoveredCountry.iso]}
+                        </div>
+                      )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </TabContent>
 
