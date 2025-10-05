@@ -16,7 +16,7 @@ import { regionNames } from "@/lib/region-names";
 import {
   GetTotalVisitorsByResponse,
   LocationView,
-} from "@/modules/analytics/use-get-total-visitors-by";
+} from "@/modules/analytics/use-get-total-visitors-by-query";
 import { ExpandIcon, Monitor } from "lucide-react";
 import * as React from "react";
 import { useCallback, useId, useMemo, useState } from "react";

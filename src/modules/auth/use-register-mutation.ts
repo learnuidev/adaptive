@@ -1,33 +1,24 @@
 import { signUp } from "@/lib/aws-smplify/amplify-auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { isAuthenticatedQueryKey } from "./use-is-authenticated.query";
-
-interface SignUpCredentials {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-}
+import { signUpCredentialsSchema, SignUpCredentials } from "./auth.types";
 
 export const useRegisterMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      email,
-      password,
-    }: {
-      email: string;
-      password: string;
-    }) => {
+    mutationFn: async (credentials: SignUpCredentials) => {
+      // Validate input against schema before API call
+      signUpCredentialsSchema.parse(credentials);
+      
       return await signUp({
-        username: email,
-        password,
-        // attributes: {
-        //   given_name: firstName,
-        //   family_name: lastName,
-        //   email,
-        // },
+        username: credentials.email,
+        password: credentials.password,
+        attributes: {
+          given_name: credentials.firstName,
+          family_name: credentials.lastName,
+          email: credentials.email,
+        },
       });
     },
     onSuccess: () => {

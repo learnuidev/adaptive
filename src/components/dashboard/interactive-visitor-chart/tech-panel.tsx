@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useGetTotalVisitorsByQuery } from "@/modules/analytics/use-get-total-visitors-by";
+import { useGetTotalVisitorsByQuery } from "@/modules/analytics/use-get-total-visitors-by-query";
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
 import { useCallback, useEffect, useMemo, useState } from "react";
 

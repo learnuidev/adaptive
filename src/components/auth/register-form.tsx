@@ -34,6 +34,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   const [viewType, setViewtype] = useState(RegistrationViewTypes.register);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [confirmationCode, setConfirmationCode] = useState("");
   const { toast } = useToast();
   const registerMutation = useRegisterMutation();
@@ -44,7 +46,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     e.preventDefault();
 
     try {
-      await registerMutation.mutateAsync({ email, password });
+      await registerMutation.mutateAsync({ email, password, firstName, lastName });
 
       setViewtype(RegistrationViewTypes.confirmRegister);
       toast({
@@ -169,6 +171,30 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="firstName">First Name</Label>
+              <Input
+                id="firstName"
+                type="text"
+                placeholder="Enter your first name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
+                disabled={registerMutation.isPending}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Last Name</Label>
+              <Input
+                id="lastName"
+                type="text"
+                placeholder="Enter your last name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required
+                disabled={registerMutation.isPending}
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input

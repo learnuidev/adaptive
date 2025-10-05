@@ -1,26 +1,19 @@
-import { confirmSignUp, signUp } from "@/lib/aws-smplify/amplify-auth";
+import { confirmSignUp } from "@/lib/aws-smplify/amplify-auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { isAuthenticatedQueryKey } from "./use-is-authenticated.query";
+import { confirmRegistrationSchema, ConfirmRegistration } from "./auth.types";
 
 export const useConfirmRegisterMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      email,
-      confirmationCode,
-    }: {
-      email: string;
-      confirmationCode: string;
-    }) => {
+    mutationFn: async (confirmation: ConfirmRegistration) => {
+      // Validate input against schema before API call
+      confirmRegistrationSchema.parse(confirmation);
+      
       return await confirmSignUp({
-        username: email,
-        confirmationCode,
-        // attributes: {
-        //   given_name: firstName,
-        //   family_name: lastName,
-        //   email,
-        // },
+        username: confirmation.email,
+        confirmationCode: confirmation.confirmationCode,
       });
     },
     onSuccess: () => {
