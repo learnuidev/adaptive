@@ -4,15 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SimplePageLayout } from "@/components/layout/page-layout";
 import { useAddCohortMutation } from "@/modules/cohort/use-add-cohort-mutation";
 import { toast } from "sonner";
 import { RolloutRuleBuilder } from "@/components/features/rollout-rule-builder";
-import { ArrowLeft } from "lucide-react";
+import { useNavigationUtils } from "@/lib/navigation-utils";
 
 const AddCohort = () => {
   const params = useParams({ strict: false }) as { websiteId?: string };
   const websiteId = params?.websiteId || "";
   const navigate = useNavigate();
+  const { navigateToCohorts } = useNavigationUtils();
 
   const [name, setName] = useState("");
   const [cohortRules, setCohortRules] = useState<
@@ -42,27 +44,16 @@ const AddCohort = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="border-b border-border/50 bg-card/50 backdrop-blur-sm">
-        <div className="p-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate({ to: `/cohorts/${websiteId}` })}
-            className="mb-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Cohorts
-          </Button>
-          <h1 className="text-2xl font-bold text-foreground">Create Cohort</h1>
-          <p className="text-muted-foreground">
-            Define a new user segment with custom rules
-          </p>
-        </div>
-      </div>
+    <SimplePageLayout
+      title="Create Cohort"
+      description="Define a new user segment with custom rules"
+      backButton={{
+        onClick: () => navigateToCohorts(websiteId),
+        text: "Back to Cohorts",
+      }}
+    >
 
-      <div className="p-6 max-w-4xl">
+      <div className="max-w-4xl">
         <form onSubmit={handleSubmit} className="space-y-6">
           <Card className="glass border-border/50">
             <CardHeader>
@@ -119,7 +110,7 @@ const AddCohort = () => {
           </div>
         </form>
       </div>
-    </div>
+    </SimplePageLayout>
   );
 };
 

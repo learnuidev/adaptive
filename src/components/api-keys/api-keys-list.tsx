@@ -3,11 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
+import { ActiveBadge } from "@/components/ui/status-badge";
+import { TimeDisplay } from "@/components/ui/time-display";
 import { RefreshCw, Trash2, Key, Copy, Eye, EyeOff } from "lucide-react";
 import { useListApiKeysQuery } from "@/modules/api-keys/use-list-api-keys-query";
 import { useDeleteApiKeyMutation } from "@/modules/api-keys/use-delete-api-key-mutation";
 import { useRotateApiKeyMutation } from "@/modules/api-keys/use-rotate-api-key-mutation";
-import { formatDistanceToNow } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import {
   AlertDialog,
@@ -138,7 +139,7 @@ export function ApiKeysList({ websiteId }: ApiKeysListProps) {
                   </p>
                 </div>
               </div>
-              <Badge variant="secondary">Active</Badge>
+              <ActiveBadge />
             </div>
 
             <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
@@ -146,12 +147,7 @@ export function ApiKeysList({ websiteId }: ApiKeysListProps) {
                 <Eye className="w-3 h-3" />
                 <span>Secret: {apiKey.previewApiSecret}</span>
               </div>
-              <span>
-                Created{" "}
-                {formatDistanceToNow(new Date(apiKey.createdAt), {
-                  addSuffix: true,
-                })}
-              </span>
+              <TimeDisplay date={new Date(apiKey.createdAt)} />
             </div>
 
             <div className="flex gap-2">

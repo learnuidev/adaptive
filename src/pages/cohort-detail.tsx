@@ -1,11 +1,12 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Users, Mail } from "lucide-react";
+import { PageLayout } from "@/components/layout/page-layout";
+import { Users, Mail } from "lucide-react";
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { useListCohortUsersQuery } from "@/modules/cohort/list-cohort-users-query";
 import { useListCohortsQuery } from "@/modules/cohort/use-list-cohorts-query";
 import { format } from "date-fns";
+import { useNavigationUtils } from "@/lib/navigation-utils";
 
 const CohortDetail = () => {
   const params = useParams({ strict: false }) as {
@@ -13,6 +14,7 @@ const CohortDetail = () => {
     cohortId?: string;
   };
   const navigate = useNavigate();
+  const { navigateToCohorts } = useNavigationUtils();
   const websiteId = params?.websiteId;
   const cohortId = params?.cohortId;
 
@@ -36,45 +38,32 @@ const CohortDetail = () => {
   const ruleCount = cohort.cohortRules?.length || 0;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="border-b border-border/50 bg-card/50 backdrop-blur-sm">
-        <div className="p-6">
-          <Button
-            variant="ghost"
-            onClick={() => navigate({ to: `/cohorts/${websiteId}` })}
-            className="mb-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Cohorts
-          </Button>
-
-          <div className="flex items-start gap-4 mb-6">
-            <div className="p-3 rounded-lg bg-primary/10">
-              <Users className="w-6 h-6 text-primary" />
-            </div>
-            <div className="flex-1">
-              <h1 className="text-2xl font-bold text-foreground mb-1">
-                {cohort.name}
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Created {format(new Date(cohort.createdAt), "MMM d, yyyy")}
-              </p>
-              <div className="flex gap-2 mt-2">
-                <Badge variant="secondary" className="text-xs">
-                  {ruleCount} {ruleCount === 1 ? "rule" : "rules"}
-                </Badge>
-                <Badge variant="secondary" className="text-xs">
-                  {cohortUsers?.length || 0}{" "}
-                  {cohortUsers?.length === 1 ? "user" : "users"}
-                </Badge>
-              </div>
-            </div>
+    <PageLayout
+      title={cohort.name}
+      description={`Created ${format(new Date(cohort.createdAt), "MMM d, yyyy")}`}
+      backButton={{
+        onClick: () => navigateToCohorts(websiteId),
+        text: "Back to Cohorts",
+      }}
+      actions={
+        <div className="flex gap-2">
+          <Badge variant="secondary" className="text-xs">
+            {ruleCount} {ruleCount === 1 ? "rule" : "rules"}
+          </Badge>
+          <Badge variant="secondary" className="text-xs">
+            {cohortUsers?.length || 0}{" "}
+            {cohortUsers?.length === 1 ? "user" : "users"}
+          </Badge>
+        </div>
+      }
+      headerContent={
+        <div className="flex items-start gap-4 mb-6">
+          <div className="p-3 rounded-lg bg-primary/10">
+            <Users className="w-6 h-6 text-primary" />
           </div>
         </div>
-      </div>
-
-      <div className="p-6">
+      }
+    >
         <Card className="glass border-border/50">
           <CardHeader>
             <h2 className="text-lg font-semibold text-foreground">
@@ -112,8 +101,7 @@ const CohortDetail = () => {
             )}
           </CardContent>
         </Card>
-      </div>
-    </div>
+    </PageLayout>
   );
 };
 
