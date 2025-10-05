@@ -70,6 +70,19 @@ interface LocationListProps {
 export const formatVisitorsValue = (value: number) =>
   value >= 1000 ? `${(value / 1000).toFixed(1)}k` : value.toLocaleString();
 
+const truncateText = (text: string, maxLength: number) => {
+  if (!text) {
+    return "";
+  }
+
+  if (text.length <= maxLength) {
+    return text;
+  }
+
+  const safeLength = 42;
+  return `${text.slice(0, safeLength).trimEnd()}…`;
+};
+
 export interface VisitorsBarDatum {
   id: string;
   label: string;
@@ -170,7 +183,7 @@ export function VisitorsBarChart({
         ? Number(derivedY) + barHeight / 2
         : Number(y) + Number(height) / 2;
 
-      const fitsInside = barWidth >= 80;
+      const fitsInside = true;
       const insideX = barStartX + 16;
       const outsideX = Math.max(barStartX - 16, marginConfig.left);
       const textX = fitsInside ? insideX : outsideX;
@@ -189,13 +202,25 @@ export function VisitorsBarChart({
       const hasSecondary = Boolean(labelDescription);
       const firstLineY = hasSecondary ? baseY - 6 : baseY;
 
-      if (!primaryContent && !labelDescription) {
+      const approximateCharWidth = 7.25;
+      const insideAvailable = Math.max(barWidth - 40, 56);
+      const outsideAvailable = Math.max(barStartX - marginConfig.left - 16, 56);
+      const maxChars = Math.max(
+        10,
+        Math.floor(
+          (fitsInside ? insideAvailable : outsideAvailable) /
+            approximateCharWidth
+        )
+      );
+      const displayedPrimary = truncateText(primaryContent, maxChars);
+
+      if (!displayedPrimary && !labelDescription) {
         return null;
       }
 
       return (
         <g>
-          {primaryContent ? (
+          {displayedPrimary ? (
             <text
               x={textX}
               y={firstLineY}
@@ -213,7 +238,7 @@ export function VisitorsBarChart({
               }
               strokeWidth={fitsInside ? 1.5 : 0}
             >
-              {primaryContent}
+              {displayedPrimary}
             </text>
           ) : null}
           {labelDescription ? (
