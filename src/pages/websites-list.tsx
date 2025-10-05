@@ -1,59 +1,54 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Plus, 
-  Settings, 
-  Trash2, 
-  Database, 
-  ExternalLink, 
-  Key 
-} from "lucide-react";
-import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
-import { AddCredentialDialog } from "@/components/credentials/add-credential-dialog";
-import { CredentialSuccessDialog } from "@/components/credentials/credential-success-dialog";
-import { NoCredentialsMessage } from "@/components/credentials/no-credentials-message";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Database, ExternalLink, Key, Plus } from "lucide-react";
+import { useState } from "react";
+
 import { useNavigate } from "@tanstack/react-router";
 import { formatDistanceToNow } from "date-fns";
-import { useCredentialStore } from "@/stores/credential-store";
+
+import { AddWebsiteDialog } from "@/components/websites/add-website-dialog";
+import { NoWebsiteMessage } from "@/components/websites/no-website-message";
+import { WebsiteSuccessDialog } from "@/components/websites/website-success-dialog";
+import { useListUserWebsitesQuery } from "@/modules/user-websites/use-list-user-websites-query";
+import { useWebsiteStore } from "@/stores/website-store";
 
 export default function CredentialsList() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
-  const [newCredential, setNewCredential] = useState<{
+  const [newWebsite, setNewWebsite] = useState<{
     id: string;
     title: string;
     accessKeyId: string;
     secretKey: string;
   } | null>(null);
-  const { data: credentials, isLoading } = useListUserCredentialsQuery();
+  const { data: websites, isLoading } = useListUserWebsitesQuery();
   const navigate = useNavigate();
-  const { setSelectedCredential } = useCredentialStore();
+  const { setSelectedWebsite } = useWebsiteStore();
 
-  const handleCredentialClick = (credentialId: string) => {
-    setSelectedCredential(credentialId);
-    navigate({ to: `/dashboard/${credentialId}` });
+  const handleCredentialClick = (websiteId: string) => {
+    setSelectedWebsite(websiteId);
+    navigate({ to: `/dashboard/${websiteId}` });
   };
 
-  const handleCredentialAdded = (credential: {
+  const handleCredentialAdded = (website: {
     id: string;
     title: string;
     accessKeyId: string;
     secretKey: string;
   }) => {
     setIsAddDialogOpen(false);
-    setNewCredential(credential);
+    setNewWebsite(website);
     setIsSuccessDialogOpen(true);
   };
 
   const handleSuccessContinue = () => {
     setIsSuccessDialogOpen(false);
-    if (newCredential) {
-      setSelectedCredential(newCredential.id);
-      navigate({ to: `/dashboard/${newCredential.id}` });
+    if (newWebsite) {
+      setSelectedWebsite(newWebsite.id);
+      navigate({ to: `/dashboard/${newWebsite.id}` });
     }
-    setNewCredential(null);
+    setNewWebsite(null);
   };
 
   if (isLoading) {
@@ -77,20 +72,20 @@ export default function CredentialsList() {
     );
   }
 
-  if (!credentials || credentials.length === 0) {
+  if (!websites || websites.length === 0) {
     return (
       <>
-        <NoCredentialsMessage />
-        <AddCredentialDialog
+        <NoWebsiteMessage />
+        <AddWebsiteDialog
           open={isAddDialogOpen}
           onOpenChange={setIsAddDialogOpen}
           onSuccess={handleCredentialAdded}
         />
-        
-        <CredentialSuccessDialog
+
+        <WebsiteSuccessDialog
           open={isSuccessDialogOpen}
           onOpenChange={setIsSuccessDialogOpen}
-          credential={newCredential}
+          website={newWebsite}
           onContinue={handleSuccessContinue}
         />
       </>
@@ -106,7 +101,7 @@ export default function CredentialsList() {
               Your Credentials
             </h1>
             <p className="text-muted-foreground">
-              Manage your API credentials and access analytics
+              Manage your API websites and access analytics
             </p>
           </div>
           <Button
@@ -119,11 +114,11 @@ export default function CredentialsList() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {credentials.map((credential) => (
+          {websites.map((website) => (
             <Card
-              key={credential.id}
+              key={website.id}
               className="p-6 hover:shadow-lg transition-all duration-200 cursor-pointer bg-card/50 border-border/50"
-              onClick={() => handleCredentialClick(credential.id)}
+              onClick={() => handleCredentialClick(website.id)}
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -132,10 +127,10 @@ export default function CredentialsList() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground">
-                      {credential.title}
+                      {website.title}
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      {credential.domain}
+                      {website.domain}
                     </p>
                   </div>
                 </div>
@@ -143,11 +138,11 @@ export default function CredentialsList() {
               </div>
 
               <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                {credential.description}
+                {website.description}
               </p>
 
               <div className="flex flex-wrap gap-1 mb-4">
-                {credential.scopes.map((scope) => (
+                {website.scopes.map((scope) => (
                   <Badge key={scope} variant="secondary" className="text-xs">
                     {scope}
                   </Badge>
@@ -161,7 +156,7 @@ export default function CredentialsList() {
                 </div>
                 <span>
                   Added{" "}
-                  {formatDistanceToNow(new Date(credential.createdAt), {
+                  {formatDistanceToNow(new Date(website.createdAt), {
                     addSuffix: true,
                   })}
                 </span>
@@ -171,16 +166,16 @@ export default function CredentialsList() {
         </div>
       </div>
 
-      <AddCredentialDialog
+      <AddWebsiteDialog
         open={isAddDialogOpen}
         onOpenChange={setIsAddDialogOpen}
         onSuccess={handleCredentialAdded}
       />
-      
-      <CredentialSuccessDialog
+
+      <WebsiteSuccessDialog
         open={isSuccessDialogOpen}
         onOpenChange={setIsSuccessDialogOpen}
-        credential={newCredential}
+        website={newWebsite}
         onContinue={handleSuccessContinue}
       />
     </div>

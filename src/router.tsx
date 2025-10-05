@@ -27,7 +27,8 @@ import Goals from "./pages/goals";
 import Trends from "./pages/trends";
 import Insights from "./pages/insights";
 import Settings from "./pages/settings";
-import CredentialsList from "./pages/credentials-list";
+import WebsitesList from "./pages/websites-list";
+import WebsiteDetail from "./pages/website-detail";
 import Documentation from "./pages/documentation-page";
 
 const queryClient = new QueryClient();
@@ -83,90 +84,96 @@ const rootRoute = createRootRoute({
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
-  component: CredentialsList,
+  component: WebsitesList,
 });
 
 const dashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/dashboard/$credentialId",
+  path: "/dashboard/$websiteId",
   component: Dashboard,
+});
+
+const websiteDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/websites/$websiteId",
+  component: WebsiteDetail,
 });
 
 const usersRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/users/$credentialId",
+  path: "/users/$websiteId",
   component: Users,
 });
 
 const userDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/users/$credentialId/$userId",
+  path: "/users/$websiteId/$userId",
   component: UserDetail,
 });
 
 const cohortsRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/cohorts/$credentialId",
+  path: "/cohorts/$websiteId",
   component: Cohorts,
 });
 
 const addCohortRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/cohorts/$credentialId/add",
+  path: "/cohorts/$websiteId/add",
   component: AddCohort,
 });
 
 const cohortDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/cohorts/$credentialId/$cohortId",
+  path: "/cohorts/$websiteId/$cohortId",
   component: CohortDetail,
 });
 
 const featureFlagsRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/features/$credentialId",
+  path: "/features/$websiteId",
   component: Features,
 });
 
 const featureDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/features/$credentialId/$featureId",
+  path: "/features/$websiteId/$featureId",
   component: FeatureDetail,
 });
 
 const eventsRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/events/$credentialId",
+  path: "/events/$websiteId",
   component: Events,
 });
 
 const goalsRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/goals/$credentialId",
+  path: "/goals/$websiteId",
   component: Goals,
 });
 
 const trendsRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/trends/$credentialId",
+  path: "/trends/$websiteId",
   component: Trends,
 });
 
 const insightsRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/insights/$credentialId",
+  path: "/insights/$websiteId",
   component: Insights,
 });
 
 const settingsRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/settings/$credentialId",
+  path: "/settings/$websiteId",
   component: Settings,
 });
 
 const addFeatureVersionRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/features/$credentialId/$featureId/add-version",
+  path: "/features/$websiteId/$featureId/add-version",
   component: AddFeatureVersion,
 });
 
@@ -180,6 +187,7 @@ const documentationRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   indexRoute,
   dashboardRoute,
+  websiteDetailRoute,
   usersRoute,
   userDetailRoute,
   cohortsRoute,

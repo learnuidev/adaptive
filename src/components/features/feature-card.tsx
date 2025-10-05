@@ -10,22 +10,24 @@ interface FeatureCardProps {
 
 export function FeatureCard({ feature }: FeatureCardProps) {
   const navigate = useNavigate();
-  const params = useParams({ strict: false }) as { credentialId?: string };
-  
+  const params = useParams({ strict: false }) as { websiteId?: string };
+
   const handleClick = () => {
-    navigate({ 
-      to: `/features/${params.credentialId}/${feature.id}` 
+    navigate({
+      to: `/features/${params.websiteId}/${feature.id}`,
     });
   };
 
   return (
-    <Card 
+    <Card
       onClick={handleClick}
       className="p-4 bg-gradient-card border-border/50 hover:shadow-medium transition-all duration-300 glass cursor-pointer"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-foreground truncate">{feature.name}</h3>
+          <h3 className="font-semibold text-foreground truncate">
+            {feature.name}
+          </h3>
           {feature.description && (
             <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
               {feature.description}

@@ -1,11 +1,9 @@
-export interface UserCredential {
+export interface UserWebsite {
   id: string;
   title: string;
   description: string;
 
   apiKey: string;
-  apiSecret: string;
-  previewApiSecret: string;
   scopes: string[];
 
   userId: string;
@@ -13,4 +11,9 @@ export interface UserCredential {
   urlEndpoint: string;
 
   createdAt: number;
+}
+
+export interface UserWebsiteWithSecret extends UserWebsite {
+  apiSecret: string;
+  previewApiSecret: string;
 }

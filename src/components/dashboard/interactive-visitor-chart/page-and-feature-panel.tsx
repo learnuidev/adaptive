@@ -15,33 +15,39 @@ import { useGetSummaryQuery } from "@/modules/analytics/use-get-summary-query";
 import { useListFeaturesQuery } from "@/modules/feature/use-list-features-query";
 
 interface InteractiveVisitorChartProps {
-  credentialId: string;
+  websiteId: string;
 }
 
 const getDisplayLabel = (path: string) => {
   if (!path) return "/";
-  const displayPath = path.startsWith("http") ? new URL(path).pathname || "/" : path;
+  const displayPath = path.startsWith("http")
+    ? new URL(path).pathname || "/"
+    : path;
   if (displayPath.length <= 34) return displayPath;
   return `${displayPath.slice(0, 16)}…${displayPath.slice(-12)}`;
 };
 
 export function PageAndFeaturePanel({
-  credentialId,
+  websiteId,
 }: InteractiveVisitorChartProps) {
   const [currentTab, setCurrentTab] = useState<"page" | "feature">("page");
-  const [pageSortDirection, setPageSortDirection] = useState<"asc" | "desc">("desc");
+  const [pageSortDirection, setPageSortDirection] = useState<"asc" | "desc">(
+    "desc"
+  );
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [detailsView, setDetailsView] = useState<"page" | "feature">("page");
   const [detailsSearch, setDetailsSearch] = useState("");
-  const [featureSortDirection, setFeatureSortDirection] = useState<"asc" | "desc">("asc");
+  const [featureSortDirection, setFeatureSortDirection] = useState<
+    "asc" | "desc"
+  >("asc");
   const { selectedPeriod } = useFilterPeriodStore();
 
   const { data: summary } = useGetSummaryQuery({
-    websiteId: credentialId,
+    websiteId: websiteId,
     period: selectedPeriod,
   });
 
-  const { data: features } = useListFeaturesQuery(credentialId);
+  const { data: features } = useListFeaturesQuery(websiteId);
 
   useEffect(() => {
     if (!isDetailsOpen) {
@@ -77,10 +83,7 @@ export function PageAndFeaturePanel({
     const mapped = pages
       .map((page) => {
         const rawPath = page?.patternHref || page?.href || "";
-        const value = Number.parseInt(
-          page?.total || page?.visits || "0",
-          10
-        );
+        const value = Number.parseInt(page?.total || page?.visits || "0", 10);
 
         return {
           fullPath: rawPath || "/",
@@ -147,10 +150,16 @@ export function PageAndFeaturePanel({
       ? list.filter((feature) => {
           const nameMatch = feature.name?.toLowerCase().includes(query);
           const keyMatch = feature.featureKey?.toLowerCase().includes(query);
-          const descriptionMatch = feature.description?.toLowerCase().includes(query);
-          const tagsMatch = feature.tags?.some((tag) => tag.toLowerCase().includes(query));
+          const descriptionMatch = feature.description
+            ?.toLowerCase()
+            .includes(query);
+          const tagsMatch = feature.tags?.some((tag) =>
+            tag.toLowerCase().includes(query)
+          );
 
-          return Boolean(nameMatch || keyMatch || descriptionMatch || tagsMatch);
+          return Boolean(
+            nameMatch || keyMatch || descriptionMatch || tagsMatch
+          );
         })
       : list;
 
@@ -163,28 +172,25 @@ export function PageAndFeaturePanel({
     return featureSortDirection === "asc" ? sorted : sorted.reverse();
   }, [detailsSearch, detailsView, features, featureSortDirection]);
 
-  const pageChartTooltip = useCallback(
-    (datum: VisitorsBarDatum) => {
-      const fullPath = (datum.secondaryLabel as string) || datum.label;
+  const pageChartTooltip = useCallback((datum: VisitorsBarDatum) => {
+    const fullPath = (datum.secondaryLabel as string) || datum.label;
 
-      return (
-        <div className="rounded-md border border-border/60 bg-background/95 px-3 py-2 shadow-lg backdrop-blur">
-          <p className="break-all text-sm font-semibold">{fullPath}</p>
-          <p className="flex items-center gap-1 text-xs text-muted-foreground">
-            <ExternalLink className="h-3 w-3" />
-            {formatVisitorsValue(datum.value)} visitors • Click to open
-          </p>
-        </div>
-      );
-    },
-    []
-  );
+    return (
+      <div className="rounded-md border border-border/60 bg-background/95 px-3 py-2 shadow-lg backdrop-blur">
+        <p className="break-all text-sm font-semibold">{fullPath}</p>
+        <p className="flex items-center gap-1 text-xs text-muted-foreground">
+          <ExternalLink className="h-3 w-3" />
+          {formatVisitorsValue(datum.value)} visitors • Click to open
+        </p>
+      </div>
+    );
+  }, []);
 
   const handlePageClick = (pagePath: string) => {
     if (!pagePath) return;
 
     // Try to construct the full URL
-    // First, check if credentialId might contain domain info, otherwise use current origin
+    // First, check if websiteId might contain domain info, otherwise use current origin
     const fullUrl = pagePath.startsWith("http")
       ? pagePath
       : `${window.location.origin}${pagePath.startsWith("/") ? "" : "/"}${pagePath}`;
@@ -207,8 +213,7 @@ export function PageAndFeaturePanel({
   const detailsPlaceholder =
     detailsView === "page" ? "Search pages..." : "Search features...";
 
-  const detailsEntityLabel =
-    detailsView === "page" ? "pages" : "features";
+  const detailsEntityLabel = detailsView === "page" ? "pages" : "features";
 
   const detailsHeader =
     detailsView === "page" ? (
@@ -415,7 +420,11 @@ export function PageAndFeaturePanel({
             <div className="p-4 h-[360px]">
               <VisitorsBarChart
                 data={pageChartData}
-                onBarClick={(datum) => handlePageClick((datum.secondaryLabel as string) || datum.label)}
+                onBarClick={(datum) =>
+                  handlePageClick(
+                    (datum.secondaryLabel as string) || datum.label
+                  )
+                }
                 tooltipRenderer={pageChartTooltip}
                 emptyState="No page data available"
               />
@@ -435,7 +444,10 @@ export function PageAndFeaturePanel({
             <div className="p-4 space-y-2">
               {features && features.length > 0 ? (
                 features.map((feature, index) => (
-                  <div key={feature.id} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
+                  <div
+                    key={feature.id}
+                    className="flex items-center justify-between py-2 border-b border-border/50 last:border-0"
+                  >
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-foreground truncate">
                         {feature.name}

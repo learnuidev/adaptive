@@ -36,10 +36,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { useSignOutMutation } from "@/modules/auth/use-signout-mutation";
 import { useToast } from "@/hooks/use-toast";
-import { useCredentialStore } from "@/stores/credential-store";
-import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
 
-const getMainItems = (credentialId?: string) => [
+import { useListUserWebsitesQuery } from "@/modules/user-websites/use-list-user-websites-query";
+import { useWebsiteStore } from "@/stores/website-store";
+
+const getMainItems = (websiteId?: string) => [
   {
     title: "Credentials",
     url: "/",
@@ -66,7 +67,7 @@ const getMainItems = (credentialId?: string) => [
   },
 ];
 
-const getToolsItems = (credentialId?: string) => [
+const getToolsItems = (websiteId?: string) => [
   {
     title: "Cohorts",
     url: "/cohorts",
@@ -120,43 +121,43 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const signOutMutation = useSignOutMutation();
   const { toast } = useToast();
-  const { selectedCredentialId, setSelectedCredential } = useCredentialStore();
-  const { data: credentials } = useListUserCredentialsQuery();
+  const { selectedWebsiteId, setSelectedWebsite } = useWebsiteStore();
+  const { data: websites } = useListUserWebsitesQuery();
 
-  // Get credentialId from current route params (handle case where it might not exist)
-  const getCredentialId = () => {
+  // Get websiteId from current route params (handle case where it might not exist)
+  const getWebsiteId = () => {
     const pathParts = location.pathname.split("/");
     if (pathParts.length >= 3) {
-      return pathParts[2]; // e.g., /dashboard/credentialId -> credentialId
+      return pathParts[2]; // e.g., /dashboard/websiteId -> websiteId
     }
     return undefined;
   };
 
-  const credentialId = getCredentialId();
-  const mainItems = getMainItems(credentialId);
-  const toolsItems = getToolsItems(credentialId);
+  const websiteId = getWebsiteId();
+  const mainItems = getMainItems(websiteId);
+  const toolsItems = getToolsItems(websiteId);
 
-  // Handle navigation with credential selection logic
+  // Handle navigation with website selection logic
   const handleNavigation = (
     url: string | null,
     requiresCredential: boolean
   ) => {
     if (!url) return;
 
-    // If it's the credentials page, navigate directly
+    // If it's the websites page, navigate directly
     if (url === "/") {
       navigate({ to: "/" });
       return;
     }
 
-    // If it requires a credential, we need to determine which credential to use
+    // If it requires a website, we need to determine which website to use
     if (requiresCredential) {
-      let targetCredentialId = credentialId || selectedCredentialId;
+      let targetCredentialId = websiteId || selectedWebsiteId;
 
-      // If no credential is available, use the first available credential
-      if (!targetCredentialId && credentials && credentials.length > 0) {
-        targetCredentialId = credentials[0].id;
-        setSelectedCredential(targetCredentialId);
+      // If no website is available, use the first available website
+      if (!targetCredentialId && websites && websites.length > 0) {
+        targetCredentialId = websites[0].id;
+        setSelectedWebsite(targetCredentialId);
       }
 
       if (targetCredentialId) {

@@ -1,3 +1,5 @@
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -5,43 +7,40 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import {
-  Users as UsersIcon,
-  UserPlus,
   Activity,
   Clock,
   MapPin,
+  UserPlus,
+  Users as UsersIcon,
 } from "lucide-react";
-import { useParams, useNavigate } from "@tanstack/react-router";
-import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
+
+import { ResponsiveFilters } from "@/components/analytics/responsive-filters";
 import { useGetSummaryQuery } from "@/modules/analytics/use-get-summary-query";
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
-import { ResponsiveFilters } from "@/components/analytics/responsive-filters";
-import { CredentialSelector } from "@/components/credentials/credential-selector";
-import { NoCredentialsMessage } from "@/components/credentials/no-credentials-message";
+
 import { WithNewEvents } from "@/components/with-new-events";
+import { useListUserWebsitesQuery } from "@/modules/user-websites/use-list-user-websites-query";
+import { NoWebsiteMessage } from "@/components/websites/no-website-message";
 
 const Users = () => {
   // Use strict: false to handle cases where params might not exist
-  const params = useParams({ strict: false }) as { credentialId?: string };
-  const credentialId = params?.credentialId;
+  const params = useParams({ strict: false }) as { websiteId?: string };
+  const websiteId = params?.websiteId;
   const navigate = useNavigate();
-  const { data: credentials } = useListUserCredentialsQuery();
+  const { data: websites } = useListUserWebsitesQuery();
   const { selectedPeriod } = useFilterPeriodStore();
   const { data: summaryData } = useGetSummaryQuery({
-    websiteId: credentialId,
+    websiteId: websiteId,
     period: selectedPeriod,
   });
 
-  const currentCredential = credentials?.find(
-    (cred) => cred.id === credentialId
-  );
+  const currentWebsite = websites?.find((cred) => cred.id === websiteId);
 
-  // Show credentials selection if no credential ID or credential not found
-  if (!credentialId || (credentials && !currentCredential)) {
-    return <NoCredentialsMessage />;
+  // Show websites selection if no website ID or website not found
+  if (!websiteId || (websites && !currentWebsite)) {
+    return <NoWebsiteMessage />;
   }
 
   // Transform visitors data for display
@@ -76,14 +75,14 @@ const Users = () => {
   const visitors = summaryData?.visitors || [];
 
   return (
-    <WithNewEvents credentialId={credentialId}>
+    <WithNewEvents websiteId={websiteId}>
       <div className="min-h-screen bg-background p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
             <h1 className="text-3xl font-bold text-foreground">Users</h1>
             <p className="text-muted-foreground">
-              {currentCredential
-                ? `Manage users for ${currentCredential.title}`
+              {currentWebsite
+                ? `Manage users for ${currentWebsite.title}`
                 : "Manage and analyze your user base"}
             </p>
           </div>
@@ -161,7 +160,11 @@ const Users = () => {
                 visitors.map((visitor) => (
                   <div
                     key={visitor.visitor_id}
-                    onClick={() => navigate({ to: `/users/${credentialId}/${visitor.visitor_id}` as any })}
+                    onClick={() =>
+                      navigate({
+                        to: `/users/${websiteId}/${visitor.visitor_id}` as any,
+                      })
+                    }
                     className="flex items-center justify-between p-3 rounded-lg border border-border/50 glass hover:bg-accent/50 cursor-pointer transition-colors"
                   >
                     <div className="flex items-center gap-3">

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
-import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
+
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -10,25 +10,29 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, Database } from "lucide-react";
-import { AddCredentialDialog } from "./add-credential-dialog";
+
+import { useListUserWebsitesQuery } from "@/modules/user-websites/use-list-user-websites-query";
+import { AddWebsiteDialog } from "./add-website-dialog";
 
 interface CredentialSelectorProps {
-  onCredentialChange?: (credentialId: string) => void;
+  onCredentialChange?: (websiteId: string) => void;
 }
 
-export function CredentialSelector({ onCredentialChange }: CredentialSelectorProps) {
-  // Use strict: false to handle cases where params might not exist  
-  const params = useParams({ strict: false }) as { credentialId?: string };
-  const credentialId = params?.credentialId;
+export function CredentialSelector({
+  onCredentialChange,
+}: CredentialSelectorProps) {
+  // Use strict: false to handle cases where params might not exist
+  const params = useParams({ strict: false }) as { websiteId?: string };
+  const websiteId = params?.websiteId;
   const navigate = useNavigate();
   const [showAddDialog, setShowAddDialog] = useState(false);
-  const { data: credentials, isLoading } = useListUserCredentialsQuery();
+  const { data: websites, isLoading } = useListUserWebsitesQuery();
 
-  const currentCredential = credentials?.find(cred => cred.id === credentialId);
+  const currentWebsite = websites?.find((website) => website.id === websiteId);
 
   const handleCredentialChange = (newCredentialId: string) => {
     const currentPath = location.pathname;
-    const basePath = currentPath.split('/')[1] || 'dashboard';
+    const basePath = currentPath.split("/")[1] || "dashboard";
     navigate({ to: `/${basePath}/${newCredentialId}` });
     onCredentialChange?.(newCredentialId);
   };
@@ -37,38 +41,44 @@ export function CredentialSelector({ onCredentialChange }: CredentialSelectorPro
     return (
       <div className="flex items-center gap-2 px-3 py-2 bg-muted/50 rounded-lg">
         <Database className="w-4 h-4 animate-pulse" />
-        <span className="text-sm text-muted-foreground">Loading credentials...</span>
+        <span className="text-sm text-muted-foreground">
+          Loading websites...
+        </span>
       </div>
     );
   }
 
   return (
     <div className="flex items-center gap-2">
-      <Select value={credentialId || undefined} onValueChange={handleCredentialChange}>
+      <Select
+        value={websiteId || undefined}
+        onValueChange={handleCredentialChange}
+      >
         <SelectTrigger className="min-w-[200px] glass border-white/10 bg-card/50 backdrop-blur-md">
-          <SelectValue 
-            placeholder="Select credential"
-            className="text-sm"
-          >
-            {currentCredential ? (
+          <SelectValue placeholder="Select website" className="text-sm">
+            {currentWebsite ? (
               <div className="flex items-center gap-2">
                 <Database className="w-4 h-4" />
-                <span className="truncate">{currentCredential.title}</span>
+                <span className="truncate">{currentWebsite.title}</span>
               </div>
             ) : (
-              "Select credential"
+              "Select website"
             )}
           </SelectValue>
         </SelectTrigger>
         <SelectContent className="glass border-white/10 bg-card/95 backdrop-blur-md">
-          {credentials?.map((credential) => (
-            <SelectItem key={credential.id} value={credential.id} className="hover:bg-white/5">
+          {websites?.map((website) => (
+            <SelectItem
+              key={website.id}
+              value={website.id}
+              className="hover:bg-white/5"
+            >
               <div className="flex items-center gap-2">
                 <Database className="w-4 h-4" />
                 <div>
-                  <div className="font-medium">{credential.title}</div>
+                  <div className="font-medium">{website.title}</div>
                   <div className="text-xs text-muted-foreground truncate max-w-[150px]">
-                    {credential.domain}
+                    {website.domain}
                   </div>
                 </div>
               </div>
@@ -76,7 +86,7 @@ export function CredentialSelector({ onCredentialChange }: CredentialSelectorPro
           ))}
         </SelectContent>
       </Select>
-      
+
       <Button
         variant="outline"
         onClick={() => setShowAddDialog(true)}
@@ -86,14 +96,14 @@ export function CredentialSelector({ onCredentialChange }: CredentialSelectorPro
         Add
       </Button>
 
-      <AddCredentialDialog 
-        open={showAddDialog} 
+      <AddWebsiteDialog
+        open={showAddDialog}
         onOpenChange={setShowAddDialog}
-        onSuccess={(credentialId) => {
+        onSuccess={(websiteId) => {
           setShowAddDialog(false);
           const currentPath = location.pathname;
-          const basePath = currentPath.split('/')[1] || 'dashboard';
-          navigate({ to: `/${basePath}/${credentialId}` });
+          const basePath = currentPath.split("/")[1] || "dashboard";
+          navigate({ to: `/${basePath}/${websiteId}` });
         }}
       />
     </div>

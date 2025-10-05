@@ -4,27 +4,26 @@ import { Plus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
-import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
-import { NoCredentialsMessage } from "@/components/credentials/no-credentials-message";
+
 import { WithGlow } from "@/components/with-glow";
 import { useListCohortsQuery } from "@/modules/cohort/use-list-cohorts-query";
 import { CohortCard } from "@/components/cohorts/cohort-card";
+import { useListUserWebsitesQuery } from "@/modules/user-websites/use-list-user-websites-query";
+import { NoWebsiteMessage } from "@/components/websites/no-website-message";
 
 const Cohorts = () => {
-  const params = useParams({ strict: false }) as { credentialId?: string };
-  const credentialId = params?.credentialId;
+  const params = useParams({ strict: false }) as { websiteId?: string };
+  const websiteId = params?.websiteId;
   const navigate = useNavigate();
-  const { data: credentials } = useListUserCredentialsQuery();
-  const { data: cohorts, isLoading } = useListCohortsQuery(credentialId || "");
+  const { data: websites } = useListUserWebsitesQuery();
+  const { data: cohorts, isLoading } = useListCohortsQuery(websiteId || "");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const currentCredential = credentials?.find(
-    (cred) => cred.id === credentialId
-  );
+  const currentWebsite = websites?.find((cred) => cred.id === websiteId);
 
-  // Show credentials selection if no credential ID or credential not found
-  if (!credentialId || (credentials && !currentCredential)) {
-    return <NoCredentialsMessage />;
+  // Show websites selection if no website ID or website not found
+  if (!websiteId || (websites && !currentWebsite)) {
+    return <NoWebsiteMessage />;
   }
 
   const filteredCohorts = (cohorts || []).filter((cohort) =>
@@ -40,14 +39,14 @@ const Cohorts = () => {
             <div>
               <h1 className="text-2xl font-bold text-foreground">Cohorts</h1>
               <p className="text-muted-foreground">
-                {currentCredential
-                  ? `${currentCredential.title}`
+                {currentWebsite
+                  ? `${currentWebsite.title}`
                   : "Segment and analyze user groups"}
               </p>
             </div>
             <WithGlow>
               <Button
-                onClick={() => navigate({ to: `/cohorts/${credentialId}/add` })}
+                onClick={() => navigate({ to: `/cohorts/${websiteId}/add` })}
                 className="bg-gradient-primary hover:bg-primary-glow shadow-emerald"
               >
                 <Plus className="w-4 h-4 mr-2" />

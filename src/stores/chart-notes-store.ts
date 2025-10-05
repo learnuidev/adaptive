@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export interface ChartNote {
   id: string;
@@ -7,15 +7,18 @@ export interface ChartNote {
   dataPoint: string;
   note: string;
   timestamp: number;
-  credentialId?: string;
+  websiteId?: string;
 }
 
 interface ChartNotesStore {
   notes: ChartNote[];
-  addNote: (note: Omit<ChartNote, 'id' | 'timestamp'>) => void;
+  addNote: (note: Omit<ChartNote, "id" | "timestamp">) => void;
   updateNote: (id: string, note: string) => void;
   deleteNote: (id: string) => void;
-  getNoteForPoint: (chartKey: string, dataPoint: string) => ChartNote | undefined;
+  getNoteForPoint: (
+    chartKey: string,
+    dataPoint: string
+  ) => ChartNote | undefined;
   getNotesForChart: (chartKey: string) => ChartNote[];
 }
 
@@ -53,7 +56,7 @@ export const useChartNotesStore = create<ChartNotesStore>()(
       },
     }),
     {
-      name: 'chart-notes-storage',
+      name: "chart-notes-storage",
     }
   )
 );

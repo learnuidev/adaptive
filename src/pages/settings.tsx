@@ -1,10 +1,7 @@
-import { useParams } from "@tanstack/react-router";
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CredentialSelector } from "@/components/websites/website-selector";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CredentialSelector } from "@/components/credentials/credential-selector";
-import { NoCredentialsMessage } from "@/components/credentials/no-credentials-message";
 import { CodeBlock } from "@/components/ui/code-block";
 import {
   Tooltip,
@@ -12,9 +9,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
-import { Terminal, Book, ExternalLink, Eye, EyeOff, Info } from "lucide-react";
-import { possibleScopes } from "@/modules/user-credentials/use-add-user-credential-mutation";
+import { possibleScopes } from "@/modules/user-websites/use-add-user-website-mutation";
+import { useListUserWebsitesQuery } from "@/modules/user-websites/use-list-user-websites-query";
+
+import { NoWebsiteMessage } from "@/components/websites/no-website-message";
+import { useParams } from "@tanstack/react-router";
+import { Book, ExternalLink, Eye, EyeOff, Info, Terminal } from "lucide-react";
+import { useState } from "react";
 
 // ──────────────────────────────────────────────────────────────
 // TYPES
@@ -279,18 +280,20 @@ const ExternalLinkButtons: React.FC<ExternalLinkButtonsProps> = ({
 // ──────────────────────────────────────────────────────────────
 
 export default function Settings() {
-  const params = useParams({ strict: false }) as { credentialId?: string };
-  const credentialId = params?.credentialId;
-  const { data: credentials } = useListUserCredentialsQuery();
+  const params = useParams({ strict: false }) as { websiteId?: string };
+  const websiteId = params?.websiteId;
+  const { data: websites } = useListUserWebsitesQuery();
   const [showApiSecret, setShowApiSecret] = useState(false);
 
-  if (!credentialId) return <NoCredentialsMessage />;
+  if (!websiteId) {
+    return <NoWebsiteMessage />;
+  }
 
-  const currentCredential = credentials?.find((c) => c.id === credentialId);
+  const currentWebsite = websites?.find((c) => c.id === websiteId);
   const usageCode = buildUsageCode(
-    currentCredential?.domain || "your-domain.com",
-    currentCredential?.apiKey || "your-api-key",
-    currentCredential?.urlEndpoint || "https://api.adaptive.fyi"
+    currentWebsite?.domain || "your-domain.com",
+    currentWebsite?.apiKey || "your-api-key",
+    currentWebsite?.urlEndpoint || "https://api.adaptive.fyi"
   );
 
   return (
@@ -305,7 +308,7 @@ export default function Settings() {
                   Settings
                 </h1>
                 <p className="text-lg text-muted-foreground">
-                  Configure your API integration and manage credentials
+                  Configure your API integration and manage websites
                 </p>
               </div>
               <div className="glass p-1 rounded-2xl">
@@ -369,21 +372,21 @@ export default function Settings() {
               <div className="grid grid-cols-1 gap-6">
                 <InfoField label="Domain">
                   <code className="text-sm font-mono text-foreground">
-                    {currentCredential?.domain || "Not configured"}
+                    {currentWebsite?.domain || "Not configured"}
                   </code>
                 </InfoField>
 
                 <InfoField label="API URL">
                   <code className="text-sm font-mono text-foreground">
-                    {currentCredential?.urlEndpoint || "Not configured"}
+                    {currentWebsite?.urlEndpoint || "Not configured"}
                   </code>
                 </InfoField>
 
-                <ApiSecretField
+                {/* <ApiSecretField
                   showSecret={showApiSecret}
                   onToggle={() => setShowApiSecret((s) => !s)}
                   value={currentCredential?.apiSecret}
-                />
+                /> */}
               </div>
             </div>
 
@@ -397,26 +400,25 @@ export default function Settings() {
                   Credential Details
                 </h2>
                 <p className="text-muted-foreground">
-                  Information about your current credential configuration
+                  Information about your current website configuration
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <InfoField label="Title">
                   <p className="text-sm text-foreground font-medium">
-                    {currentCredential?.title || "Unknown"}
+                    {currentWebsite?.title || "Unknown"}
                   </p>
                 </InfoField>
 
                 <InfoField label="Description">
                   <p className="text-sm text-muted-foreground">
-                    {currentCredential?.description ||
-                      "No description provided"}
+                    {currentWebsite?.description || "No description provided"}
                   </p>
                 </InfoField>
 
                 <InfoField label="Scopes" className="md:col-span-2">
-                  <ScopesDisplay scopes={currentCredential?.scopes} />
+                  <ScopesDisplay scopes={currentWebsite?.scopes} />
                 </InfoField>
               </div>
             </div>

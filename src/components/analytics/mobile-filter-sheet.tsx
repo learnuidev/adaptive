@@ -1,29 +1,24 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
-import { 
-  Sheet, 
-  SheetContent, 
-  SheetHeader, 
-  SheetTitle, 
-  SheetTrigger 
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Filter, 
-  Database, 
-  Clock, 
-  Check,
-  ChevronDown 
-} from "lucide-react";
-import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
+import { Filter, Database, Clock, Check, ChevronDown } from "lucide-react";
+
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
 import { FilterPeriod } from "@/modules/analytics/analytics.types";
+import { useListUserWebsitesQuery } from "@/modules/user-websites/use-list-user-websites-query";
 
 const periodLabels: Record<FilterPeriod, string> = {
   today: "Today",
-  yesterday: "Yesterday", 
+  yesterday: "Yesterday",
   day: "Day",
   week: "Week",
   month: "Month",
@@ -33,7 +28,7 @@ const periodLabels: Record<FilterPeriod, string> = {
   last30d: "Last 30 days",
   last12m: "Last 12 months",
   wtd: "Week to date",
-  mtd: "Month to date", 
+  mtd: "Month to date",
   ytd: "Year to date",
   all: "All time",
   custom: "Custom",
@@ -41,17 +36,15 @@ const periodLabels: Record<FilterPeriod, string> = {
 
 export function MobileFilterSheet() {
   const [open, setOpen] = useState(false);
-  const params = useParams({ strict: false }) as { credentialId?: string };
-  const credentialId = params?.credentialId;
+  const params = useParams({ strict: false }) as { websiteId?: string };
+  const websiteId = params?.websiteId;
   const navigate = useNavigate();
-  const { data: credentials } = useListUserCredentialsQuery();
+  const { data: websites } = useListUserWebsitesQuery();
   const { selectedPeriod, setSelectedPeriod } = useFilterPeriodStore();
 
-  const currentCredential = credentials?.find(cred => cred.id === credentialId);
-  
-  const handleCredentialChange = (newCredentialId: string) => {
+  const handleWebsiteChange = (newCredentialId: string) => {
     const currentPath = location.pathname;
-    const basePath = currentPath.split('/')[1] || 'dashboard';
+    const basePath = currentPath.split("/")[1] || "dashboard";
     navigate({ to: `/${basePath}/${newCredentialId}` });
     setOpen(false);
   };
@@ -63,15 +56,15 @@ export function MobileFilterSheet() {
 
   const getActiveFiltersCount = () => {
     let count = 0;
-    if (selectedPeriod !== 'week') count++;
+    if (selectedPeriod !== "week") count++;
     return count;
   };
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           size="sm"
           className="relative flex items-center gap-2 glass border-white/10 bg-card/50 backdrop-blur-md h-9 px-3"
         >
@@ -85,12 +78,14 @@ export function MobileFilterSheet() {
           )}
         </Button>
       </SheetTrigger>
-      
+
       <SheetContent side="bottom" className="max-h-[85vh] rounded-t-2xl">
         <SheetHeader className="pb-6">
-          <SheetTitle className="text-left text-xl font-semibold">Filters</SheetTitle>
+          <SheetTitle className="text-left text-xl font-semibold">
+            Filters
+          </SheetTitle>
         </SheetHeader>
-        
+
         <div className="space-y-6">
           {/* Credential Selection */}
           <div className="space-y-3">
@@ -99,22 +94,20 @@ export function MobileFilterSheet() {
               <h3 className="font-medium">Website</h3>
             </div>
             <div className="grid gap-2">
-              {credentials?.map((credential) => (
+              {websites?.map((website) => (
                 <Button
-                  key={credential.id}
-                  variant={credentialId === credential.id ? "default" : "ghost"}
+                  key={website.id}
+                  variant={websiteId === website.id ? "default" : "ghost"}
                   className="justify-between h-12 px-4"
-                  onClick={() => handleCredentialChange(credential.id)}
+                  onClick={() => handleWebsiteChange(website.id)}
                 >
                   <div className="flex flex-col items-start">
-                    <span className="font-medium">{credential.title}</span>
+                    <span className="font-medium">{website.title}</span>
                     <span className="text-xs text-muted-foreground">
-                      {credential.domain}
+                      {website.domain}
                     </span>
                   </div>
-                  {credentialId === credential.id && (
-                    <Check className="w-4 h-4" />
-                  )}
+                  {websiteId === website.id && <Check className="w-4 h-4" />}
                 </Button>
               ))}
             </div>
@@ -137,9 +130,7 @@ export function MobileFilterSheet() {
                   onClick={() => handlePeriodChange(key as FilterPeriod)}
                 >
                   <span>{label}</span>
-                  {selectedPeriod === key && (
-                    <Check className="w-4 h-4" />
-                  )}
+                  {selectedPeriod === key && <Check className="w-4 h-4" />}
                 </Button>
               ))}
             </div>
@@ -147,7 +138,7 @@ export function MobileFilterSheet() {
         </div>
 
         <div className="pt-6 pb-4">
-          <Button 
+          <Button
             className="w-full h-12 text-base font-medium"
             onClick={() => setOpen(false)}
           >

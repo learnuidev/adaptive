@@ -1,34 +1,30 @@
 import { FeatureCard } from "@/components/features/feature-card";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Plus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
 import { useParams } from "@tanstack/react-router";
-import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
-import { NoCredentialsMessage } from "@/components/credentials/no-credentials-message";
+import { Plus, Search } from "lucide-react";
+import { useState } from "react";
+
+import { AddFeatureDialog } from "@/components/features/add-feature-dialog";
 import { WithGlow } from "@/components/with-glow";
 import { useListFeaturesQuery } from "@/modules/feature/use-list-features-query";
-import { AddFeatureDialog } from "@/components/features/add-feature-dialog";
+import { useListUserWebsitesQuery } from "@/modules/user-websites/use-list-user-websites-query";
+import { NoWebsiteMessage } from "@/components/websites/no-website-message";
 
 export default function Features() {
-  const params = useParams({ strict: false }) as { credentialId?: string };
-  const credentialId = params?.credentialId;
-  const { data: credentials } = useListUserCredentialsQuery();
-  const { data: features, isLoading } = useListFeaturesQuery(
-    credentialId || ""
-  );
+  const params = useParams({ strict: false }) as { websiteId?: string };
+  const websiteId = params?.websiteId;
+  const { data: websites } = useListUserWebsitesQuery();
+  const { data: features, isLoading } = useListFeaturesQuery(websiteId || "");
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
-  const currentCredential = credentials?.find(
-    (cred) => cred.id === credentialId
-  );
+  const currentWebsite = websites?.find((website) => website.id === websiteId);
 
-  // Show credentials selection if no credential ID or credential not found
-  if (!credentialId || (credentials && !currentCredential)) {
-    return <NoCredentialsMessage />;
+  // Show websites selection if no website ID or website not found
+  if (!websiteId || (websites && !currentWebsite)) {
+    return <NoWebsiteMessage />;
   }
 
   const filteredFeatures = (features || []).filter(
@@ -48,9 +44,7 @@ export default function Features() {
             <div>
               <h1 className="text-2xl font-bold text-foreground">Features</h1>
               <p className="text-muted-foreground">
-                {currentCredential
-                  ? `${currentCredential.title}`
-                  : "Manage features"}
+                {currentWebsite ? `${currentWebsite.title}` : "Manage features"}
               </p>
             </div>
             <WithGlow>
@@ -116,7 +110,7 @@ export default function Features() {
       <AddFeatureDialog
         open={isAddDialogOpen}
         onOpenChange={setIsAddDialogOpen}
-        credentialId={credentialId || ""}
+        websiteId={websiteId || ""}
       />
     </div>
   );

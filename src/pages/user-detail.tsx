@@ -45,10 +45,10 @@ import {
 } from "lucide-react";
 import { DeviceUsageChart } from "@/components/dashboard/device-usage-chart";
 import { useParams, useNavigate } from "@tanstack/react-router";
-import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
+// import { useListUserCredentialsQuery } from "@/modules/user-websites/use-list-user-websites-query";
 import { useGetSummaryQuery } from "@/modules/analytics/use-get-summary-query";
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
-import { NoCredentialsMessage } from "@/components/credentials/no-credentials-message";
+
 import { WithNewEvents } from "@/components/with-new-events";
 import { ResponsiveFilters } from "@/components/analytics/responsive-filters";
 import { useListEventsByEmailQuery } from "@/modules/analytics/use-list-events-by-email-query";
@@ -56,18 +56,20 @@ import { useState, useMemo } from "react";
 import { AnalyticsEvent } from "@/modules/analytics/analytics.types";
 import JsonView from "@uiw/react-json-view";
 import { useGetUserInfoQuery } from "@/modules/analytics/use-get-user-info-query";
+import { useListUserWebsitesQuery } from "@/modules/user-websites/use-list-user-websites-query";
+import { NoWebsiteMessage } from "@/components/websites/no-website-message";
 
 const UserDetail = () => {
   const params = useParams({ strict: false }) as {
-    credentialId?: string;
+    websiteId?: string;
     userId?: string;
   };
-  const { credentialId, userId } = params;
+  const { websiteId, userId } = params;
   const navigate = useNavigate();
-  const { data: credentials } = useListUserCredentialsQuery();
+  const { data: websites } = useListUserWebsitesQuery();
   const { selectedPeriod } = useFilterPeriodStore();
   const { data: summaryData } = useGetSummaryQuery({
-    websiteId: credentialId,
+    websiteId: websiteId,
     period: selectedPeriod,
   });
 
@@ -85,9 +87,7 @@ const UserDetail = () => {
   );
   const [filterValue, setFilterValue] = useState("");
 
-  const currentCredential = credentials?.find(
-    (cred) => cred.id === credentialId
-  );
+  const currentWebsite = websites?.find((cred) => cred.id === websiteId);
 
   // Find the specific user from visitors data
   const user = summaryData?.visitors?.find(
@@ -96,12 +96,12 @@ const UserDetail = () => {
 
   const { data: userEvents } = useListEventsByEmailQuery({
     email: user?.email,
-    websiteId: credentialId,
+    websiteId: websiteId,
     period: selectedPeriod,
   });
   const { data: userInfo } = useGetUserInfoQuery({
     email: user?.email,
-    websiteId: credentialId,
+    websiteId: websiteId,
   });
 
   // Filter and sort events
@@ -170,9 +170,9 @@ const UserDetail = () => {
     sortDirection,
   ]);
 
-  // Show credentials selection if no credential ID or credential not found
-  if (!credentialId || (credentials && !currentCredential)) {
-    return <NoCredentialsMessage />;
+  // Show websites selection if no website ID or website not found
+  if (!websiteId || (websites && !currentWebsite)) {
+    return <NoWebsiteMessage />;
   }
 
   const getDisplayName = (email?: string, visitorId?: string) => {
@@ -216,13 +216,13 @@ const UserDetail = () => {
 
   if (!user) {
     return (
-      <WithNewEvents credentialId={credentialId}>
+      <WithNewEvents websiteId={websiteId}>
         <div className="min-h-screen bg-background p-6 space-y-6">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate({ to: `/users/${credentialId}` as any })}
+              onClick={() => navigate({ to: `/users/${websiteId}` as any })}
               className="gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -243,7 +243,7 @@ const UserDetail = () => {
   }
 
   return (
-    <WithNewEvents credentialId={credentialId}>
+    <WithNewEvents websiteId={websiteId}>
       <div className="min-h-screen bg-background p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -251,7 +251,7 @@ const UserDetail = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate({ to: `/users/${credentialId}` as any })}
+              onClick={() => navigate({ to: `/users/${websiteId}` as any })}
               className="gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -303,14 +303,17 @@ const UserDetail = () => {
                       <MapPin className="h-4 w-4 text-muted-foreground" />
                       <span className="text-muted-foreground">Location:</span>
                       <span className="text-foreground">
-                        {userInfo?.basicInformation?.location || formatLocation(user.country, user.region, user.city)}
+                        {userInfo?.basicInformation?.location ||
+                          formatLocation(user.country, user.region, user.city)}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Clock className="h-4 w-4 text-muted-foreground" />
                       <span className="text-muted-foreground">Last Seen:</span>
                       <span className="text-foreground">
-                        {userInfo?.basicInformation?.lastSeen ? formatLastSeen(userInfo.basicInformation.lastSeen) : formatLastSeen(user.last_seen)}
+                        {userInfo?.basicInformation?.lastSeen
+                          ? formatLastSeen(userInfo.basicInformation.lastSeen)
+                          : formatLastSeen(user.last_seen)}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
@@ -319,7 +322,11 @@ const UserDetail = () => {
                         First Visit:
                       </span>
                       <span className="text-foreground">
-                        {userInfo?.basicInformation?.firstVisit ? new Date(userInfo.basicInformation.firstVisit).toLocaleDateString() : new Date(user.last_seen).toLocaleDateString()}
+                        {userInfo?.basicInformation?.firstVisit
+                          ? new Date(
+                              userInfo.basicInformation.firstVisit
+                            ).toLocaleDateString()
+                          : new Date(user.last_seen).toLocaleDateString()}
                       </span>
                     </div>
                   </div>
@@ -332,27 +339,33 @@ const UserDetail = () => {
                     Primary Device & Browser
                   </h3>
                   <div className="space-y-2">
-                    {userInfo?.devicesUsed && userInfo.devicesUsed.length > 0 ? (
+                    {userInfo?.devicesUsed &&
+                    userInfo.devicesUsed.length > 0 ? (
                       <>
                         <div className="flex items-center gap-2 text-sm">
                           <Globe className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-muted-foreground">Browser:</span>
+                          <span className="text-muted-foreground">
+                            Browser:
+                          </span>
                           <span className="text-foreground">
-                            {userInfo.devicesUsed[0].browser_name} {userInfo.devicesUsed[0].browser_version}
+                            {userInfo.devicesUsed[0].browser_name}{" "}
+                            {userInfo.devicesUsed[0].browser_version}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
                           <Monitor className="h-4 w-4 text-muted-foreground" />
                           <span className="text-muted-foreground">OS:</span>
                           <span className="text-foreground">
-                            {userInfo.devicesUsed[0].os_name} {userInfo.devicesUsed[0].os_version}
+                            {userInfo.devicesUsed[0].os_name}{" "}
+                            {userInfo.devicesUsed[0].os_version}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
                           <Smartphone className="h-4 w-4 text-muted-foreground" />
                           <span className="text-muted-foreground">Device:</span>
                           <span className="text-foreground">
-                            {userInfo.devicesUsed[0].device_vendor} {userInfo.devicesUsed[0].device_model}
+                            {userInfo.devicesUsed[0].device_vendor}{" "}
+                            {userInfo.devicesUsed[0].device_model}
                           </span>
                         </div>
                       </>
@@ -360,7 +373,9 @@ const UserDetail = () => {
                       <>
                         <div className="flex items-center gap-2 text-sm">
                           <Globe className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-muted-foreground">Browser:</span>
+                          <span className="text-muted-foreground">
+                            Browser:
+                          </span>
                           <span className="text-foreground">Unknown</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
@@ -419,7 +434,9 @@ const UserDetail = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {formatDuration(userInfo?.basicInformation?.averageDuration ?? 0)}
+                {formatDuration(
+                  userInfo?.basicInformation?.averageDuration ?? 0
+                )}
               </div>
               <p className="text-xs text-muted-foreground">
                 Average session time
@@ -434,7 +451,13 @@ const UserDetail = () => {
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-2">
-                <Badge variant={userInfo?.basicInformation?.status === "active" ? "default" : "secondary"}>
+                <Badge
+                  variant={
+                    userInfo?.basicInformation?.status === "active"
+                      ? "default"
+                      : "secondary"
+                  }
+                >
                   {userInfo?.basicInformation?.status ?? "Unknown"}
                 </Badge>
               </div>
@@ -602,7 +625,7 @@ const UserDetail = () => {
                       key={`${event.id}-${index}`}
                       className="flex items-center justify-between p-4 rounded-lg border bg-card/50 hover:bg-card transition-colors"
                     >
-                      <div 
+                      <div
                         className="flex items-center space-x-4 flex-1 cursor-pointer"
                         onClick={() => setSelectedEvent(event)}
                       >
@@ -647,7 +670,7 @@ const UserDetail = () => {
                               size="sm"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                window.open(event.href, '_blank');
+                                window.open(event.href, "_blank");
                               }}
                               className="gap-1"
                             >

@@ -10,10 +10,10 @@ import { RolloutRuleBuilder } from "@/components/features/rollout-rule-builder";
 import { ArrowLeft } from "lucide-react";
 
 const AddCohort = () => {
-  const params = useParams({ strict: false }) as { credentialId?: string };
-  const credentialId = params?.credentialId || "";
+  const params = useParams({ strict: false }) as { websiteId?: string };
+  const websiteId = params?.websiteId || "";
   const navigate = useNavigate();
-  
+
   const [name, setName] = useState("");
   const [cohortRules, setCohortRules] = useState<
     Array<{
@@ -30,12 +30,12 @@ const AddCohort = () => {
     try {
       await addCohortMutation.mutateAsync({
         name,
-        websiteId: credentialId,
+        websiteId,
         cohortRules: cohortRules.length > 0 ? cohortRules : null,
       });
 
       toast.success("Cohort created");
-      navigate({ to: `/cohorts/${credentialId}` });
+      navigate({ to: `/cohorts/${websiteId}` });
     } catch (error) {
       toast.error("Failed to create cohort");
     }
@@ -49,7 +49,7 @@ const AddCohort = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate({ to: `/cohorts/${credentialId}` })}
+            onClick={() => navigate({ to: `/cohorts/${websiteId}` })}
             className="mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -87,14 +87,15 @@ const AddCohort = () => {
             <CardHeader>
               <CardTitle>Cohort Rules</CardTitle>
               <p className="text-xs text-muted-foreground">
-                Define rules to segment users based on their behavior and attributes
+                Define rules to segment users based on their behavior and
+                attributes
               </p>
             </CardHeader>
             <CardContent>
               <RolloutRuleBuilder
                 rules={cohortRules}
                 onChange={setCohortRules}
-                websiteId={credentialId}
+                websiteId={websiteId}
               />
             </CardContent>
           </Card>
@@ -103,7 +104,7 @@ const AddCohort = () => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate({ to: `/cohorts/${credentialId}` })}
+              onClick={() => navigate({ to: `/cohorts/${websiteId}` })}
               className="glass"
             >
               Cancel

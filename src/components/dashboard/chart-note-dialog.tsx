@@ -19,7 +19,7 @@ interface ChartNoteDialogProps {
   chartKey: string;
   dataPoint: string;
   dataPointLabel: string;
-  credentialId?: string;
+  websiteId?: string;
 }
 
 export function ChartNoteDialog({
@@ -28,12 +28,13 @@ export function ChartNoteDialog({
   chartKey,
   dataPoint,
   dataPointLabel,
-  credentialId,
+  websiteId,
 }: ChartNoteDialogProps) {
   const { toast } = useToast();
-  const { addNote, updateNote, deleteNote, getNoteForPoint } = useChartNotesStore();
+  const { addNote, updateNote, deleteNote, getNoteForPoint } =
+    useChartNotesStore();
   const existingNote = getNoteForPoint(chartKey, dataPoint);
-  
+
   const [note, setNote] = useState("");
 
   useEffect(() => {
@@ -65,7 +66,7 @@ export function ChartNoteDialog({
         chartKey,
         dataPoint,
         note,
-        credentialId,
+        websiteId,
       });
       toast({
         title: "Note added",
@@ -90,14 +91,13 @@ export function ChartNoteDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="glass border-white/10 bg-card/95 backdrop-blur-md">
         <DialogHeader>
-          <DialogTitle>
-            {existingNote ? "Edit Note" : "Add Note"}
-          </DialogTitle>
+          <DialogTitle>{existingNote ? "Edit Note" : "Add Note"}</DialogTitle>
           <DialogDescription>
-            Add a note for <strong>{dataPointLabel}</strong> to track important events or changes.
+            Add a note for <strong>{dataPointLabel}</strong> to track important
+            events or changes.
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="py-4">
           <Textarea
             placeholder="Enter your note here..."

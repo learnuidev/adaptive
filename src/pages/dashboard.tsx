@@ -1,13 +1,13 @@
 import { ResponsiveFilters } from "@/components/analytics/responsive-filters";
-import { NoCredentialsMessage } from "@/components/credentials/no-credentials-message";
-import { UnifiedAnalyticsCard } from "@/components/dashboard/unified-analytics-card";
 import { InteractiveVisitorChart } from "@/components/dashboard/interactive-visitor-chart/interactive-visitor-chart";
+import { UnifiedAnalyticsCard } from "@/components/dashboard/unified-analytics-card";
+import { NoWebsiteMessage } from "@/components/websites/no-website-message";
 import { WithNewEvents } from "@/components/with-new-events";
 import {
   useGetSummaryQuery,
   VisitorCount,
 } from "@/modules/analytics/use-get-summary-query";
-import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
+import { useListUserWebsitesQuery } from "@/modules/user-websites/use-list-user-websites-query";
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
 import { useParams } from "@tanstack/react-router";
 import { useState } from "react";
@@ -152,9 +152,9 @@ const featureFlags = [
   },
 ];
 
+import { GoalsPanel } from "@/components/dashboard/interactive-visitor-chart/goals-panel";
 import { FilterPeriod } from "@/modules/analytics/analytics.types";
 import { GetSummaryResponse } from "@/modules/analytics/use-get-summary-query";
-import { GoalsPanel } from "@/components/dashboard/interactive-visitor-chart/goals-panel";
 
 const formatSessionTime = (summary: GetSummaryResponse) => {
   const totalSeconds = summary?.averageSession.current || 0;
@@ -170,14 +170,12 @@ const formatSessionTime = (summary: GetSummaryResponse) => {
 
 export default function Dashboard() {
   // Use strict: false to handle cases where params might not exist
-  const params = useParams({ strict: false }) as { credentialId?: string };
-  const credentialId = params?.credentialId;
-  const { data: credentials } = useListUserCredentialsQuery();
+  const params = useParams({ strict: false }) as { websiteId?: string };
+  const websiteId = params?.websiteId;
+  const { data: websites } = useListUserWebsitesQuery();
   const [flags, setFlags] = useState(featureFlags);
 
-  const currentCredential = credentials?.find(
-    (cred) => cred.id === credentialId
-  );
+  const currentWebsite = websites?.find((cred) => cred.id === websiteId);
 
   const toggleFlag = (id: number) => {
     setFlags(
@@ -189,7 +187,7 @@ export default function Dashboard() {
 
   const { selectedPeriod } = useFilterPeriodStore();
   const { data: summary } = useGetSummaryQuery({
-    websiteId: credentialId,
+    websiteId,
     period: selectedPeriod,
   });
 
@@ -254,13 +252,13 @@ export default function Dashboard() {
     });
   };
 
-  // Show credentials selection if no credential ID or credential not found
-  if (!credentialId || (credentials && !currentCredential)) {
-    return <NoCredentialsMessage />;
+  // Show websites selection if no website ID or website not found
+  if (!websiteId || (websites && !currentWebsite)) {
+    return <NoWebsiteMessage />;
   }
 
   return (
-    <WithNewEvents credentialId={credentialId}>
+    <WithNewEvents websiteId={websiteId}>
       <div className="min-h-screen bg-background w-full">
         {/* Header */}
 
@@ -290,9 +288,9 @@ export default function Dashboard() {
           />
 
           {/* Interactive Visitor Analytics */}
-          <InteractiveVisitorChart credentialId={credentialId} />
+          <InteractiveVisitorChart websiteId={websiteId} />
 
-          <GoalsPanel credentialId={credentialId} />
+          <GoalsPanel websiteId={websiteId} />
         </div>
       </div>
     </WithNewEvents>

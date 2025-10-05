@@ -31,7 +31,7 @@ export type RolloutRuleGroup = {
 
 export default function AddFeatureVersion() {
   const params = useParams({ strict: false }) as {
-    credentialId?: string;
+    websiteId?: string;
     featureId?: string;
   };
   const navigate = useNavigate();
@@ -94,7 +94,7 @@ export default function AddFeatureVersion() {
             description: "Feature version added successfully",
           });
           navigate({
-            to: `/features/${params.credentialId}/${params.featureId}`,
+            to: `/features/${params.websiteId}/${params.featureId}`,
           });
         },
         onError: () => {
@@ -117,7 +117,7 @@ export default function AddFeatureVersion() {
             variant="ghost"
             onClick={() =>
               navigate({
-                to: `/features/${params.credentialId}/${params.featureId}`,
+                to: `/features/${params.websiteId}/${params.featureId}`,
               })
             }
             className="mb-4"
@@ -230,7 +230,7 @@ export default function AddFeatureVersion() {
             <RolloutRuleBuilder
               rules={rolloutRules}
               onChange={setRolloutRules}
-              websiteId={params.credentialId || ""}
+              websiteId={params.websiteId || ""}
             />
           </div>
 
@@ -240,7 +240,7 @@ export default function AddFeatureVersion() {
               variant="outline"
               onClick={() =>
                 navigate({
-                  to: `/features/${params.credentialId}/${params.featureId}`,
+                  to: `/features/${params.websiteId}/${params.featureId}`,
                 })
               }
             >

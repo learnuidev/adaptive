@@ -30,16 +30,7 @@ import { FeatureNotEnabled } from "@/components/feature-not-enabled";
 type ViewState = "list" | "selector" | "form";
 
 const TrendsFeature = () => {
-  // const { featureKey } = useFeatureKey();
-
-  // console.log("feature Key", featureKey);
-
   const { track } = useTrackFeature();
-
-  // const adaptive = useAdaptive();
-  // Handle credentialId parameter like other pages
-  const params = useParams({ strict: false }) as { credentialId?: string };
-  const credentialId = params?.credentialId;
 
   const [viewState, setViewState] = useState<ViewState>("list");
   const [selectedType, setSelectedType] = useState<TrendVariant | null>(null);

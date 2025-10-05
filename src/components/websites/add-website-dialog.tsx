@@ -18,15 +18,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  useAddUserCredentialMutation,
-  AddUserCredentialParam,
-  addUserCredentialParamSchema,
-  possibleScopes,
-} from "@/modules/user-credentials/use-add-user-credential-mutation";
+
 import { useToast } from "@/hooks/use-toast";
 
-interface AddCredentialDialogProps {
+interface AddWebsiteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: (credential: {
@@ -45,17 +40,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { timezones } from "./timezones";
+import {
+  AddUserWebsiteParam,
+  addUserWebsiteParamSchema,
+  possibleScopes,
+  useAddUserWebsiteMutation,
+} from "@/modules/user-websites/use-add-user-website-mutation";
 
-export function AddCredentialDialog({
+export function AddWebsiteDialog({
   open,
   onOpenChange,
   onSuccess,
-}: AddCredentialDialogProps) {
+}: AddWebsiteDialogProps) {
   const { toast } = useToast();
-  const addMutation = useAddUserCredentialMutation();
+  const addMutation = useAddUserWebsiteMutation();
 
-  const form = useForm<AddUserCredentialParam>({
-    resolver: zodResolver(addUserCredentialParamSchema),
+  const form = useForm<AddUserWebsiteParam>({
+    resolver: zodResolver(addUserWebsiteParamSchema),
     defaultValues: {
       title: "",
       description: "",
@@ -65,17 +66,17 @@ export function AddCredentialDialog({
     },
   });
 
-  const onSubmit = async (data: AddUserCredentialParam) => {
+  const onSubmit = async (data: AddUserWebsiteParam) => {
     try {
       const result = await addMutation.mutateAsync(data);
-      // Create mock credentials for demo purposes
-      const mockCredential = {
+      // Use the actual API secret from the response
+      const credentialWithSecret = {
         id: result.id,
         title: data.title,
-        accessKeyId: `AK${Math.random().toString(36).substring(2, 18).toUpperCase()}`,
-        secretKey: `SK${Math.random().toString(36).substring(2, 38)}${Math.random().toString(36).substring(2, 10)}`,
+        accessKeyId: result.id,
+        secretKey: result.id,
       };
-      onSuccess?.(mockCredential);
+      onSuccess?.(credentialWithSecret);
       form.reset();
     } catch (error) {
       toast({

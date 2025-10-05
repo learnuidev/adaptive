@@ -2,12 +2,12 @@ import { useHasUserEventsQuery } from "@/modules/analytics/use-has-user-events-q
 import { ReactNode } from "react";
 
 interface WithNewEventsProps {
-  credentialId?: string;
+  websiteId?: string;
   children: ReactNode;
 }
 
-export function WithNewEvents({ credentialId, children }: WithNewEventsProps) {
-  const { data } = useHasUserEventsQuery(credentialId);
+export function WithNewEvents({ websiteId, children }: WithNewEventsProps) {
+  const { data } = useHasUserEventsQuery(websiteId);
 
   if (!data?.hasUserEvents) {
     return (
@@ -35,7 +35,7 @@ export function WithNewEvents({ credentialId, children }: WithNewEventsProps) {
             <p className="mt-2 text-sm text-muted-foreground">
               Follow the setup steps in{" "}
               <a
-                href={`/settings/${credentialId}`}
+                href={`/settings/${websiteId}`}
                 className="underline hover:text-foreground"
               >
                 settings

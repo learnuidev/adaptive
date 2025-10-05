@@ -2,14 +2,15 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Database, Plus } from "lucide-react";
-import { AddCredentialDialog } from "./add-credential-dialog";
-import { CredentialSuccessDialog } from "./credential-success-dialog";
-import { useNavigate } from "@tanstack/react-router";
 
-export function NoCredentialsMessage() {
+import { useNavigate } from "@tanstack/react-router";
+import { AddWebsiteDialog } from "./add-website-dialog";
+import { WebsiteSuccessDialog } from "./website-success-dialog";
+
+export function NoWebsiteMessage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
-  const [newCredential, setNewCredential] = useState<{
+  const [newWebsite, setNewWebsite] = useState<{
     id: string;
     title: string;
     accessKeyId: string;
@@ -17,23 +18,23 @@ export function NoCredentialsMessage() {
   } | null>(null);
   const navigate = useNavigate();
 
-  const handleCredentialAdded = (credential: {
+  const handleWebsiteAdded = (website: {
     id: string;
     title: string;
     accessKeyId: string;
     secretKey: string;
   }) => {
     setIsAddDialogOpen(false);
-    setNewCredential(credential);
+    setNewWebsite(website);
     setIsSuccessDialogOpen(true);
   };
 
   const handleSuccessContinue = () => {
     setIsSuccessDialogOpen(false);
-    if (newCredential) {
-      navigate({ to: `/dashboard/${newCredential.id}` });
+    if (newWebsite) {
+      navigate({ to: `/dashboard/${newWebsite.id}` });
     }
-    setNewCredential(null);
+    setNewWebsite(null);
   };
 
   return (
@@ -48,7 +49,8 @@ export function NoCredentialsMessage() {
               Welcome to Analytics
             </h1>
             <p className="text-muted-foreground">
-              Start by adding your first API credential to access your analytics data.
+              Start by adding your first API credential to access your analytics
+              data.
             </p>
           </div>
 
@@ -63,16 +65,16 @@ export function NoCredentialsMessage() {
         </Card>
       </div>
 
-      <AddCredentialDialog
+      <AddWebsiteDialog
         open={isAddDialogOpen}
         onOpenChange={setIsAddDialogOpen}
-        onSuccess={handleCredentialAdded}
+        onSuccess={handleWebsiteAdded}
       />
-      
-      <CredentialSuccessDialog
+
+      <WebsiteSuccessDialog
         open={isSuccessDialogOpen}
         onOpenChange={setIsSuccessDialogOpen}
-        credential={newCredential}
+        website={newWebsite}
         onContinue={handleSuccessContinue}
       />
     </>

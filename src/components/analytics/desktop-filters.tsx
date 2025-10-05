@@ -1,4 +1,4 @@
-import { CredentialSelector } from "@/components/credentials/credential-selector";
+import { CredentialSelector } from "@/components/websites/website-selector";
 import { FilterPeriodSelector } from "./filter-period-selector";
 
 export function DesktopFilters() {

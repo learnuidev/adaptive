@@ -34,10 +34,10 @@ const geoUrl =
   "https://nomadmethod-api-dev-assetsbucket-2u2iqsv5nizc.s3.amazonaws.com/01K6R1ZYAFM3E05H0C8GEXF0PV.json";
 
 interface InteractiveVisitorChartProps {
-  credentialId: string;
+  websiteId: string;
 }
 
-export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
+export function LocationPanel({ websiteId }: InteractiveVisitorChartProps) {
   const [locationView, setLocationView] = useState<LocationView>("map");
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [detailsSearch, setDetailsSearch] = useState("");
@@ -54,7 +54,7 @@ export function LocationPanel({ credentialId }: InteractiveVisitorChartProps) {
   const { selectedPeriod } = useFilterPeriodStore();
 
   const { data: locationData } = useGetTotalVisitorsByQuery({
-    websiteId: credentialId,
+    websiteId: websiteId,
     period: selectedPeriod,
     groupBy: locationView === "map" ? "country" : locationView,
   });

@@ -8,13 +8,18 @@ import { useListCohortsQuery } from "@/modules/cohort/use-list-cohorts-query";
 import { format } from "date-fns";
 
 const CohortDetail = () => {
-  const params = useParams({ strict: false }) as { credentialId?: string; cohortId?: string };
+  const params = useParams({ strict: false }) as {
+    websiteId?: string;
+    cohortId?: string;
+  };
   const navigate = useNavigate();
-  const credentialId = params?.credentialId;
+  const websiteId = params?.websiteId;
   const cohortId = params?.cohortId;
 
-  const { data: cohorts } = useListCohortsQuery(credentialId || "");
-  const { data: cohortUsers, isLoading } = useListCohortUsersQuery(cohortId || "");
+  const { data: cohorts } = useListCohortsQuery(websiteId || "");
+  const { data: cohortUsers, isLoading } = useListCohortUsersQuery(
+    cohortId || ""
+  );
 
   const cohort = cohorts?.find((c) => c.id === cohortId);
 
@@ -37,7 +42,7 @@ const CohortDetail = () => {
         <div className="p-6">
           <Button
             variant="ghost"
-            onClick={() => navigate({ to: `/cohorts/${credentialId}` })}
+            onClick={() => navigate({ to: `/cohorts/${websiteId}` })}
             className="mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -60,7 +65,8 @@ const CohortDetail = () => {
                   {ruleCount} {ruleCount === 1 ? "rule" : "rules"}
                 </Badge>
                 <Badge variant="secondary" className="text-xs">
-                  {cohortUsers?.length || 0} {cohortUsers?.length === 1 ? "user" : "users"}
+                  {cohortUsers?.length || 0}{" "}
+                  {cohortUsers?.length === 1 ? "user" : "users"}
                 </Badge>
               </div>
             </div>
@@ -71,7 +77,9 @@ const CohortDetail = () => {
       <div className="p-6">
         <Card className="glass border-border/50">
           <CardHeader>
-            <h2 className="text-lg font-semibold text-foreground">Cohort Users</h2>
+            <h2 className="text-lg font-semibold text-foreground">
+              Cohort Users
+            </h2>
           </CardHeader>
           <CardContent>
             {isLoading ? (
@@ -83,7 +91,11 @@ const CohortDetail = () => {
                 {cohortUsers.map((user, index) => (
                   <div
                     key={index}
-                    onClick={() => navigate({ to: `/users/${cohort.websiteId}/${user.visitor_id}` })}
+                    onClick={() =>
+                      navigate({
+                        to: `/users/${cohort.websiteId}/${user.visitor_id}`,
+                      })
+                    }
                     className="flex items-center gap-3 p-3 rounded-lg bg-background/50 border border-border/50 hover:border-primary/20 transition-colors cursor-pointer"
                   >
                     <Mail className="w-4 h-4 text-muted-foreground" />

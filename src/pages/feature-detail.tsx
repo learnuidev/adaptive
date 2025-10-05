@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function FeatureDetail() {
   const params = useParams({ strict: false }) as {
-    credentialId?: string;
+    websiteId?: string;
     featureId?: string;
   };
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ export default function FeatureDetail() {
         <div className="p-6">
           <Button
             variant="ghost"
-            onClick={() => navigate({ to: `/features/${params.credentialId}` })}
+            onClick={() => navigate({ to: `/features/${params.websiteId}` })}
             className="mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -74,7 +74,7 @@ export default function FeatureDetail() {
               className="bg-gradient-primary hover:bg-primary-glow shadow-emerald"
               onClick={() =>
                 navigate({
-                  to: `/features/${params.credentialId}/${params.featureId}/add-version`,
+                  to: `/features/${params.websiteId}/${params.featureId}/add-version`,
                 })
               }
             >

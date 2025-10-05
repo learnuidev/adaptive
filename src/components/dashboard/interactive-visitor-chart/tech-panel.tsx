@@ -14,10 +14,10 @@ import {
 import type { VisitorsBarDatum } from "./interactive-visitor-chart.components";
 
 interface InteractiveVisitorChartProps {
-  credentialId: string;
+  websiteId: string;
 }
 
-export function TechPanel({ credentialId }: InteractiveVisitorChartProps) {
+export function TechPanel({ websiteId }: InteractiveVisitorChartProps) {
   const [techView, setTechView] = useState<
     "browser_name" | "os_name" | "device"
   >("browser_name");
@@ -29,7 +29,7 @@ export function TechPanel({ credentialId }: InteractiveVisitorChartProps) {
   const { selectedPeriod } = useFilterPeriodStore();
 
   const { data: techData } = useGetTotalVisitorsByQuery({
-    websiteId: credentialId,
+    websiteId: websiteId,
     period: selectedPeriod,
     groupBy: techView,
   });

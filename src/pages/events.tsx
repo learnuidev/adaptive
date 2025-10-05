@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -5,27 +6,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Activity, MousePointer, Eye, UserPlus } from "lucide-react";
 import { useParams } from "@tanstack/react-router";
-import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
+import { Activity, Eye, MousePointer, UserPlus } from "lucide-react";
+
 import { ResponsiveFilters } from "@/components/analytics/responsive-filters";
-import { NoCredentialsMessage } from "@/components/credentials/no-credentials-message";
 import { WithNewEvents } from "@/components/with-new-events";
+import { useListUserWebsitesQuery } from "@/modules/user-websites/use-list-user-websites-query";
+import { NoWebsiteMessage } from "@/components/websites/no-website-message";
 
 const Events = () => {
   // Use strict: false to handle cases where params might not exist
-  const params = useParams({ strict: false }) as { credentialId?: string };
-  const credentialId = params?.credentialId;
-  const { data: credentials } = useListUserCredentialsQuery();
+  const params = useParams({ strict: false }) as { websiteId?: string };
+  const websiteId = params?.websiteId;
+  const { data: websites } = useListUserWebsitesQuery();
 
-  const currentCredential = credentials?.find(
-    (cred) => cred.id === credentialId
-  );
+  const currentWebsite = websites?.find((cred) => cred.id === websiteId);
 
-  // Show credentials selection if no credential ID or credential not found
-  if (!credentialId || (credentials && !currentCredential)) {
-    return <NoCredentialsMessage />;
+  // Show websites selection if no website ID or website not found
+  if (!websiteId || (websites && !currentWebsite)) {
+    return <NoWebsiteMessage />;
   }
 
   const mockEvents = [
@@ -86,14 +85,14 @@ const Events = () => {
   };
 
   return (
-    <WithNewEvents credentialId={credentialId}>
+    <WithNewEvents websiteId={websiteId}>
       <div className="min-h-screen bg-background p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
             <h1 className="text-3xl font-bold text-foreground">Events</h1>
             <p className="text-muted-foreground">
-              {currentCredential
-                ? `Track events for ${currentCredential.title}`
+              {currentWebsite
+                ? `Track events for ${currentWebsite.title}`
                 : "Track and analyze user events and interactions"}
             </p>
           </div>

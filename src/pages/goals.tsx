@@ -1,76 +1,94 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Target, TrendingUp, Users, DollarSign } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { useParams } from "@tanstack/react-router";
-import { useListUserCredentialsQuery } from "@/modules/user-credentials/use-list-user-credentials-query";
+import { DollarSign, Target, TrendingUp, Users } from "lucide-react";
+
 import { ResponsiveFilters } from "@/components/analytics/responsive-filters";
-import { NoCredentialsMessage } from "@/components/credentials/no-credentials-message";
+import { NoWebsiteMessage } from "@/components/websites/no-website-message";
+import { useGetCurrentWebsite } from "@/hooks/use-get-current-website";
+import { useListUserWebsitesQuery } from "@/modules/user-websites/use-list-user-websites-query";
 
 const Goals = () => {
   // Use strict: false to handle cases where params might not exist
-  const params = useParams({ strict: false }) as { credentialId?: string };
-  const credentialId = params?.credentialId;
-  const { data: credentials } = useListUserCredentialsQuery();
-  
-  const currentCredential = credentials?.find(cred => cred.id === credentialId);
+  const params = useParams({ strict: false }) as { websiteId?: string };
+  const websiteId = params?.websiteId;
+  const { data: websites } = useListUserWebsitesQuery();
 
-  // Show credentials selection if no credential ID or credential not found
-  if (!credentialId || (credentials && !currentCredential)) {
-    return <NoCredentialsMessage />;
+  const currentWebsite = useGetCurrentWebsite();
+
+  // Show websites selection if no website ID or website not found
+  if (!websiteId || (websites && !currentWebsite)) {
+    return <NoWebsiteMessage />;
   }
 
   const mockGoals = [
-    { 
-      id: 1, 
-      name: "Increase User Signups", 
-      target: 1000, 
-      current: 750, 
+    {
+      id: 1,
+      name: "Increase User Signups",
+      target: 1000,
+      current: 750,
       status: "active",
-      period: "This Month"
+      period: "This Month",
     },
-    { 
-      id: 2, 
-      name: "Reduce Bounce Rate", 
-      target: 25, 
-      current: 30, 
+    {
+      id: 2,
+      name: "Reduce Bounce Rate",
+      target: 25,
+      current: 30,
       status: "behind",
       period: "This Quarter",
-      unit: "%"
+      unit: "%",
     },
-    { 
-      id: 3, 
-      name: "Revenue Growth", 
-      target: 50000, 
-      current: 42000, 
+    {
+      id: 3,
+      name: "Revenue Growth",
+      target: 50000,
+      current: 42000,
       status: "active",
       period: "This Quarter",
-      unit: "$"
+      unit: "$",
     },
-    { 
-      id: 4, 
-      name: "Page Load Speed", 
-      target: 2, 
-      current: 1.8, 
+    {
+      id: 4,
+      name: "Page Load Speed",
+      target: 2,
+      current: 1.8,
       status: "achieved",
       period: "Ongoing",
-      unit: "s"
+      unit: "s",
     },
   ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'achieved': return 'default';
-      case 'active': return 'secondary';
-      case 'behind': return 'destructive';
-      default: return 'outline';
+      case "achieved":
+        return "default";
+      case "active":
+        return "secondary";
+      case "behind":
+        return "destructive";
+      default:
+        return "outline";
     }
   };
 
-  const calculateProgress = (current: number, target: number, unit?: string) => {
-    if (unit === '%' || unit === 's') {
+  const calculateProgress = (
+    current: number,
+    target: number,
+    unit?: string
+  ) => {
+    if (unit === "%" || unit === "s") {
       // For percentages and time, lower is better for some metrics
-      return unit === '%' ? Math.max(0, (target / current) * 100) : Math.min(100, (target / current) * 100);
+      return unit === "%"
+        ? Math.max(0, (target / current) * 100)
+        : Math.min(100, (target / current) * 100);
     }
     return Math.min(100, (current / target) * 100);
   };
@@ -81,7 +99,9 @@ const Goals = () => {
         <div className="space-y-2">
           <h1 className="text-3xl font-bold text-foreground">Goals</h1>
           <p className="text-muted-foreground">
-            {currentCredential ? `Track goals for ${currentCredential.title}` : "Track progress towards your business objectives"}
+            {currentWebsite
+              ? `Track goals for ${currentWebsite.title}`
+              : "Track progress towards your business objectives"}
           </p>
         </div>
         <ResponsiveFilters />
@@ -121,22 +141,20 @@ const Goals = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">+24%</div>
-            <p className="text-xs text-muted-foreground">
-              Target: +30%
-            </p>
+            <p className="text-xs text-muted-foreground">Target: +30%</p>
           </CardContent>
         </Card>
 
         <Card className="glass">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Revenue Target</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Revenue Target
+            </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">84%</div>
-            <p className="text-xs text-muted-foreground">
-              $42K of $50K goal
-            </p>
+            <p className="text-xs text-muted-foreground">$42K of $50K goal</p>
           </CardContent>
         </Card>
       </div>
@@ -151,22 +169,36 @@ const Goals = () => {
         <CardContent>
           <div className="space-y-6">
             {mockGoals.map((goal) => {
-              const progress = calculateProgress(goal.current, goal.target, goal.unit);
+              const progress = calculateProgress(
+                goal.current,
+                goal.target,
+                goal.unit
+              );
               return (
                 <div key={goal.id} className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <h4 className="font-medium text-foreground">{goal.name}</h4>
-                      <p className="text-sm text-muted-foreground">{goal.period}</p>
+                      <h4 className="font-medium text-foreground">
+                        {goal.name}
+                      </h4>
+                      <p className="text-sm text-muted-foreground">
+                        {goal.period}
+                      </p>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="text-right">
                         <p className="text-sm font-medium">
-                          {goal.unit === '$' ? '$' : ''}{goal.current.toLocaleString()}{goal.unit && goal.unit !== '$' ? goal.unit : ''}
-                          {' '}/{' '}
-                          {goal.unit === '$' ? '$' : ''}{goal.target.toLocaleString()}{goal.unit && goal.unit !== '$' ? goal.unit : ''}
+                          {goal.unit === "$" ? "$" : ""}
+                          {goal.current.toLocaleString()}
+                          {goal.unit && goal.unit !== "$"
+                            ? goal.unit
+                            : ""} / {goal.unit === "$" ? "$" : ""}
+                          {goal.target.toLocaleString()}
+                          {goal.unit && goal.unit !== "$" ? goal.unit : ""}
                         </p>
-                        <p className="text-xs text-muted-foreground">{Math.round(progress)}% complete</p>
+                        <p className="text-xs text-muted-foreground">
+                          {Math.round(progress)}% complete
+                        </p>
                       </div>
                       <Badge variant={getStatusColor(goal.status) as any}>
                         {goal.status}

@@ -1,33 +1,33 @@
 import { appConfig } from "@/lib/app-config";
 import { fetchWithToken } from "@/lib/aws-smplify/fetch-with-token";
-
 import { useQuery } from "@tanstack/react-query";
-import { UserCredential } from "./user-credential.types";
+import { ApiKey } from "./api-key.types";
 
-const listUserCredentials = async (): Promise<UserCredential[]> => {
+const listApiKeys = async (websiteId: string): Promise<ApiKey[]> => {
   const res = await fetchWithToken(
-    `${appConfig.apiUrl}/v1/list-user-credentials`,
+    `${appConfig.apiUrl}/v1/list-api-keys`,
     {
       method: "POST",
-
-      body: JSON.stringify({}),
+      body: JSON.stringify({ websiteId }),
     }
   );
 
   if (!res.ok) {
     throw Error(`Something went wrong`);
   }
+  
   const resp = await res.json();
-  return resp as UserCredential[];
+  return resp.apiKeys as ApiKey[];
 };
 
-export const listUserCredentialsQueryId = "list-user-credentials";
-export const useListUserCredentialsQuery = () => {
+export const listApiKeysQueryId = "list-api-keys";
+export const useListApiKeysQuery = (websiteId: string) => {
   return useQuery({
-    queryKey: [listUserCredentialsQueryId],
+    queryKey: [listApiKeysQueryId, websiteId],
     queryFn: async () => {
-      return listUserCredentials();
+      return listApiKeys(websiteId);
     },
+    enabled: !!websiteId,
     refetchOnMount: false,
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,

@@ -2,9 +2,10 @@ import { appConfig } from "@/lib/app-config";
 import { fetchWithToken } from "@/lib/aws-smplify/fetch-with-token";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { UserCredential } from "./user-credential.types";
-import { listUserCredentialsQueryId } from "./use-list-user-credentials-query";
+
 import { z } from "zod";
+import { UserWebsite } from "./user-website.types";
+import { listUserWebsitesQueryId } from "./use-list-user-websites-query";
 
 type Scope = "read" | "write" | "*";
 export const possibleScopes = [
@@ -20,7 +21,7 @@ const sampleData = {
   scopes: ["read", "write"],
 };
 
-export const addUserCredentialParamSchema = z.object({
+export const addUserWebsiteParamSchema = z.object({
   title: z.string().min(1),
   description: z.string().min(1),
   domain: z.string().min(1),
@@ -28,40 +29,35 @@ export const addUserCredentialParamSchema = z.object({
   timeZone: z.string().min(1),
 });
 
-export type AddUserCredentialParam = z.infer<
-  typeof addUserCredentialParamSchema
->;
+export type AddUserWebsiteParam = z.infer<typeof addUserWebsiteParamSchema>;
 
-const addUserCredential = async (
-  input: AddUserCredentialParam
-): Promise<UserCredential> => {
+const addUserWebsite = async (
+  input: AddUserWebsiteParam
+): Promise<UserWebsite> => {
   // Validate input against schema before posting
-  addUserCredentialParamSchema.parse(input);
+  addUserWebsiteParamSchema.parse(input);
 
-  const res = await fetchWithToken(
-    `${appConfig.apiUrl}/v1/add-user-credential`,
-    {
-      method: "POST",
-      body: JSON.stringify(input),
-    }
-  );
+  const res = await fetchWithToken(`${appConfig.apiUrl}/v1/add-user-website`, {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
 
   if (!res.ok) {
     throw Error(`Something went wrong`);
   }
 
   const resp = await res.json();
-  return resp as UserCredential;
+  return resp as UserWebsite;
 };
-export const useAddUserCredentialMutation = () => {
+export const useAddUserWebsiteMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (input: AddUserCredentialParam) => {
-      return addUserCredential(input);
+    mutationFn: async (input: AddUserWebsiteParam) => {
+      return addUserWebsite(input);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: [listUserCredentialsQueryId] });
+      queryClient.invalidateQueries({ queryKey: [listUserWebsitesQueryId] });
     },
   });
 };

@@ -38,7 +38,7 @@ import type {
 } from "recharts/types/component/DefaultTooltipContent";
 
 interface InteractiveVisitorChartProps {
-  credentialId: string;
+  websiteId: string;
 }
 
 interface LocationItemProps {

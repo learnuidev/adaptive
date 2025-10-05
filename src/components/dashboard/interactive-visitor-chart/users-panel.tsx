@@ -12,10 +12,10 @@ import {
 } from "./interactive-visitor-chart.components";
 
 interface InteractiveVisitorChartProps {
-  credentialId: string;
+  websiteId: string;
 }
 
-export function UsersPanel({ credentialId }: InteractiveVisitorChartProps) {
+export function UsersPanel({ websiteId }: InteractiveVisitorChartProps) {
   const [techView, setTechView] = useState<string>("users");
   const { selectedPeriod } = useFilterPeriodStore();
 
@@ -26,7 +26,7 @@ export function UsersPanel({ credentialId }: InteractiveVisitorChartProps) {
 
   // const { selectedPeriod } = useFilterPeriodStore();
   const { data: summary } = useGetSummaryQuery({
-    websiteId: credentialId,
+    websiteId: websiteId,
     period: selectedPeriod,
   });
 

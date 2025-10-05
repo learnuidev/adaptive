@@ -16,13 +16,13 @@ import { toast } from "sonner";
 interface AddFeatureDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  credentialId: string;
+  websiteId: string;
 }
 
 export function AddFeatureDialog({
   open,
   onOpenChange,
-  credentialId,
+  websiteId,
 }: AddFeatureDialogProps) {
   const [name, setName] = useState("");
   const [featureKey, setFeatureKey] = useState("");
@@ -46,8 +46,8 @@ export function AddFeatureDialog({
         featureKey,
         description: description || undefined,
         userId: authUser.email,
-        websiteId: credentialId,
-        featureKeyAndWebsiteId: `${featureKey}#${credentialId}`,
+        websiteId: websiteId,
+        featureKeyAndWebsiteId: `${featureKey}#${websiteId}`,
         tags: tags
           ? tags
               .split(",")

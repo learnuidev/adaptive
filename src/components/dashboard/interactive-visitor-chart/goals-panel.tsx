@@ -22,10 +22,10 @@ import {
 import { useGetSummaryQuery } from "@/modules/analytics/use-get-summary-query";
 
 interface InteractiveVisitorChartProps {
-  credentialId: string;
+  websiteId: string;
 }
 
-export function GoalsPanel({ credentialId }: InteractiveVisitorChartProps) {
+export function GoalsPanel({ websiteId }: InteractiveVisitorChartProps) {
   const [techView, setTechView] = useState<"goals">("goals");
   const { selectedPeriod } = useFilterPeriodStore();
 
@@ -36,7 +36,7 @@ export function GoalsPanel({ credentialId }: InteractiveVisitorChartProps) {
 
   // const { selectedPeriod } = useFilterPeriodStore();
   const { data: summary } = useGetSummaryQuery({
-    websiteId: credentialId,
+    websiteId: websiteId,
     period: selectedPeriod,
   });
 
