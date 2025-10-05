@@ -32,7 +32,10 @@ import {
   YAxis,
 } from "recharts";
 import type { LabelProps, TooltipProps } from "recharts";
-import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
+import type {
+  NameType,
+  ValueType,
+} from "recharts/types/component/DefaultTooltipContent";
 
 interface InteractiveVisitorChartProps {
   credentialId: string;
@@ -139,57 +142,99 @@ export function VisitorsBarChart({
     );
   }, []);
 
-  const renderPrimaryLabel = useCallback((props: LabelProps) => {
-    const { x = 0, y = 0, width = 0, height = 0 } = props;
-    const payload = props.payload as VisitorsBarDatum | undefined;
-    const labelText = payload?.label ?? "";
-    const labelPrefix = payload?.labelPrefix;
-    const labelDescription = payload?.labelDescription?.trim()
-      ? payload.labelDescription
-      : undefined;
+  const renderPrimaryLabel = useCallback(
+    (props: LabelProps) => {
+      const { x = 0, y = 0, width = 0, height = 0, viewBox } = props;
+      const payload = props.payload as VisitorsBarDatum | undefined;
+      const labelText = payload?.label ?? "";
+      const labelPrefix = payload?.labelPrefix;
+      const labelDescription = payload?.labelDescription?.trim()
+        ? payload.labelDescription
+        : undefined;
 
-    const textX = Number(x) + 12;
-    const baseY = Number(y) + Number(height) / 2;
+      const derivedX = viewBox?.x ?? x;
+      const derivedY = viewBox?.y ?? y;
+      const derivedWidth = viewBox?.width ?? width;
+      const derivedHeight = viewBox?.height ?? height;
 
-    const primaryContent = [labelPrefix, labelText].filter(Boolean).join(" ").trim();
-    const hasSecondary = Boolean(labelDescription);
-    const firstLineY = hasSecondary ? baseY - 6 : baseY;
+      const barStartX = Number.isFinite(Number(derivedX))
+        ? Number(derivedX)
+        : Number(x);
+      const barWidth = Number.isFinite(Number(derivedWidth))
+        ? Number(derivedWidth)
+        : Number(width);
+      const barHeight = Number.isFinite(Number(derivedHeight))
+        ? Number(derivedHeight)
+        : Number(height);
+      const baseY = Number.isFinite(Number(derivedY))
+        ? Number(derivedY) + barHeight / 2
+        : Number(y) + Number(height) / 2;
 
-    if (!primaryContent && !labelDescription) {
-      return null;
-    }
+      const fitsInside = barWidth >= 80;
+      const insideX = barStartX + 16;
+      const outsideX = Math.max(barStartX - 16, marginConfig.left);
+      const textX = fitsInside ? insideX : outsideX;
+      const textAnchor = fitsInside ? "start" : "end";
+      const primaryFill = fitsInside
+        ? "hsl(var(--primary-foreground))"
+        : "hsl(var(--foreground))";
+      const secondaryFill = fitsInside
+        ? "hsl(var(--primary-foreground) / 0.7)"
+        : "hsl(var(--muted-foreground))";
 
-    return (
-      <g>
-        {primaryContent ? (
-          <text
-            x={textX}
-            y={firstLineY}
-            fill="hsl(var(--foreground))"
-            fontSize={14}
-            fontWeight={600}
-            textAnchor="start"
-            dominantBaseline="middle"
-          >
-            {primaryContent}
-          </text>
-        ) : null}
-        {labelDescription ? (
-          <text
-            x={textX}
-            y={firstLineY + 14}
-            fill="hsl(var(--muted-foreground))"
-            fontSize={11}
-            fontWeight={500}
-            textAnchor="start"
-            dominantBaseline="middle"
-          >
-            {labelDescription}
-          </text>
-        ) : null}
-      </g>
-    );
-  }, []);
+      const primaryContent = [labelPrefix, labelText]
+        .filter(Boolean)
+        .join(" ")
+        .trim();
+      const hasSecondary = Boolean(labelDescription);
+      const firstLineY = hasSecondary ? baseY - 6 : baseY;
+
+      if (!primaryContent && !labelDescription) {
+        return null;
+      }
+
+      return (
+        <g>
+          {primaryContent ? (
+            <text
+              x={textX}
+              y={firstLineY}
+              fill={primaryFill}
+              fontSize={14}
+              fontWeight={600}
+              textAnchor={textAnchor}
+              dominantBaseline="middle"
+              pointerEvents="none"
+              style={{ paintOrder: "stroke" }}
+              stroke={
+                fitsInside
+                  ? "hsl(var(--primary-foreground) / 0.2)"
+                  : "transparent"
+              }
+              strokeWidth={fitsInside ? 1.5 : 0}
+            >
+              {primaryContent}
+            </text>
+          ) : null}
+          {labelDescription ? (
+            <text
+              x={textX}
+              y={firstLineY + 14}
+              fill={secondaryFill}
+              fontSize={11}
+              fontWeight={500}
+              textAnchor={textAnchor}
+              dominantBaseline="middle"
+              pointerEvents="none"
+            >
+              {labelDescription}
+            </text>
+          ) : null}
+        </g>
+      );
+    },
+    [marginConfig.left]
+  );
 
   const renderValueLabel = useCallback(
     (props: LabelProps) => {
@@ -202,7 +247,11 @@ export function VisitorsBarChart({
             ? Number(props.value)
             : payload?.value;
 
-      if (rawValue === undefined || rawValue === null || Number.isNaN(rawValue)) {
+      if (
+        rawValue === undefined ||
+        rawValue === null ||
+        Number.isNaN(rawValue)
+      ) {
         return null;
       }
 
@@ -254,7 +303,9 @@ export function VisitorsBarChart({
         <div className="rounded-md border border-border/60 bg-background/95 px-3 py-2 shadow-lg backdrop-blur">
           <p className="text-sm font-semibold">{datum.label}</p>
           {datum.secondaryLabel && datum.secondaryLabel !== datum.label ? (
-            <p className="break-all text-xs text-muted-foreground">{datum.secondaryLabel}</p>
+            <p className="break-all text-xs text-muted-foreground">
+              {datum.secondaryLabel}
+            </p>
           ) : null}
           <p className="text-xs text-muted-foreground">
             {valueFormatter(datum.value)} visitors
@@ -267,11 +318,7 @@ export function VisitorsBarChart({
 
   if (!data?.length) {
     const empty =
-      typeof emptyState === "string" ? (
-        <span>{emptyState}</span>
-      ) : (
-        emptyState
-      );
+      typeof emptyState === "string" ? <span>{emptyState}</span> : emptyState;
 
     return (
       <div
@@ -288,12 +335,29 @@ export function VisitorsBarChart({
         <BarChart data={data} layout="vertical" margin={marginConfig}>
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.85} />
-              <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.55} />
+              <stop
+                offset="0%"
+                stopColor="hsl(var(--primary))"
+                stopOpacity={0.85}
+              />
+              <stop
+                offset="100%"
+                stopColor="hsl(var(--primary))"
+                stopOpacity={0.55}
+              />
             </linearGradient>
+
             <linearGradient id={gradientActiveId} x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={1} />
-              <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.75} />
+              <stop
+                offset="0%"
+                stopColor="hsl(var(--primary))"
+                stopOpacity={1}
+              />
+              <stop
+                offset="100%"
+                stopColor="hsl(var(--primary))"
+                stopOpacity={0.75}
+              />
             </linearGradient>
           </defs>
           <CartesianGrid
@@ -308,8 +372,18 @@ export function VisitorsBarChart({
             tickLine={false}
             tick={false}
           />
-          <YAxis dataKey="label" type="category" width={0} axisLine={false} tickLine={false} tick={false} />
-          <RechartTooltip cursor={{ fill: cursorFill }} content={tooltipContent} />
+          <YAxis
+            dataKey="label"
+            type="category"
+            width={0}
+            axisLine={false}
+            tickLine={false}
+            tick={false}
+          />
+          <RechartTooltip
+            cursor={{ fill: cursorFill }}
+            content={tooltipContent}
+          />
           <Bar
             dataKey="value"
             radius={[0, 999, 999, 0]}
@@ -317,7 +391,9 @@ export function VisitorsBarChart({
             onClick={
               onBarClick
                 ? (event) => {
-                    const datum = event?.payload as VisitorsBarDatum | undefined;
+                    const datum = event?.payload as
+                      | VisitorsBarDatum
+                      | undefined;
                     if (datum) {
                       onBarClick(datum);
                     }
@@ -327,13 +403,26 @@ export function VisitorsBarChart({
             onMouseEnter={(_, index) => setHoveredIndex(index)}
             onMouseLeave={() => setHoveredIndex(null)}
           >
-            <LabelList position="insideLeft" dataKey="label" content={renderPrimaryLabel} />
-            <LabelList position="right" dataKey="value" content={renderValueLabel} />
+            <LabelList
+              position="insideLeft"
+              dataKey="label"
+              content={renderPrimaryLabel}
+            />
+
+            <LabelList
+              position="right"
+              dataKey="value"
+              content={renderValueLabel}
+            />
             {data.map((item, index) => (
               <Cell
                 key={`${item.id}-${index}`}
                 cursor={onBarClick ? "pointer" : "default"}
-                fill={hoveredIndex === index ? `url(#${gradientActiveId})` : `url(#${gradientId})`}
+                fill={
+                  hoveredIndex === index
+                    ? `url(#${gradientActiveId})`
+                    : `url(#${gradientId})`
+                }
                 fillOpacity={hoveredIndex === index ? 1 : 0.85}
               />
             ))}
@@ -423,7 +512,10 @@ export function LocationList({ data, locationView }: LocationListProps) {
         .map((item) => (
           <LocationItem
             key={item.name}
-            name={getLocationDisplayName(item.name || "", locationView || "country")}
+            name={getLocationDisplayName(
+              item.name || "",
+              locationView || "country"
+            )}
             visitors={item.visitors}
             icon={getLocationIcon(item?.name || "", locationView || "country")}
           />
@@ -584,7 +676,9 @@ export function AnalyticsDetailsDialog({
       <DialogContent className="w-[min(90vw,80rem)] max-w-5xl">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          {description ? <DialogDescription>{description}</DialogDescription> : null}
+          {description ? (
+            <DialogDescription>{description}</DialogDescription>
+          ) : null}
         </DialogHeader>
         <div className="space-y-4">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
