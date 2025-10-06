@@ -8,3 +8,4 @@
 - State management: prefer zustand for global state, then react-query for server state.
 - Update state immutably—never mutate directly.
 - Try to duplicate code as little as possible and keep it DRY.
+- Everytime feature is implement modify the docs in ./agent/features/<feature-name> etc
