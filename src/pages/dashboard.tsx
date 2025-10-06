@@ -52,6 +52,7 @@ const featureFlags = [
 ];
 
 import { GoalsPanel } from "@/components/dashboard/interactive-visitor-chart/goals-panel";
+import { LiveUsersGlobe } from "@/components/dashboard/live-users-globe";
 import { FilterPeriod } from "@/modules/analytics/analytics.types";
 import { GetSummaryResponse } from "@/modules/analytics/use-get-summary-query";
 
@@ -73,6 +74,7 @@ export default function Dashboard() {
   const websiteId = params?.websiteId;
   const { data: websites } = useListUserWebsitesQuery();
   const [flags, setFlags] = useState(featureFlags);
+  const [showGlobe, setShowGlobe] = useState(false);
 
   const currentWebsite = websites?.find((cred) => cred.id === websiteId);
 
@@ -150,6 +152,8 @@ export default function Dashboard() {
       change: 0, // Live users don't have a previous period comparison
       enabled: metricsEnabled[2],
       showCheckbox: false,
+      onClick: () => setShowGlobe(true),
+      clickable: true,
     },
     {
       label: "Session time",
@@ -209,6 +213,13 @@ export default function Dashboard() {
           <GoalsPanel websiteId={websiteId} />
         </div>
       </div>
+
+      {/* Live Users Globe Modal */}
+      <LiveUsersGlobe 
+        websiteId={websiteId}
+        isOpen={showGlobe}
+        onClose={() => setShowGlobe(false)}
+      />
     </WithNewEvents>
   );
 }

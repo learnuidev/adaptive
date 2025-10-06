@@ -106,6 +106,8 @@ interface MetricData {
   change: number;
   enabled: boolean;
   showCheckbox?: boolean;
+  onClick?: () => void;
+  clickable?: boolean;
 }
 
 interface UnifiedAnalyticsCardProps {
@@ -169,17 +171,25 @@ export function UnifiedAnalyticsCard({
         {/* Metrics Row */}
         <div className="flex items-start gap-12 mb-6 pb-4 border-b border-border/20">
           {metrics.map((metric, index) => (
-            <div key={index} className="flex-shrink-0">
+            <div 
+              key={index} 
+              className={`flex-shrink-0 ${metric.clickable ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
+              onClick={metric.onClick}
+            >
               <div className="flex items-center gap-2 mb-1.5">
                 {metric.showCheckbox && (
                   <Checkbox
                     checked={metric.enabled}
                     onCheckedChange={() => onToggleMetric?.(index)}
                     className="h-4 w-4 rounded border-2"
+                    onClick={(e) => e.stopPropagation()}
                   />
                 )}
                 <label className="text-sm text-muted-foreground whitespace-nowrap">
                   {metric.label}
+                  {metric.clickable && (
+                    <span className="ml-1 text-xs text-blue-400 hover:text-blue-300">(click to view)</span>
+                  )}
                 </label>
               </div>
               <div className="text-2xl font-bold text-foreground mb-0.5">
