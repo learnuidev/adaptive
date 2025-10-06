@@ -24,7 +24,10 @@ export function LiveUsersGlobe({
   const [mapLoaded, setMapLoaded] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
-  const [popupCoordinates, setPopupCoordinates] = useState<{ lng: number; lat: number } | null>(null);
+  const [popupCoordinates, setPopupCoordinates] = useState<{
+    lng: number;
+    lat: number;
+  } | null>(null);
   const popupRef = useRef<HTMLDivElement>(null);
 
   const handleZoomIn = () => {
@@ -125,14 +128,18 @@ export function LiveUsersGlobe({
       mapInstance.removeSource("users-source");
     }
 
+    console.log("Processing live users data:", liveUsersData);
+    console.log("Number of live users:", liveUsersData?.liveUsers?.length);
+
     // Group users by exact coordinates for clustering nearby users
     const locationGroups = liveUsersData.liveUsers.reduce((acc: any, user) => {
+      // Group by coordinates if available, otherwise group by city/country
       if (user.latitude && user.longitude) {
         // Round coordinates to 2 decimal places to cluster nearby users
         const latKey = Math.round(user.latitude * 100) / 100;
         const lngKey = Math.round(user.longitude * 100) / 100;
         const key = `${latKey},${lngKey}`;
-        
+
         if (!acc[key]) {
           acc[key] = {
             latitude: user.latitude,
@@ -145,9 +152,27 @@ export function LiveUsersGlobe({
         }
         acc[key].users.push(user);
         acc[key].count++;
+      } else if (user.city && user.country) {
+        // Fallback to city/country grouping for users without coordinates
+        const key = `${user.city},${user.country}`;
+
+        if (!acc[key]) {
+          acc[key] = {
+            latitude: 0, // Will be set to 0,0 for users without exact coordinates
+            longitude: 0,
+            city: user.city,
+            country: user.country,
+            users: [],
+            count: 0,
+          };
+        }
+        acc[key].users.push(user);
+        acc[key].count++;
       }
       return acc;
     }, {});
+
+    console.log("Location groups:", locationGroups);
 
     // Create features for clustered locations with actual coordinates
     const features = Object.values(locationGroups).map((location: any) => ({
@@ -163,6 +188,9 @@ export function LiveUsersGlobe({
         coordinates: [location.longitude, location.latitude], // [longitude, latitude] for GeoJSON
       },
     }));
+
+    console.log("Created features:", features);
+    console.log("Features length:", features.length);
 
     // Add source for user locations
     mapInstance.addSource("users-source", {
@@ -184,7 +212,7 @@ export function LiveUsersGlobe({
           ["linear"],
           ["get", "userCount"],
           1,
-          5,
+          8,
           10,
           15,
           50,
@@ -197,22 +225,36 @@ export function LiveUsersGlobe({
       },
     });
 
+    console.log("Users layer added successfully");
+    console.log("Layer exists:", mapInstance.getLayer("users-layer"));
+    console.log("Source exists:", mapInstance.getSource("users-source"));
+
     // Add popups for user locations
     mapInstance.on("click", "users-layer", (e) => {
-      if (!e.features || e.features.length === 0) return;
+      console.log("Click event on users-layer:", e);
+
+      if (!e.features || e.features.length === 0) {
+        console.log("No features found");
+        return;
+      }
 
       const feature = e.features[0];
       const properties = feature.properties;
 
+      console.log("Feature properties:", properties);
+
       // Show user details for the first user in the cluster
       const firstUser = properties.users[0];
       if (firstUser) {
+        console.log("Setting selected user:", firstUser);
         setSelectedUser(firstUser);
         setSelectedUsers(properties.users);
-        setPopupCoordinates({ 
-          lng: e.lngLat.lng, 
-          lat: e.lngLat.lat 
+        setPopupCoordinates({
+          lng: e.lngLat.lng,
+          lat: e.lngLat.lat,
         });
+      } else {
+        console.log("No users found in properties");
       }
     });
 
@@ -225,6 +267,20 @@ export function LiveUsersGlobe({
       mapInstance.getCanvas().style.cursor = "";
     });
 
+    // Add a general click handler to debug what's happening
+    mapInstance.on("click", (e) => {
+      const features = mapInstance.queryRenderedFeatures(e.point, {
+        layers: ["users-layer"],
+      });
+
+      console.log("General map click:", e);
+      console.log("Features at click point:", features);
+      console.log(
+        "All layers at point:",
+        mapInstance.queryRenderedFeatures(e.point)
+      );
+    });
+
     // No need for geocoding since we have actual coordinates
   }, [mapLoaded, liveUsersData]);
 
@@ -233,25 +289,26 @@ export function LiveUsersGlobe({
     if (!map.current || !popupRef.current || !popupCoordinates) return;
 
     const mapInstance = map.current;
-    
+
     const updatePopupPosition = () => {
       if (popupRef.current && popupCoordinates) {
-        const pixel = mapInstance.project([popupCoordinates.lng, popupCoordinates.lat]);
+        const pixel = mapInstance.project([
+          popupCoordinates.lng,
+          popupCoordinates.lat,
+        ]);
         popupRef.current.style.left = `${pixel.x}px`;
         popupRef.current.style.top = `${pixel.y}px`;
       }
     };
 
-    mapInstance.on('move', updatePopupPosition);
-    mapInstance.on('zoom', updatePopupPosition);
+    mapInstance.on("move", updatePopupPosition);
+    mapInstance.on("zoom", updatePopupPosition);
 
     return () => {
-      mapInstance.off('move', updatePopupPosition);
-      mapInstance.off('zoom', updatePopupPosition);
+      mapInstance.off("move", updatePopupPosition);
+      mapInstance.off("zoom", updatePopupPosition);
     };
   }, [mapLoaded, popupCoordinates]);
-
-  
 
   if (!isOpen) return null;
 
@@ -299,7 +356,7 @@ export function LiveUsersGlobe({
             style={{
               left: `${map.current.project([popupCoordinates.lng, popupCoordinates.lat]).x}px`,
               top: `${map.current.project([popupCoordinates.lng, popupCoordinates.lat]).y}px`,
-              transform: 'translate(-50%, -100%)'
+              transform: "translate(-50%, -100%)",
             }}
           >
             <LiveUserDetailsPopup
