@@ -7,6 +7,7 @@ import {
   useGetSummaryQuery,
   VisitorCount,
 } from "@/modules/analytics/use-get-summary-query";
+import { useGetLiveUsersQuery } from "@/modules/analytics/use-get-live-users-query";
 import { useListUserWebsitesQuery } from "@/modules/user-websites/use-list-user-websites-query";
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
 import { useParams } from "@tanstack/react-router";
@@ -90,6 +91,15 @@ export default function Dashboard() {
     customDateRange: selectedPeriod === "custom" ? customDateRange : undefined,
   });
 
+  const { data: liveUsersData } = useGetLiveUsersQuery({
+    websiteId,
+    timeWindowMinutes: 30,
+    includeSummary: false,
+    includeGeography: false,
+    limit: 1000,
+    enabled: !!websiteId,
+  });
+
   // Reusable helper: turns summary.totalVisitors.current into chart-ready points
 
   // Inside component:
@@ -117,7 +127,7 @@ export default function Dashboard() {
     secondaryValue: totalPageVisitsOvertimeChartData[index]?.value || 0,
   }));
 
-  const [metricsEnabled, setMetricsEnabled] = useState([true, true, true]);
+  const [metricsEnabled, setMetricsEnabled] = useState([true, true, true, true]);
 
   const metricsData = [
     {
@@ -135,10 +145,17 @@ export default function Dashboard() {
       showCheckbox: true,
     },
     {
+      label: "Live Users",
+      value: liveUsersData?.metadata.totalLiveUsers || 0,
+      change: 0, // Live users don't have a previous period comparison
+      enabled: metricsEnabled[2],
+      showCheckbox: false,
+    },
+    {
       label: "Session time",
       value: summary?.averageSession.current ? formatSessionTime(summary) : "0",
       change: summary?.averageSession.percentageDifference || 0,
-      enabled: metricsEnabled[2],
+      enabled: metricsEnabled[3],
       showCheckbox: false,
     },
   ];
