@@ -83,10 +83,11 @@ export default function Dashboard() {
     );
   };
 
-  const { selectedPeriod } = useFilterPeriodStore();
+  const { selectedPeriod, customDateRange } = useFilterPeriodStore();
   const { data: summary } = useGetSummaryQuery({
     websiteId,
     period: selectedPeriod,
+    customDateRange: selectedPeriod === "custom" ? customDateRange : undefined,
   });
 
   // Reusable helper: turns summary.totalVisitors.current into chart-ready points

@@ -17,17 +17,17 @@ interface InteractiveVisitorChartProps {
 
 export function UsersPanel({ websiteId }: InteractiveVisitorChartProps) {
   const [techView, setTechView] = useState<string>("users");
-  const { selectedPeriod } = useFilterPeriodStore();
+  const { selectedPeriod, customDateRange } = useFilterPeriodStore();
 
   const getIcon = (name: string) => {
     if (name?.toLowerCase().includes("target")) return TargetIcon;
     return Monitor;
   };
 
-  // const { selectedPeriod } = useFilterPeriodStore();
   const { data: summary } = useGetSummaryQuery({
     websiteId: websiteId,
     period: selectedPeriod,
+    customDateRange: selectedPeriod === "custom" ? customDateRange : undefined,
   });
 
   const goalsIntoVisitors: any = summary?.goalsCount?.map((gc) => {

@@ -15,6 +15,8 @@ import { Filter, Database, Clock, Check, ChevronDown } from "lucide-react";
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
 import { FilterPeriod } from "@/modules/analytics/analytics.types";
 import { useListUserWebsitesQuery } from "@/modules/user-websites/use-list-user-websites-query";
+import { DateRangePicker } from "./date-range-picker";
+import { safeFormatDate } from "@/utils/date-utils";
 
 const periodLabels: Record<FilterPeriod, string> = {
   today: "Today",
@@ -40,7 +42,8 @@ export function MobileFilterSheet() {
   const websiteId = params?.websiteId;
   const navigate = useNavigate();
   const { data: websites } = useListUserWebsitesQuery();
-  const { selectedPeriod, setSelectedPeriod } = useFilterPeriodStore();
+  const { selectedPeriod, setSelectedPeriod, customDateRange, setCustomDateRange } = useFilterPeriodStore();
+  const [showMobileDatePicker, setShowMobileDatePicker] = useState(false);
 
   const handleWebsiteChange = (newCredentialId: string) => {
     const currentPath = location.pathname;
@@ -50,7 +53,17 @@ export function MobileFilterSheet() {
   };
 
   const handlePeriodChange = (period: FilterPeriod) => {
-    setSelectedPeriod(period);
+    if (period === "custom") {
+      setShowMobileDatePicker(true);
+    } else {
+      setSelectedPeriod(period);
+      setOpen(false);
+    }
+  };
+
+  const handleMobileDateRangeChange = (dateRange: { startDate: Date; endDate: Date }) => {
+    setCustomDateRange(dateRange);
+    setShowMobileDatePicker(false);
     setOpen(false);
   };
 
@@ -134,6 +147,31 @@ export function MobileFilterSheet() {
                 </Button>
               ))}
             </div>
+            
+            {showMobileDatePicker && (
+              <div className="mt-4 p-4 border rounded-lg bg-card/50">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium">Select date range</span>
+                  <button
+                    onClick={() => setShowMobileDatePicker(false)}
+                    className="text-muted-foreground hover:text-foreground text-sm"
+                  >
+                    Cancel
+                  </button>
+                </div>
+                <DateRangePicker
+                  value={customDateRange || undefined}
+                  onChange={handleMobileDateRangeChange}
+                  className="w-full"
+                />
+              </div>
+            )}
+            
+            {selectedPeriod === "custom" && customDateRange && !showMobileDatePicker && (
+              <div className="mt-2 p-2 bg-muted/30 rounded text-xs text-muted-foreground">
+                Custom: {safeFormatDate(customDateRange.startDate)} - {safeFormatDate(customDateRange.endDate)}
+              </div>
+            )}
           </div>
         </div>
 

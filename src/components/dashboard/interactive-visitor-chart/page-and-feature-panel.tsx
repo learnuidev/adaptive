@@ -40,11 +40,12 @@ export function PageAndFeaturePanel({
   const [featureSortDirection, setFeatureSortDirection] = useState<
     "asc" | "desc"
   >("asc");
-  const { selectedPeriod } = useFilterPeriodStore();
+  const { selectedPeriod, customDateRange } = useFilterPeriodStore();
 
   const { data: summary } = useGetSummaryQuery({
     websiteId: websiteId,
     period: selectedPeriod,
+    customDateRange: selectedPeriod === "custom" ? customDateRange : undefined,
   });
 
   const { data: features } = useListFeaturesQuery(websiteId);

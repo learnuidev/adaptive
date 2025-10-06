@@ -2,7 +2,7 @@
 import { appConfig } from "@/lib/app-config";
 import { fetchWithToken } from "@/lib/aws-smplify/fetch-with-token";
 import { useQuery } from "@tanstack/react-query";
-import { FilterPeriod } from "./analytics.types";
+import { FilterPeriod, CustomDateRange } from "./analytics.types";
 // import { FilterPeriod } from "./use-list-events-by-email-query";
 
 type HourlyRecord = { hour: string; total: number };
@@ -269,15 +269,24 @@ export type GetSummaryResponse = {
 async function getSummary({
   websiteId,
   period,
+  customDateRange,
 }: {
   websiteId: string;
   period: FilterPeriod;
+  customDateRange?: CustomDateRange;
 }): Promise<GetSummaryResponse> {
+  const requestBody: any = { websiteId, period };
+
+  if (period === "custom" && customDateRange) {
+    requestBody.from = customDateRange.startDate;
+    requestBody.to = customDateRange.endDate;
+  }
+
   const res = await fetchWithToken(
     `${appConfig.apiUrl}/v1/analytics/get-summary`,
     {
       method: "POST",
-      body: JSON.stringify({ websiteId, period }),
+      body: JSON.stringify(requestBody),
     }
   );
 
@@ -376,14 +385,16 @@ const getSummaryQueryKey = "get-summary";
 export const useGetSummaryQuery = ({
   websiteId,
   period,
+  customDateRange,
 }: {
   websiteId: string;
   period: FilterPeriod;
+  customDateRange?: CustomDateRange;
 }) => {
   return useQuery<GetSummaryResponse>({
-    queryKey: [getSummaryQueryKey, websiteId, period],
+    queryKey: [getSummaryQueryKey, websiteId, period, customDateRange],
     queryFn: async () => {
-      const response = await getSummary({ websiteId, period });
+      const response = await getSummary({ websiteId, period, customDateRange });
       return response;
     },
     // refetchInterval: 5000,

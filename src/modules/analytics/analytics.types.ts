@@ -44,6 +44,11 @@ export type FilterPeriod =
   | "all"
   | "custom";
 
+export type CustomDateRange = {
+  startDate: Date | string;
+  endDate: Date | string;
+};
+
 export const filterPeriods: Record<FilterPeriod, FilterPeriod> = {
   today: "today",
   yesterday: "yesterday",

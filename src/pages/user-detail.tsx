@@ -67,10 +67,11 @@ const UserDetail = () => {
   const { websiteId, userId } = params;
   const navigate = useNavigate();
   const { data: websites } = useListUserWebsitesQuery();
-  const { selectedPeriod } = useFilterPeriodStore();
+  const { selectedPeriod, customDateRange } = useFilterPeriodStore();
   const { data: summaryData } = useGetSummaryQuery({
     websiteId: websiteId,
     period: selectedPeriod,
+    customDateRange: selectedPeriod === "custom" ? customDateRange : undefined,
   });
 
   // Activity state management

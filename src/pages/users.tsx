@@ -30,10 +30,11 @@ const Users = () => {
   const websiteId = params?.websiteId;
   const navigate = useNavigate();
   const { data: websites } = useListUserWebsitesQuery();
-  const { selectedPeriod } = useFilterPeriodStore();
+  const { selectedPeriod, customDateRange } = useFilterPeriodStore();
   const { data: summaryData } = useGetSummaryQuery({
     websiteId: websiteId,
     period: selectedPeriod,
+    customDateRange: selectedPeriod === "custom" ? customDateRange : undefined,
   });
 
   const currentWebsite = websites?.find((cred) => cred.id === websiteId);
