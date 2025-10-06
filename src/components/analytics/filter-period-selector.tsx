@@ -12,10 +12,6 @@ import { useFilterPeriodStore } from "@/stores/filter-period-store";
 const periodLabels: Record<FilterPeriod, string> = {
   today: "Today",
   yesterday: "Yesterday",
-  day: "Day",
-  week: "Week",
-  month: "Month",
-  year: "Year",
   last24h: "Last 24 hours",
   last7d: "Last 7 days",
   last30d: "Last 30 days",
