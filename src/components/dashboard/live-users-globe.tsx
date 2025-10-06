@@ -3,7 +3,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useGetLiveUsersQuery } from "@/modules/analytics/use-get-live-users-query";
 import { Button } from "@/components/ui/button";
-import { X, Users } from "lucide-react";
+import { X, Users, Plus, Minus } from "lucide-react";
 
 interface LiveUsersGlobeProps {
   websiteId: string;
@@ -21,6 +21,30 @@ export function LiveUsersGlobe({
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+
+  const handleZoomIn = () => {
+    if (map.current) {
+      map.current.zoomIn();
+    }
+  };
+
+  const handleZoomOut = () => {
+    if (map.current) {
+      map.current.zoomOut();
+    }
+  };
+
+  const handleResetView = () => {
+    if (map.current) {
+      map.current.flyTo({
+        center: [0, 0],
+        zoom: 1.5,
+        pitch: 0,
+        bearing: 0,
+        duration: 1000,
+      });
+    }
+  };
 
   console.log("API KEY", mapboxApiKey);
 
@@ -46,6 +70,12 @@ export function LiveUsersGlobe({
       zoom: 1.5,
       pitch: 0,
       bearing: 0,
+      interactive: true, // Enable all default interactions
+      dragPan: true,
+      dragRotate: true,
+      scrollZoom: true, // Enable scroll wheel zoom
+      minZoom: 0.5, // Allow zooming out further
+      maxZoom: 8, // Limit zoom in for globe perspective
     });
 
     mapInstance.on("load", () => {
@@ -60,15 +90,9 @@ export function LiveUsersGlobe({
         "star-intensity": 0.15,
       });
 
-      // Add gentle rotation animation
-      let rotation = 0;
-      const rotateGlobe = () => {
-        rotation = (rotation + 0.1) % 360;
-        mapInstance.setBearing(rotation);
-      };
+      // No auto-rotation - user controls everything manually
 
-      const intervalId = setInterval(rotateGlobe, 50);
-      mapInstance.on("remove", () => clearInterval(intervalId));
+      // No cleanup needed for rotation interval
     });
 
     map.current = mapInstance;
@@ -320,6 +344,41 @@ export function LiveUsersGlobe({
           </div>
         )}
 
+        {/* Zoom Controls */}
+        {mapLoaded && (
+          <div className="absolute bottom-6 right-6 bg-black/50 backdrop-blur-sm border border-white/10 rounded-lg p-2">
+            <div className="flex flex-col gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleZoomIn}
+                className="text-white hover:bg-white/10 h-8 w-8"
+                title="Zoom in"
+              >
+                <Plus className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleZoomOut}
+                className="text-white hover:bg-white/10 h-8 w-8"
+                title="Zoom out"
+              >
+                <Minus className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleResetView}
+                className="text-white hover:bg-white/10 h-8 w-8 text-xs"
+                title="Reset view"
+              >
+                ⟲
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* Legend */}
         {mapLoaded && (
           <div className="absolute bottom-6 left-6 bg-black/50 backdrop-blur-sm border border-white/10 rounded-lg p-4">
@@ -330,6 +389,14 @@ export function LiveUsersGlobe({
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-green-400 rounded-full"></div>
                 <span className="text-gray-300 text-sm">Active users</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
+                <span className="text-gray-300 text-sm">Click & drag to rotate</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-purple-400 rounded-full"></div>
+                <span className="text-gray-300 text-sm">Scroll to zoom</span>
               </div>
               <div className="text-gray-400 text-xs">
                 Circle size represents number of users

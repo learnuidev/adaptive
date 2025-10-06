@@ -16,10 +16,12 @@ interface LiveUsersGlobeProps {
 
 **Key Features**:
 - Full-screen modal with backdrop blur
-- 3D rotating globe using Mapbox GL JS
+- 3D interactive globe using Mapbox GL JS
+- Click-and-drag rotation with touch support
 - Real-time user location clustering
 - Interactive popups with user details
-- Automatic rotation animation
+- Auto-rotation that pauses during user interaction
+- Visual feedback for drag state
 - Responsive design
 
 ## Component Structure
@@ -101,10 +103,14 @@ mapInstance.addLayer({
 - Cursor changes on marker hover
 - Visual feedback for interactive elements
 
-### Rotation Animation
-- Continuous 0.1 degree rotation every 50ms
-- Smooth transition effects
-- Automatic cleanup on unmount
+### Interactive Rotation
+- **Click and Drag**: Mouse-based rotation control
+- **Touch Support**: Touch gesture support for mobile devices
+- **Auto-Rotation**: Continuous 0.1 degree rotation every 50ms when not interacting
+- **Pause on Interaction**: Auto-rotation pauses during user dragging
+- **Visual Feedback**: Legend indicator shows current drag state
+- **Smooth Transitions**: Seamless transitions between auto and manual rotation
+- **Automatic Cleanup**: Proper cleanup of event listeners and intervals
 
 ## Usage in Dashboard
 **Location**: `src/pages/dashboard.tsx`
