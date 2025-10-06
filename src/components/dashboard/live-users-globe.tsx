@@ -4,6 +4,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { useGetLiveUsersQuery } from "@/modules/analytics/use-get-live-users-query";
 import { Button } from "@/components/ui/button";
 import { X, Users, Plus, Minus } from "lucide-react";
+import { LiveUserDetailsPopup } from "./live-user-details-popup";
 
 interface LiveUsersGlobeProps {
   websiteId: string;
@@ -21,6 +22,10 @@ export function LiveUsersGlobe({
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
+  const [popupCoordinates, setPopupCoordinates] = useState<{ lng: number; lat: number } | null>(null);
+  const popupRef = useRef<HTMLDivElement>(null);
 
   const handleZoomIn = () => {
     if (map.current) {
@@ -56,6 +61,8 @@ export function LiveUsersGlobe({
     limit: 1000,
     enabled: isOpen && !!websiteId,
   });
+
+  console.log("live users", liveUsersData);
 
   useEffect(() => {
     if (!isOpen || !mapContainer.current) return;
@@ -118,12 +125,18 @@ export function LiveUsersGlobe({
       mapInstance.removeSource("users-source");
     }
 
-    // Group users by location
+    // Group users by exact coordinates for clustering nearby users
     const locationGroups = liveUsersData.liveUsers.reduce((acc: any, user) => {
-      if (user.city && user.country) {
-        const key = `${user.city}, ${user.country}`;
+      if (user.latitude && user.longitude) {
+        // Round coordinates to 2 decimal places to cluster nearby users
+        const latKey = Math.round(user.latitude * 100) / 100;
+        const lngKey = Math.round(user.longitude * 100) / 100;
+        const key = `${latKey},${lngKey}`;
+        
         if (!acc[key]) {
           acc[key] = {
+            latitude: user.latitude,
+            longitude: user.longitude,
             city: user.city,
             country: user.country,
             users: [],
@@ -136,18 +149,18 @@ export function LiveUsersGlobe({
       return acc;
     }, {});
 
-    // Create features for clustered locations
+    // Create features for clustered locations with actual coordinates
     const features = Object.values(locationGroups).map((location: any) => ({
       type: "Feature",
       properties: {
-        name: location.city,
-        country: location.country,
+        name: location.city || "Unknown Location",
+        country: location.country || "Unknown",
         userCount: location.count,
         users: location.users,
       },
       geometry: {
         type: "Point",
-        coordinates: [0, 0], // Will be updated with geocoded coordinates
+        coordinates: [location.longitude, location.latitude], // [longitude, latitude] for GeoJSON
       },
     }));
 
@@ -191,31 +204,16 @@ export function LiveUsersGlobe({
       const feature = e.features[0];
       const properties = feature.properties;
 
-      const popup = new mapboxgl.Popup({
-        closeButton: true,
-        closeOnClick: true,
-      }).setHTML(`
-        <div class="p-3">
-          <h3 class="font-semibold text-white mb-2">${properties.name}, ${properties.country}</h3>
-          <p class="text-sm text-gray-300">${properties.userCount} live user${properties.userCount !== 1 ? "s" : ""}</p>
-          <div class="mt-2 space-y-1">
-            ${properties.users
-              .slice(0, 3)
-              .map(
-                (user: any) => `
-              <div class="text-xs text-gray-400">
-                ${user.page ? `Viewing: ${user.page}` : "Active user"}
-                ${user.duration ? ` • ${Math.floor(user.duration / 60)}m` : ""}
-              </div>
-            `
-              )
-              .join("")}
-            ${properties.users.length > 3 ? `<div class="text-xs text-gray-500">+${properties.users.length - 3} more...</div>` : ""}
-          </div>
-        </div>
-      `);
-
-      popup.setLngLat(e.lngLat).addTo(mapInstance);
+      // Show user details for the first user in the cluster
+      const firstUser = properties.users[0];
+      if (firstUser) {
+        setSelectedUser(firstUser);
+        setSelectedUsers(properties.users);
+        setPopupCoordinates({ 
+          lng: e.lngLat.lng, 
+          lat: e.lngLat.lat 
+        });
+      }
     });
 
     // Change cursor on hover
@@ -227,77 +225,33 @@ export function LiveUsersGlobe({
       mapInstance.getCanvas().style.cursor = "";
     });
 
-    // Update coordinates for each location (simplified geocoding)
-    // In a real implementation, you'd use a proper geocoding service
-    const updateCoordinates = async () => {
-      const updatedFeatures = await Promise.all(
-        Object.values(locationGroups).map(async (location: any) => {
-          // Simple coordinate mapping - in production, use proper geocoding
-          const coords = getCoordinatesForLocation(
-            location.city,
-            location.country
-          );
-          return {
-            type: "Feature",
-            properties: {
-              name: location.city,
-              country: location.country,
-              userCount: location.count,
-              users: location.users,
-            },
-            geometry: {
-              type: "Point",
-              coordinates: coords,
-            },
-          };
-        })
-      );
+    // No need for geocoding since we have actual coordinates
+  }, [mapLoaded, liveUsersData]);
 
-      const source = mapInstance.getSource(
-        "users-source"
-      ) as mapboxgl.GeoJSONSource;
-      if (source) {
-        source.setData({
-          type: "FeatureCollection",
-          features: updatedFeatures as any,
-        });
+  // Update popup position when map moves
+  useEffect(() => {
+    if (!map.current || !popupRef.current || !popupCoordinates) return;
+
+    const mapInstance = map.current;
+    
+    const updatePopupPosition = () => {
+      if (popupRef.current && popupCoordinates) {
+        const pixel = mapInstance.project([popupCoordinates.lng, popupCoordinates.lat]);
+        popupRef.current.style.left = `${pixel.x}px`;
+        popupRef.current.style.top = `${pixel.y}px`;
       }
     };
 
-    updateCoordinates();
-  }, [mapLoaded, liveUsersData]);
+    mapInstance.on('move', updatePopupPosition);
+    mapInstance.on('zoom', updatePopupPosition);
 
-  // Simple coordinate lookup - in production, use proper geocoding
-  const getCoordinatesForLocation = (
-    city: string,
-    country: string
-  ): [number, number] => {
-    // This is a very simplified mapping - you'd want to use a proper geocoding API
-    const cityCoordinates: { [key: string]: [number, number] } = {
-      "New York": [-74.006, 40.7128],
-      London: [-0.1278, 51.5074],
-      Tokyo: [139.6503, 35.6762],
-      Paris: [2.3522, 48.8566],
-      Sydney: [151.2093, -33.8688],
-      "San Francisco": [-122.4194, 37.7749],
-      "Los Angeles": [-118.2437, 34.0522],
-      Chicago: [-87.6298, 41.8781],
-      Toronto: [-79.3832, 43.6532],
-      Berlin: [13.405, 52.52],
-      Mumbai: [72.8777, 19.076],
-      Singapore: [103.8198, 1.3521],
-      Dubai: [55.2708, 25.2048],
-      Seoul: [126.978, 37.5665],
-      Moscow: [37.6173, 55.7558],
-      "São Paulo": [-46.6333, -23.5505],
-      "Mexico City": [-99.1332, 19.4326],
-      Cairo: [31.2357, 30.0444],
-      Bangkok: [100.5018, 13.7563],
-      Jakarta: [106.8456, -6.2088],
+    return () => {
+      mapInstance.off('move', updatePopupPosition);
+      mapInstance.off('zoom', updatePopupPosition);
     };
+  }, [mapLoaded, popupCoordinates]);
 
-    return cityCoordinates[city] || [0, 0];
-  };
+  
 
   if (!isOpen) return null;
 
@@ -336,6 +290,32 @@ export function LiveUsersGlobe({
           className="w-full h-full"
           style={{ paddingTop: "73px" }}
         />
+
+        {/* Custom Popup Container */}
+        {selectedUser && popupCoordinates && map.current && (
+          <div
+            ref={popupRef}
+            className="absolute z-20"
+            style={{
+              left: `${map.current.project([popupCoordinates.lng, popupCoordinates.lat]).x}px`,
+              top: `${map.current.project([popupCoordinates.lng, popupCoordinates.lat]).y}px`,
+              transform: 'translate(-50%, -100%)'
+            }}
+          >
+            <LiveUserDetailsPopup
+              user={selectedUser}
+              users={selectedUsers}
+              mapInstance={map.current}
+              coordinates={popupCoordinates}
+              websiteId={websiteId}
+              onClose={() => {
+                setSelectedUser(null);
+                setSelectedUsers([]);
+                setPopupCoordinates(null);
+              }}
+            />
+          </div>
+        )}
 
         {/* Loading State */}
         {!mapLoaded && (
@@ -392,7 +372,9 @@ export function LiveUsersGlobe({
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
-                <span className="text-gray-300 text-sm">Click & drag to rotate</span>
+                <span className="text-gray-300 text-sm">
+                  Click & drag to rotate
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-purple-400 rounded-full"></div>
