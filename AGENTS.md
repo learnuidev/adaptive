@@ -1,83 +1,39 @@
 # AGENTS.md
 
-## 1. Project Overview
+This file contains project guidelines and conventions organized into separate documentation files for better maintainability.
 
-This project is a modern React app using:
+## Documentation Sections
 
-- Chadcn UI for styling
-- TypeScript for type safety
-- Zod for schema validation
-- React, Vite, and Tailwind CSS
+### 1. [Project Overview](.agents/system/project-overview.md)
 
-Follow these conventions for human and AI contributors. Only use approved dependencies.
+Overview of the project stack and general conventions.
 
----
+### 2. [Development Guidelines](.agents/system/development-guidelines.md)
 
-## 2. Development Guidelines
+Core development patterns and practices.
 
-- Use functional components and React hooks exclusively.
-- Import UI from Chadcn UI registry—never rebuild primitives.
-- Write all source in TypeScript (`.ts`, `.tsx`), not JavaScript.
-- Use Zod for all schemas: form validation, APIs, and data guardrails.
-- Integrate Zod with React Hook Form for forms.
-- State management: prefer zustand for global state, then react-query for server state.
-- Update state immutably—never mutate directly.
-- Try to duplicate code as little as possible and keep it DRY.
+### 3. [Directory Structure](.agents/system/directory-structure.md)
 
-### 2.1 Directory Structure
+Project organization and folder conventions.
 
-All the source code is defined in `/src` directory. Lets break it down into subdirectories:
+### 4. [Naming Conventions](.agents/system/naming-conventions.md)
 
-- `/src/components`: All React components.
-- `/src/hooks`: Custom React hooks.
-- `/src/utils`: General-purpose utility functions.
-- `/src/modules`: Contains business logic modules. Each module should have a clear responsibility. Each module consists of three things: types, react-query hooks, and utility functions. This is where we define our apis and server side state logic.
-- `/src/lib`: Contains third-party libraries and utilities.
-- `/src/pages`: Contains top-level pages. Each page should have a clear responsibility. Each page consists of three things: types, react-query hooks, and utility functions. This is where we define our apis and server side state logic.
+File and component naming standards.
 
----
+### 5. [Security & Performance](.agents/system/security-performance.md)
 
-## 3.Naming Conventions
+Guidelines for secure and performant code.
 
-Always use kebab-case for file names, component names, and hooks/utils files.
+### 6. [Documentation Standards](.agents/system/documentation-standards.md)
 
-- **Component Files:** Use kebab-case for the file, matching the component (`users-list.tsx` for `UsersList`).
-- **Component Names:** PascalCase in source (`UsersList`).
-- **Hooks/Utils Files:** kebab-case (`use-auth.ts`, `format-date.ts`) for useAuth and formatDate respectively.
-- **Assets:** kebab-case (`user-avatar.png`).
-- **Hooks/Utils Files:** kebab-case (`use-auth.ts`, `format-date.ts`) for useAuth and formatDate respectively.
-- **React Queries / Mutations:** kebab-case (`use-list-users-query.ts`, `use-create-user-mutation.ts`) for useListUsersQuery and useCreateUserMutation respectively.
+How to document code and update guidelines.
 
----
+### 7. [Agent Goals Workflow](.agents/system/agent-goals-workflow.md)
 
-## 4. Security & Performance
+AI agent task management and reporting procedures.
 
-- Validate all user input with Zod
-- Implement proper error boundaries
-- Use React.memo() for expensive re-renders
-- Lazy load heavy components with React.lazy()
-- Optimize images and assets
+## Features
 
-## 5. Documentation Standards
+### 8. [Live Earth View](.agents/features/live-earth-view/feature-overview.md)
 
-- Include README.md in each major directory
-- Document complex business logic
-- Keep component props well-documented
-- Update this AGENTS.md when adding new patterns
-
-### 6. Goals (agent goals)
-
-- Create new goal: Add markdown file to appropriate date directory
-- Format: `YYYY/MM/DD_HH_MM_description.md`
-- Task status tracking within markdown files
-- Cross-repository task coordination and documentation
-
-### 6.1 Agent Goals (agent-goals) workflow
-
-- This is written by human and initially status is TODO.
-- The user then asks AI to implement the feature by feature description
-- AI first find the task and changes its status to IN_PROGRESS
-- The AI then implements the feature by creating the necessary files and directories.
-- Once AI finishes implement the feature, it should change the status to DONE.
-- The AI should also add a section called ## Agent Report outling all the possble changes made in the md file. Please add timestamp of when this report was filed and total time it took to implement this feature
-- Agent report should be concise and no longer than 8 bullet points and 200 words
+Real-time 3D globe visualization showing live website users worldwide with interactive features and automatic data updates.
