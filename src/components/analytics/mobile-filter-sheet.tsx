@@ -21,10 +21,10 @@ import { safeFormatDate } from "@/utils/date-utils";
 const periodLabels: Record<FilterPeriod, string> = {
   today: "Today",
   yesterday: "Yesterday",
-  day: "Day",
-  week: "Week",
-  month: "Month",
-  year: "Year",
+  // day: "Day",
+  // week: "Week",
+  // month: "Month",
+  // year: "Year",
   last24h: "Last 24 hours",
   last7d: "Last 7 days",
   last30d: "Last 30 days",
@@ -42,8 +42,12 @@ export function MobileFilterSheet() {
   const websiteId = params?.websiteId;
   const navigate = useNavigate();
   const { data: websites } = useListUserWebsitesQuery();
-  const { selectedPeriod, setSelectedPeriod, customDateRange, setCustomDateRange } = useFilterPeriodStore();
-  const [showMobileDatePicker, setShowMobileDatePicker] = useState(false);
+  const {
+    selectedPeriod,
+    setSelectedPeriod,
+    customDateRange,
+    setCustomDateRange,
+  } = useFilterPeriodStore();
 
   const handleWebsiteChange = (newCredentialId: string) => {
     const currentPath = location.pathname;
@@ -54,22 +58,29 @@ export function MobileFilterSheet() {
 
   const handlePeriodChange = (period: FilterPeriod) => {
     if (period === "custom") {
-      setShowMobileDatePicker(true);
+      setSelectedPeriod("custom");
     } else {
       setSelectedPeriod(period);
       setOpen(false);
     }
   };
 
-  const handleMobileDateRangeChange = (dateRange: { startDate: Date; endDate: Date }) => {
+  const handleMobileDateApply = (dateRange: {
+    startDate: Date;
+    endDate: Date;
+  }) => {
     setCustomDateRange(dateRange);
-    setShowMobileDatePicker(false);
+    setOpen(false);
+  };
+
+  const handleMobileDateClear = () => {
+    setCustomDateRange(null);
+    setSelectedPeriod("last7d");
     setOpen(false);
   };
 
   const getActiveFiltersCount = () => {
-    let count = 0;
-    if (selectedPeriod !== "week") count++;
+    const count = 0;
     return count;
   };
 
@@ -147,29 +158,33 @@ export function MobileFilterSheet() {
                 </Button>
               ))}
             </div>
-            
-            {showMobileDatePicker && (
-              <div className="mt-4 p-4 border rounded-lg bg-card/50">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium">Select date range</span>
-                  <button
-                    onClick={() => setShowMobileDatePicker(false)}
-                    className="text-muted-foreground hover:text-foreground text-sm"
-                  >
-                    Cancel
-                  </button>
-                </div>
-                <DateRangePicker
-                  value={customDateRange || undefined}
-                  onChange={handleMobileDateRangeChange}
-                  className="w-full"
-                />
-              </div>
-            )}
-            
-            {selectedPeriod === "custom" && customDateRange && !showMobileDatePicker && (
-              <div className="mt-2 p-2 bg-muted/30 rounded text-xs text-muted-foreground">
-                Custom: {safeFormatDate(customDateRange.startDate)} - {safeFormatDate(customDateRange.endDate)}
+
+            {selectedPeriod === "custom" && (
+              <div className="mt-4">
+                {customDateRange ? (
+                  <div className="flex items-center justify-between p-3 bg-muted/30 rounded border">
+                    <span className="text-sm text-foreground">
+                      {safeFormatDate(customDateRange.startDate)} - {safeFormatDate(customDateRange.endDate)}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setCustomDateRange(null);
+                      }}
+                      className="text-xs"
+                    >
+                      Change dates
+                    </Button>
+                  </div>
+                ) : (
+                  <DateRangePicker
+                    value={customDateRange || undefined}
+                    onApply={handleMobileDateApply}
+                    onClear={handleMobileDateClear}
+                    className="w-full"
+                  />
+                )}
               </div>
             )}
           </div>
