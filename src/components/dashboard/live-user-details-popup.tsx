@@ -25,8 +25,8 @@ import { FilterPeriod } from "@/modules/analytics/analytics.types";
 interface LiveUserDetailsPopupProps {
   user: LiveUser;
   users?: LiveUser[];
-  mapInstance: mapboxgl.Map;
-  coordinates: { lng: number; lat: number };
+  mapInstance?: mapboxgl.Map;
+  coordinates?: { lng: number; lat: number };
   websiteId: string;
   onClose: () => void;
 }

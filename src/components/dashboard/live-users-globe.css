@@ -1,0 +1,14 @@
+.mapboxgl-popup.live-users-popup {
+  z-index: 1000;
+}
+
+.mapboxgl-popup-content {
+  padding: 0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+.mapboxgl-popup-tip {
+  border-top-color: white !important;
+}
