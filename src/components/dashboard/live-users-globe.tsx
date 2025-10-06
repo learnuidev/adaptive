@@ -83,7 +83,7 @@ export function LiveUsersGlobe({
       style: "mapbox://styles/mapbox/dark-v11",
       projection: "globe", // This creates the 3D globe effect
       center: [0, 0],
-      zoom: 1.5,
+      zoom: 2,
       pitch: 0,
       bearing: 0,
       interactive: true, // Enable all default interactions
@@ -122,6 +122,11 @@ export function LiveUsersGlobe({
       }
     };
   }, [isOpen]);
+
+  // Simple test effect to verify effects are working
+  useEffect(() => {
+    console.log("EFFECT SYSTEM WORKING - Component rendered");
+  });
 
   // Separate effect to debug when dependencies change
   useEffect(() => {
@@ -268,79 +273,86 @@ export function LiveUsersGlobe({
     console.log("Valid features:", validFeatures);
     console.log("Valid features length:", validFeatures.length);
 
-    // Add source for user locations
-    mapInstance.addSource("users-source", {
-      type: "geojson",
-      data: {
-        type: "FeatureCollection",
-        features: validFeatures as GeoJSON.Feature[],
-      },
-    });
-
-    // Add layer for user locations
-    mapInstance.addLayer({
-      id: "users-layer",
-      type: "circle",
-      source: "users-source",
-      paint: {
-        "circle-radius": [
-          "interpolate",
-          ["linear"],
-          ["get", "userCount"],
-          1,
-          8,
-          10,
-          15,
-          50,
-          25,
-        ],
-        "circle-color": "#00ff88",
-        "circle-opacity": 0.8,
-        "circle-stroke-color": "#ffffff",
-        "circle-stroke-width": 2,
-      },
-    });
-
-    // Check if layer exists and is visible
-    setTimeout(() => {
-      // Check layer visibility
-      const layout = mapInstance.getLayoutProperty("users-layer", "visibility");
-
-      // Check if source has data
-      const source = mapInstance.getSource("users-source");
-    }, 1000);
-
-    // Initialize Mapbox popup after layer is created
-    popupRef.current = new mapboxgl.Popup({
-      closeOnClick: false,
-      offset: 15,
-      className: "live-users-popup",
-    });
-
-    mapInstance.on("click", "users-layer", (e) => {
-      if (!e.features || e.features.length === 0) {
+    // Wait for style to be loaded before adding layers
+    const addLayers = () => {
+      if (!mapInstance.isStyleLoaded()) {
+        console.log("Style not loaded yet, waiting...");
+        setTimeout(addLayers, 100);
         return;
       }
 
-      const feature = e.features[0] as GeoJSON.Feature;
-      const properties = feature.properties as {
-        name: string;
-        country: string;
-        userCount: number;
-        users: LiveUser[];
-      };
+      console.log("Style loaded, adding layers...");
 
-      console.log("Feature properties:", properties);
+      // Add source for user locations
+      mapInstance.addSource("users-source", {
+        type: "geojson",
+        data: {
+          type: "FeatureCollection",
+          features: validFeatures as GeoJSON.Feature[],
+        },
+      });
 
-      // Show user details for the first user in the cluster
-      const firstUser = properties.users[0];
-      if (firstUser) {
-        console.log("Setting selected user:", firstUser);
-        setSelectedUser(firstUser);
-        setSelectedUsers(properties.users);
+      // Add layer for user locations
+      mapInstance.addLayer({
+        id: "users-layer",
+        type: "circle",
+        source: "users-source",
+        paint: {
+          "circle-radius": [
+            "interpolate",
+            ["linear"],
+            ["get", "userCount"],
+            1,
+            8,
+            10,
+            15,
+            50,
+            25,
+          ],
+          "circle-color": "#00ff88",
+          "circle-opacity": 0.8,
+          "circle-stroke-color": "#ffffff",
+          "circle-stroke-width": 2,
+        },
+      });
 
-        // Create a simple test popup first
-        if (popupRef.current) {
+      // Initialize Mapbox popup after layer is created
+      popupRef.current = new mapboxgl.Popup({
+        closeOnClick: false,
+        offset: 15,
+        className: "live-users-popup",
+      });
+      console.log("Popup initialized after layer creation:", popupRef.current);
+
+      // Add popups for user locations
+      console.log("Attaching click event to users-layer...");
+      mapInstance.on("click", "users-layer", (e) => {
+        console.log("Click event on users-layer:", e);
+
+        if (!e.features || e.features.length === 0) {
+          console.log("No features found");
+          return;
+        }
+
+        const feature = e.features[0] as GeoJSON.Feature;
+        const properties = feature.properties as {
+          name: string;
+          country: string;
+          userCount: number;
+          users: LiveUser[];
+        };
+
+        console.log("Feature properties:", properties);
+
+        // Show user details for the first user in the cluster
+        const firstUser = properties.users[0];
+        console.log("PROPS");
+        if (firstUser) {
+          console.log("Setting selected user:", firstUser);
+          setSelectedUser(firstUser);
+          setSelectedUsers(properties.users);
+
+          // Create a simple test popup first
           const testContent = document.createElement("div");
           testContent.innerHTML = `
             <div style="padding: 10px; background: white; border-radius: 8px; border: 1px solid #ccc;">
@@ -354,40 +366,40 @@ export function LiveUsersGlobe({
             e.lngLat.lng,
             e.lngLat.lat,
           ]);
-          popupRef.current
-            .setLngLat([e.lngLat.lng, e.lngLat.lat])
+          popupRef
+            .current!.setLngLat([e.lngLat.lng, e.lngLat.lat])
             .setDOMContent(testContent)
             .addTo(mapInstance);
         } else {
-          console.error("Popup reference is null!");
+          console.log("No users found in properties");
         }
-      } else {
-        console.log("No users found in properties");
-      }
-    });
-
-    // Change cursor on hover
-    mapInstance.on("mouseenter", "users-layer", () => {
-      mapInstance.getCanvas().style.cursor = "pointer";
-    });
-
-    mapInstance.on("mouseleave", "users-layer", () => {
-      mapInstance.getCanvas().style.cursor = "";
-    });
-
-    // Add a general click handler to debug what's happening
-    mapInstance.on("click", (e) => {
-      const features = mapInstance.queryRenderedFeatures(e.point, {
-        layers: ["users-layer"],
       });
 
-      console.log("General map click:", e);
-      console.log("Features at click point:", features);
-      console.log(
-        "All layers at point:",
-        mapInstance.queryRenderedFeatures(e.point)
-      );
-    });
+      // Change cursor on hover
+      mapInstance.on("mouseenter", "users-layer", () => {
+        mapInstance.getCanvas().style.cursor = "pointer";
+      });
+
+      mapInstance.on("mouseleave", "users-layer", () => {
+        mapInstance.getCanvas().style.cursor = "";
+      });
+
+      // Add a general click handler to debug what's happening
+      mapInstance.on("click", (e) => {
+        const features = mapInstance.queryRenderedFeatures(e.point, {
+          layers: ["users-layer"],
+        });
+
+        console.log("General map click:", e);
+        console.log("Features at click point:", features);
+        console.log(
+          "All layers at point:",
+          mapInstance.queryRenderedFeatures(e.point)
+        );
+      });
+    };
+
+    addLayers();
 
     // No need for geocoding since we have actual coordinates
   }, [mapLoaded, liveUsersData, JSON.stringify(liveUsersData)]);
@@ -452,7 +464,7 @@ export function LiveUsersGlobe({
         />
 
         {/* Mapbox Popup Portal - Temporarily disabled for testing */}
-        {/* {selectedUser && (
+        {selectedUser && (
           <>
             {createPortal(
               <LiveUserDetailsPopup
@@ -472,7 +484,7 @@ export function LiveUsersGlobe({
               contentRef.current
             )}
           </>
-        )} */}
+        )}
 
         {/* Loading State */}
         {!mapLoaded && (
