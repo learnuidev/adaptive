@@ -41,10 +41,10 @@ type UsageCode = string;
 // CONSTANTS
 // ──────────────────────────────────────────────────────────────
 
-const INSTALL_CODE: InstallCode = `npm install adaptive_engine@latest`;
+const INSTALL_CODE: InstallCode = `npm install adaptive.fyi@latest`;
 
 const PROVIDER_CODE: ProviderCode = `import React, { createContext, useContext } from "react";
-import { adaptive, IAdaptive, IAdaptiveInput } from "adaptive_engine";
+import { adaptive, IAdaptive, IAdaptiveInput } from "adaptive.fyi";
 
 export const AdaptiveContext = createContext<IAdaptive | undefined>(undefined);
 
