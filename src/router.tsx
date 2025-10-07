@@ -7,6 +7,7 @@ import {
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { TooltipProvider } from "./components/ui/tooltip";
 import Dock from "./components/dock/dock";
+import TopNavbar from "./components/navbar/top-navbar";
 import { Toaster } from "./components/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Authenticated } from "./components/authenticated";
@@ -61,12 +62,15 @@ const rootRoute = createRootRoute({
               <TooltipProvider>
                 <div className="h-screen w-full bg-background relative">
                   <main className="flex-1 flex flex-col h-full">
-                    <div className="flex-1 overflow-auto p-4 pt-16 sm:pt-20 pb-20 sm:pb-24">
-                      <Outlet />
+                    <div className="flex-1 overflow-auto p-4 pt-16 sm:pt-24 pb-20 sm:pb-24">
+                      <div className="max-w-6xl mx-auto">
+                        <Outlet />
+                      </div>
                     </div>
                     <Toaster />
                   </main>
 
+                  <TopNavbar />
                   <Dock />
                 </div>
               </TooltipProvider>

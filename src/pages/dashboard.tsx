@@ -12,8 +12,11 @@ import { useListUserWebsitesQuery } from "@/modules/user-websites/use-list-user-
 import { useFilterPeriodStore } from "@/stores/filter-period-store";
 import { useParams } from "@tanstack/react-router";
 import { useState } from "react";
-import { buildChartData, combineChartData, calculatePercentageChange } from "@/lib/chart-utils";
-
+import {
+  buildChartData,
+  combineChartData,
+  calculatePercentageChange,
+} from "@/lib/chart-utils";
 
 const deviceData = [
   { name: "Desktop", value: 65 },
@@ -129,7 +132,12 @@ export default function Dashboard() {
     secondaryValue: totalPageVisitsOvertimeChartData[index]?.value || 0,
   }));
 
-  const [metricsEnabled, setMetricsEnabled] = useState([true, true, true, true]);
+  const [metricsEnabled, setMetricsEnabled] = useState([
+    true,
+    true,
+    true,
+    true,
+  ]);
 
   const metricsData = [
     {
@@ -215,7 +223,7 @@ export default function Dashboard() {
       </div>
 
       {/* Live Users Globe Modal */}
-      <LiveUsersGlobe 
+      <LiveUsersGlobe
         websiteId={websiteId}
         isOpen={showGlobe}
         onClose={() => setShowGlobe(false)}

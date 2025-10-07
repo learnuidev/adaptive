@@ -1,19 +1,4 @@
-import { useState } from "react";
-import {
-  BarChart3,
-  Flag,
-  Home,
-  Users,
-  TrendingUp,
-  Settings,
-  Zap,
-  Activity,
-  Target,
-  Palette,
-  LogOut,
-  Route,
-} from "lucide-react";
-import { Link, useLocation, useNavigate } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
 import {
   Sidebar,
   SidebarContent,
@@ -23,22 +8,26 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useTheme } from "@/contexts/ThemeContext";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { useSignOutMutation } from "@/modules/auth/use-signout-mutation";
 import { useToast } from "@/hooks/use-toast";
+import { useSignOutMutation } from "@/modules/auth/use-signout-mutation";
+import { useLocation, useNavigate } from "@tanstack/react-router";
+import {
+  BarChart3,
+  Flag,
+  Home,
+  LogOut,
+  Settings,
+  Target,
+  TrendingUp,
+  Users,
+} from "lucide-react";
 
 import { useListUserWebsitesQuery } from "@/modules/user-websites/use-list-user-websites-query";
 import { useWebsiteStore } from "@/stores/website-store";
+import { ThemeSelector } from "./theme-selector";
 
 const getMainItems = (websiteId?: string) => [
   {
@@ -246,43 +235,7 @@ export function AppSidebar() {
 
         {/* Settings & Theme */}
         <div className="mt-auto p-2 space-y-2 pt-4">
-          {!collapsed && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full justify-start"
-                >
-                  <Palette className="w-4 h-4 mr-2" />
-                  Theme
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                className="bg-popover border-border"
-              >
-                <DropdownMenuItem
-                  onClick={() => setTheme("light")}
-                  className="cursor-pointer"
-                >
-                  Light
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setTheme("dark")}
-                  className="cursor-pointer"
-                >
-                  Dark
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setTheme("beige")}
-                  className="cursor-pointer"
-                >
-                  Beige
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+          {!collapsed && <ThemeSelector />}
 
           <Button
             variant="ghost"
