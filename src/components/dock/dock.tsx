@@ -153,7 +153,7 @@ const Dock: React.FC<DockProps> = ({ className = "" }) => {
           {/* Dock Background */}
           <motion.div
             className={`
-            px-6 py-3 rounded-2xl
+            px-6 py-2 rounded-full
             backdrop-blur-xl
             ${
               theme === "dark"
