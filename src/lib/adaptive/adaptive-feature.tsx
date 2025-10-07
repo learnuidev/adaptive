@@ -78,7 +78,13 @@ export function AdaptiveFeature({
       return <LoadingComponent />;
     }
 
-    return <div></div>;
+    return (
+      <div>
+        <h1 className="text-center text-lg font-medium text-primary">
+          Loading feature...
+        </h1>
+      </div>
+    );
   }
 
   if (data === true) {
