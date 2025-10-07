@@ -43,7 +43,7 @@ export function CohortCard({ cohort, websiteId }: CohortCardProps) {
 
   return (
     <Card 
-      className="glass border-border/50 hover:border-primary/20 transition-all cursor-pointer"
+      className="glass hover:shadow-medium transition-all cursor-pointer"
       onClick={() => navigate({ to: `/cohorts/${websiteId}/${cohort.id}` })}
     >
       <CardHeader className="pb-3">

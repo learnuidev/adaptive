@@ -64,7 +64,7 @@ const rootRoute = createRootRoute({
                   <div className="flex h-screen w-full bg-background">
                     <AppSidebar />
                     <main className="flex-1 flex flex-col">
-                      <header className="flex h-12 items-center border-b bg-background px-4">
+                      <header className="flex h-12 items-center bg-background px-4">
                         <SidebarTrigger />
                       </header>
                       <div className="flex-1 overflow-auto p-4">

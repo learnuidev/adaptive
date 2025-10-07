@@ -200,10 +200,10 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-r bg-background">
+    <Sidebar collapsible="icon" className="bg-background">
       <SidebarContent className="flex flex-col h-full bg-background">
         {/* Logo */}
-        <div className="flex items-center p-4 border-b">
+        <div className="flex items-center p-4">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <BarChart3 className="w-5 h-5 text-primary-foreground" />
@@ -245,7 +245,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         {/* Settings & Theme */}
-        <div className="mt-auto p-2 space-y-2 border-t">
+        <div className="mt-auto p-2 space-y-2 pt-4">
           {!collapsed && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

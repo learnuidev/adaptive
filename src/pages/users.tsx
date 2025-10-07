@@ -166,7 +166,7 @@ const Users = () => {
                         to: `/users/${websiteId}/${visitor.visitor_id}` as any,
                       })
                     }
-                    className="flex items-center justify-between p-3 rounded-lg border border-border/50 glass hover:bg-accent/50 cursor-pointer transition-colors"
+                    className="flex items-center justify-between p-3 rounded-lg glass hover:bg-accent/50 cursor-pointer transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       <Avatar>

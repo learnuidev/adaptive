@@ -33,7 +33,7 @@ const Cohorts = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="border-b border-border/50 bg-card/50 backdrop-blur-sm">
+      <div className="bg-card/50 backdrop-blur-sm">
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -56,7 +56,7 @@ const Cohorts = () => {
           </div>
 
           {/* Stats */}
-          <Card className="p-4 glass border-border/50">
+          <Card className="p-4 glass">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Total Cohorts</p>
@@ -77,7 +77,7 @@ const Cohorts = () => {
             placeholder="Search cohorts..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 glass border-border/50"
+            className="pl-9 glass"
           />
         </div>
 

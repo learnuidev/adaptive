@@ -171,7 +171,7 @@ const Events = () => {
                 return (
                   <div
                     key={event.id}
-                    className="flex items-center justify-between p-3 rounded-lg border border-border/50 glass"
+                    className="flex items-center justify-between p-3 rounded-lg glass"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">

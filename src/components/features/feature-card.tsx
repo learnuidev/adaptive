@@ -21,7 +21,7 @@ export function FeatureCard({ feature }: FeatureCardProps) {
   return (
     <Card
       onClick={handleClick}
-      className="p-4 bg-gradient-card border-border/50 hover:shadow-medium transition-all duration-300 glass cursor-pointer"
+      className="p-4 bg-gradient-card hover:shadow-medium transition-all duration-300 glass cursor-pointer"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">

@@ -77,7 +77,7 @@ const People = () => {
     <WithNewEvents websiteId={websiteId}>
       <div className="min-h-screen bg-background">
         {/* Header */}
-        <div className="border-b border-border/50 bg-card/50 backdrop-blur-sm">
+        <div className="bg-card/50 backdrop-blur-sm">
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -93,7 +93,7 @@ const People = () => {
 
             {/* Stats Cards */}
             <div className="grid gap-4 md:grid-cols-4">
-              <Card className="p-4 glass border-border/50">
+              <Card className="p-4 glass">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground">Total Users</p>
@@ -103,7 +103,7 @@ const People = () => {
                 </div>
               </Card>
 
-              <Card className="p-4 glass border-border/50">
+              <Card className="p-4 glass">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground">Active Users</p>
@@ -113,7 +113,7 @@ const People = () => {
                 </div>
               </Card>
 
-              <Card className="p-4 glass border-border/50">
+              <Card className="p-4 glass">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground">Total Cohorts</p>
@@ -123,7 +123,7 @@ const People = () => {
                 </div>
               </Card>
 
-              <Card className="p-4 glass border-border/50">
+              <Card className="p-4 glass">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground">Avg. Session</p>
@@ -161,7 +161,7 @@ const People = () => {
                               to: `/users/${websiteId}/${visitor.visitor_id}`,
                             })
                           }
-                          className="flex items-center justify-between p-3 rounded-lg border border-border/50 glass hover:bg-accent/50 cursor-pointer transition-colors"
+                          className="flex items-center justify-between p-3 rounded-lg glass hover:bg-accent/50 cursor-pointer transition-colors"
                         >
                           <div className="flex items-center gap-3">
                             <Avatar>
@@ -215,7 +215,7 @@ const People = () => {
                     placeholder="Search cohorts..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9 glass border-border/50"
+                    className="pl-9 glass"
                   />
                 </div>
                 <WithGlow>
