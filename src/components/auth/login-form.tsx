@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLoginMutation, LoginError } from "@/modules/auth/use-login-mutation";
+import { ForgotPasswordForm } from "./forgot-password-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +21,7 @@ export const LoginForm = ({
   isLogin: boolean;
   setIsLogin: (value: boolean) => void;
 }) => {
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -49,6 +51,10 @@ export const LoginForm = ({
       });
     }
   };
+
+  if (showForgotPassword) {
+    return <ForgotPasswordForm onBack={() => setShowForgotPassword(false)} />;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -136,6 +142,17 @@ export const LoginForm = ({
               Sign In
             </Button>
           </form>
+
+          <div className="text-center mt-4">
+            <Button
+              variant="link"
+              className="text-sm text-muted-foreground hover:text-primary p-0 h-auto"
+              onClick={() => setShowForgotPassword(true)}
+              disabled={loginMutation.isPending}
+            >
+              Forgot your password?
+            </Button>
+          </div>
 
           <Button
             variant="ghost"

@@ -24,6 +24,20 @@ export const confirmRegistrationSchema = z.object({
 
 export type ConfirmRegistration = z.infer<typeof confirmRegistrationSchema>;
 
+export const forgotPasswordSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+});
+
+export type ForgotPassword = z.infer<typeof forgotPasswordSchema>;
+
+export const resetPasswordSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  confirmationCode: z.string().min(1, "Confirmation code is required"),
+  newPassword: z.string().min(6, "Password must be at least 6 characters long"),
+});
+
+export type ResetPassword = z.infer<typeof resetPasswordSchema>;
+
 // User profile types
 export const userProfileSchema = z.object({
   sub: z.string(), // User ID

@@ -10,6 +10,8 @@ import {
   signOut as signOutAmplify,
   signUp as signUpAmplify,
   confirmSignUp as confirmSignUpAmplify,
+  resetPassword as resetPasswordAmplify,
+  confirmResetPassword as confirmResetPasswordAmplify,
   AuthError,
 } from "aws-amplify/auth";
 
@@ -90,4 +92,32 @@ export async function confirmSignUp(
 
 export async function signOut(...input: Parameters<typeof signOutAmplify>) {
   return signOutAmplify(...input);
+}
+
+export async function resetPassword(username: string) {
+  try {
+    const result = await resetPasswordAmplify({ username });
+    return result;
+  } catch (error) {
+    console.error("Error during password reset:", error);
+    throw error;
+  }
+}
+
+export async function confirmResetPassword(
+  username: string,
+  confirmationCode: string,
+  newPassword: string
+) {
+  try {
+    const result = await confirmResetPasswordAmplify({
+      username,
+      confirmationCode,
+      newPassword,
+    });
+    return result;
+  } catch (error) {
+    console.error("Error during password reset confirmation:", error);
+    throw error;
+  }
 }
