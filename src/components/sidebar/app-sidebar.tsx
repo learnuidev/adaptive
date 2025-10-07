@@ -80,12 +80,6 @@ const getToolsItems = (websiteId?: string) => [
     icon: Target,
     requiresCredential: true,
   },
-  {
-    title: "Journeys",
-    url: "/user-journeys",
-    icon: Route,
-    requiresCredential: true,
-  },
 
   {
     title: "Trends",
@@ -93,12 +87,7 @@ const getToolsItems = (websiteId?: string) => [
     icon: TrendingUp,
     requiresCredential: true,
   },
-  {
-    title: "Insights",
-    url: "/insights",
-    icon: Zap,
-    requiresCredential: true,
-  },
+
   {
     title: "Features",
     url: "/features",

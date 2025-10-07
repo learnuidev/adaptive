@@ -7,91 +7,44 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Link } from "@tanstack/react-router";
 import { useParams } from "@tanstack/react-router";
-import { DollarSign, Target, TrendingUp, Users } from "lucide-react";
+import {
+  ArrowRight,
+  DollarSign,
+  Target,
+  TrendingUp,
+  Users,
+} from "lucide-react";
 
 import { ResponsiveFilters } from "@/components/analytics/responsive-filters";
 import { NoWebsiteMessage } from "@/components/websites/no-website-message";
 import { useGetCurrentWebsite } from "@/hooks/use-get-current-website";
+import { useListGoalsQuery } from "@/modules/analytics/use-list-goals-query";
 import { useListUserWebsitesQuery } from "@/modules/user-websites/use-list-user-websites-query";
+import { useFilterPeriodStore } from "@/stores/filter-period-store";
 
 const Goals = () => {
   // Use strict: false to handle cases where params might not exist
   const params = useParams({ strict: false }) as { websiteId?: string };
   const websiteId = params?.websiteId;
   const { data: websites } = useListUserWebsitesQuery();
+  const { selectedPeriod, customDateRange } = useFilterPeriodStore();
 
   const currentWebsite = useGetCurrentWebsite();
+
+  const { data: goalsData, isLoading: goalsLoading } = useListGoalsQuery({
+    websiteId: websiteId!,
+    period: selectedPeriod,
+    // customDateRange: selectedPeriod === "custom" ? customDateRange : undefined,
+  });
 
   // Show websites selection if no website ID or website not found
   if (!websiteId || (websites && !currentWebsite)) {
     return <NoWebsiteMessage />;
   }
 
-  const mockGoals = [
-    {
-      id: 1,
-      name: "Increase User Signups",
-      target: 1000,
-      current: 750,
-      status: "active",
-      period: "This Month",
-    },
-    {
-      id: 2,
-      name: "Reduce Bounce Rate",
-      target: 25,
-      current: 30,
-      status: "behind",
-      period: "This Quarter",
-      unit: "%",
-    },
-    {
-      id: 3,
-      name: "Revenue Growth",
-      target: 50000,
-      current: 42000,
-      status: "active",
-      period: "This Quarter",
-      unit: "$",
-    },
-    {
-      id: 4,
-      name: "Page Load Speed",
-      target: 2,
-      current: 1.8,
-      status: "achieved",
-      period: "Ongoing",
-      unit: "s",
-    },
-  ];
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "achieved":
-        return "default";
-      case "active":
-        return "secondary";
-      case "behind":
-        return "destructive";
-      default:
-        return "outline";
-    }
-  };
-
-  const calculateProgress = (
-    current: number,
-    target: number,
-    unit?: string
-  ) => {
-    if (unit === "%" || unit === "s") {
-      // For percentages and time, lower is better for some metrics
-      return unit === "%"
-        ? Math.max(0, (target / current) * 100)
-        : Math.min(100, (target / current) * 100);
-    }
-    return Math.min(100, (current / target) * 100);
-  };
+  const goals = goalsData?.goals || [];
 
   return (
     <div className="min-h-screen bg-background p-6 space-y-6">
@@ -161,55 +114,47 @@ const Goals = () => {
 
       <Card className="glass">
         <CardHeader>
-          <CardTitle>Goal Progress</CardTitle>
+          <CardTitle>Goals</CardTitle>
           <CardDescription>
-            Current progress on your key objectives
+            Click on any goal to view the journeys that led to it
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
-            {mockGoals.map((goal) => {
-              const progress = calculateProgress(
-                goal.current,
-                goal.target,
-                goal.unit
-              );
-              return (
-                <div key={goal.id} className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <h4 className="font-medium text-foreground">
-                        {goal.name}
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        {goal.period}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="text-right">
-                        <p className="text-sm font-medium">
-                          {goal.unit === "$" ? "$" : ""}
-                          {goal.current.toLocaleString()}
-                          {goal.unit && goal.unit !== "$"
-                            ? goal.unit
-                            : ""} / {goal.unit === "$" ? "$" : ""}
-                          {goal.target.toLocaleString()}
-                          {goal.unit && goal.unit !== "$" ? goal.unit : ""}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {Math.round(progress)}% complete
+          {goalsLoading ? (
+            <div className="text-center py-8">Loading goals...</div>
+          ) : goals.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              No goals found for this website
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {goals.map((goal) => (
+                <Link
+                  key={goal.id}
+                  to={`/goals/${websiteId}/journeys/${goal.id}`}
+                  className="block"
+                >
+                  <div className="p-4 border rounded-lg hover:bg-secondary/50 cursor-pointer transition-colors">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <h4 className="font-medium text-foreground">
+                          {goal.goalName}
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          Created by {goal.email} •{" "}
+                          {new Date(goal.created_at).toLocaleDateString()}
                         </p>
                       </div>
-                      <Badge variant={getStatusColor(goal.status) as any}>
-                        {goal.status}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary">Active</Badge>
+                        <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                      </div>
                     </div>
                   </div>
-                  <Progress value={progress} className="h-2" />
-                </div>
-              );
-            })}
-          </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

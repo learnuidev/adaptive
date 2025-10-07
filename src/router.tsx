@@ -24,6 +24,7 @@ import FeatureDetail from "./pages/feature-detail";
 import AddFeatureVersion from "./pages/add-feature-version";
 import Events from "./pages/events";
 import Goals from "./pages/goals";
+import GoalJourneys from "./pages/goal-journeys";
 import Trends from "./pages/trends";
 import Insights from "./pages/insights";
 import Settings from "./pages/settings";
@@ -153,6 +154,12 @@ const goalsRoute = createRoute({
   component: Goals,
 });
 
+const goalJourneysRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/goals/$websiteId/journeys/$goalId",
+  component: GoalJourneys,
+});
+
 const trendsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/trends/$websiteId",
@@ -198,6 +205,7 @@ const routeTree = rootRoute.addChildren([
   addFeatureVersionRoute,
   eventsRoute,
   goalsRoute,
+  goalJourneysRoute,
   trendsRoute,
   insightsRoute,
   settingsRoute,
