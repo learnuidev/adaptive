@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-type Theme = 'light' | 'beige' | 'dark';
+type Theme = 'light' | 'beige' | 'dark' | 'rose';
 
 interface ThemeContextType {
   theme: Theme;
@@ -35,13 +35,15 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     localStorage.setItem('adaptive-theme', theme);
     
     // Remove all theme classes
-    document.documentElement.classList.remove('light', 'beige', 'dark');
+    document.documentElement.classList.remove('light', 'beige', 'dark', 'rose');
     
     // Add the current theme class
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
     } else if (theme === 'beige') {
       document.documentElement.classList.add('beige');
+    } else if (theme === 'rose') {
+      document.documentElement.classList.add('rose');
     }
   }, [theme]);
 

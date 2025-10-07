@@ -2,7 +2,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Palette } from "lucide-react";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Coffee, Moon, Sun } from "lucide-react";
+import { Coffee, Moon, Sun, Flower } from "lucide-react";
 import { useState } from "react";
 
 export function ThemeSelector() {
@@ -28,9 +28,15 @@ export function ThemeSelector() {
       icon: Coffee,
       color: "from-orange-200 to-orange-300",
     },
+    {
+      id: "rose",
+      name: "Rose",
+      icon: Flower,
+      color: "from-rose-300 to-rose-400",
+    },
   ];
 
-  const handleThemeChange = (newTheme: "light" | "dark" | "beige") => {
+  const handleThemeChange = (newTheme: "light" | "dark" | "beige" | "rose") => {
     setTheme(newTheme);
     setIsThemeMenuOpen(false);
   };
@@ -47,6 +53,8 @@ export function ThemeSelector() {
               ? "bg-gray-800/50 hover:bg-gray-700/50"
               : theme === "beige"
                 ? "bg-orange-200/50 hover:bg-orange-300/50"
+              : theme === "rose"
+                ? "bg-rose-200/50 hover:bg-rose-300/50"
                 : "bg-gray-200/50 hover:bg-gray-300/50"
           }
         `}
@@ -61,6 +69,8 @@ export function ThemeSelector() {
                 ? "text-gray-300"
                 : theme === "beige"
                   ? "text-orange-800"
+                : theme === "rose"
+                  ? "text-rose-800"
                   : "text-gray-700"
             }
           `}
@@ -86,6 +96,8 @@ export function ThemeSelector() {
                     ? "bg-gray-900/90 border-gray-800/50"
                     : theme === "beige"
                       ? "bg-orange-50/90 border-orange-200/50"
+                    : theme === "rose"
+                      ? "bg-rose-50/90 border-rose-200/50"
                       : "bg-white/90 border-gray-200/50"
                 }
               `}
@@ -99,7 +111,7 @@ export function ThemeSelector() {
                     key={themeOption.id}
                     onClick={() =>
                       handleThemeChange(
-                        themeOption.id as "light" | "dark" | "beige"
+                        themeOption.id as "light" | "dark" | "beige" | "rose"
                       )
                     }
                     className={`
@@ -112,6 +124,8 @@ export function ThemeSelector() {
                             ? "hover:bg-gray-800/50"
                             : theme === "beige"
                               ? "hover:bg-orange-200/50"
+                            : theme === "rose"
+                              ? "hover:bg-rose-200/50"
                               : "hover:bg-gray-100/50"
                       }
                     `}
@@ -128,6 +142,8 @@ export function ThemeSelector() {
                               ? "text-gray-300"
                               : theme === "beige"
                                 ? "text-orange-800"
+                              : theme === "rose"
+                                ? "text-rose-800"
                                 : "text-gray-700"
                         }
                       `}
@@ -142,6 +158,8 @@ export function ThemeSelector() {
                               ? "text-gray-300"
                               : theme === "beige"
                                 ? "text-orange-800"
+                              : theme === "rose"
+                                ? "text-rose-800"
                                 : "text-gray-700"
                         }
                       `}
