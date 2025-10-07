@@ -98,13 +98,13 @@ const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({
 
             <div>
               <label className="text-sm font-medium text-foreground mb-2 block">
-                API Secret
+                API Key
               </label>
               <div className="flex items-center gap-2">
                 <div className="flex-1 bg-muted rounded-lg px-3 py-2">
                   <code className="text-sm font-mono break-all">
                     {showSecret
-                      ? apiKey.apiSecret
+                      ? apiKey.apiKey
                       : "•••••••••••••••••••••••••••••••••••••••"}
                   </code>
                 </div>
@@ -122,7 +122,7 @@ const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => copyToClipboard(apiKey.apiSecret)}
+                  onClick={() => copyToClipboard(apiKey.apiKey)}
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
