@@ -2,6 +2,12 @@ import { appConfig } from "@/lib/app-config";
 import { fetchWithToken } from "@/lib/aws-smplify/fetch-with-token";
 import { useQuery } from "@tanstack/react-query";
 
+export type EventFilter = {
+  key: string;
+  operator: 'eq' | 'ne' | 'contains' | 'startsWith' | 'endsWith' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'nin';
+  value: string | number | boolean | string[] | number[];
+};
+
 export type LiveUser = {
   visitor_id: string;
   last_seen: string;
@@ -53,12 +59,14 @@ async function getLiveUsers({
   includeSummary = true,
   includeGeography = false,
   limit = 100,
+  filters = [],
 }: {
   websiteId: string;
   timeWindowMinutes?: number;
   includeSummary?: boolean;
   includeGeography?: boolean;
   limit?: number;
+  filters?: EventFilter[];
 }): Promise<GetLiveUsersResponse> {
   const requestBody = {
     websiteId,
@@ -66,6 +74,7 @@ async function getLiveUsers({
     includeSummary,
     includeGeography,
     limit,
+    filters,
   };
 
   const res = await fetchWithToken(
@@ -91,6 +100,7 @@ export const useGetLiveUsersQuery = ({
   includeSummary = true,
   includeGeography = false,
   limit = 100,
+  filters = [],
   enabled = true,
 }: {
   websiteId: string;
@@ -98,6 +108,7 @@ export const useGetLiveUsersQuery = ({
   includeSummary?: boolean;
   includeGeography?: boolean;
   limit?: number;
+  filters?: EventFilter[];
   enabled?: boolean;
 }) => {
   return useQuery<GetLiveUsersResponse>({
@@ -108,6 +119,7 @@ export const useGetLiveUsersQuery = ({
       includeSummary,
       includeGeography,
       limit,
+      filters,
     ],
     queryFn: async () => {
       const response = await getLiveUsers({
@@ -116,6 +128,7 @@ export const useGetLiveUsersQuery = ({
         includeSummary,
         includeGeography,
         limit,
+        filters,
       });
       return response;
     },
