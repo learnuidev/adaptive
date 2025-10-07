@@ -65,14 +65,6 @@ const Dock: React.FC<DockProps> = ({ className = "" }) => {
       color: "from-green-400 to-green-600",
     },
     {
-      id: "events",
-      title: "Events",
-      icon: Activity,
-      url: "/events",
-      requiresCredential: true,
-      color: "from-orange-400 to-orange-600",
-    },
-    {
       id: "goals",
       title: "Goals",
       icon: Target,
