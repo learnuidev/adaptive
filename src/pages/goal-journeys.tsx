@@ -112,7 +112,6 @@ const GoalJourneys = () => {
             </p>
           </div>
         </div>
-        <ResponsiveFilters />
       </div>
 
       <Card className="glass">
