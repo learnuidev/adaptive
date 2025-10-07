@@ -68,8 +68,6 @@ const addFeatureVersion = async (
     throw Error(parseResp.error.message);
   }
 
-  console.log("parse resp", parseResp);
-
   const res = await fetchWithToken(
     `${appConfig.apiUrl}/v1/analytics/add-feature-version`,
     {

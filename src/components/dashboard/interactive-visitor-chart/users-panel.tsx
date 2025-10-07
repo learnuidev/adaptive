@@ -37,10 +37,6 @@ export function UsersPanel({ websiteId }: InteractiveVisitorChartProps) {
     };
   });
 
-  console.log("GOALS", goalsIntoVisitors);
-
-  console.log("SUM", summary);
-
   return (
     <Card className="bg-gradient-card border-border/50 hover:shadow-medium transition-all duration-300 animate-fade-in glass">
       <Tabs value={techView} onValueChange={(v) => setTechView(v as any)}>

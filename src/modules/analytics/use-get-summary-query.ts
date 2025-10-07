@@ -376,7 +376,6 @@ async function getSummary({
 
     return resp;
   } catch (error) {
-    console.log("ERROR", error);
     throw Error(`Something went wrong`);
   }
 }

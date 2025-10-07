@@ -59,8 +59,6 @@ export function LocationPanel({ websiteId }: InteractiveVisitorChartProps) {
     groupBy: locationView === "map" ? "country" : locationView,
   });
 
-  console.log("LOCATION DATA", locationData);
-
   const activeLocationView = locationView === "map" ? "country" : locationView;
 
   useEffect(() => {
@@ -389,7 +387,6 @@ export function LocationPanel({ websiteId }: InteractiveVisitorChartProps) {
               <ZoomableGroup>
                 <Geographies geography={geoUrl}>
                   {({ geographies }) => {
-                    console.log("GEOS", geographies);
                     return geographies.map((geo) => {
                       const countryName = geo.properties.NAME;
                       const countryNameISO = geo.properties.ISO_A2;
