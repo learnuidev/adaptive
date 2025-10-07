@@ -4,17 +4,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { 
-  MapPin, 
-  Clock, 
-  Monitor, 
-  Smartphone, 
-  Globe, 
+import {
+  MapPin,
+  Clock,
+  Monitor,
+  Smartphone,
+  Globe,
   Activity,
   Eye,
   Calendar,
   ExternalLink,
-  X
+  X,
 } from "lucide-react";
 import { useGetUserInfoQuery } from "@/modules/analytics/use-get-user-info-query";
 import { useListEventsByEmailQuery } from "@/modules/analytics/use-list-events-by-email-query";
@@ -41,10 +41,10 @@ export function LiveUserDetailsPopup({
 }: LiveUserDetailsPopupProps) {
   const [activeTab, setActiveTab] = useState<"overview" | "events">("overview");
   const [selectedUserIndex, setSelectedUserIndex] = useState(0);
-  
+
   const allUsers = users || [user];
   const currentUser = allUsers[selectedUserIndex];
-  
+
   const { data: userInfo } = useGetUserInfoQuery({
     websiteId,
     email: currentUser.email || "",
@@ -68,9 +68,11 @@ export function LiveUserDetailsPopup({
   };
 
   const getDeviceIcon = (deviceModel: string) => {
-    if (deviceModel?.toLowerCase().includes("iphone") || 
-        deviceModel?.toLowerCase().includes("android") ||
-        deviceModel?.toLowerCase().includes("mobile")) {
+    if (
+      deviceModel?.toLowerCase().includes("iphone") ||
+      deviceModel?.toLowerCase().includes("android") ||
+      deviceModel?.toLowerCase().includes("mobile")
+    ) {
       return <Smartphone className="w-4 h-4" />;
     }
     return <Monitor className="w-4 h-4" />;
@@ -117,12 +119,16 @@ export function LiveUserDetailsPopup({
       {allUsers.length > 1 && (
         <div className="px-4 py-2 border-b border-gray-200 bg-gray-50">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">User at this location:</span>
+            <span className="text-sm text-gray-600">
+              User at this location:
+            </span>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setSelectedUserIndex(Math.max(0, selectedUserIndex - 1))}
+                onClick={() =>
+                  setSelectedUserIndex(Math.max(0, selectedUserIndex - 1))
+                }
                 disabled={selectedUserIndex === 0}
               >
                 Previous
@@ -133,7 +139,11 @@ export function LiveUserDetailsPopup({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setSelectedUserIndex(Math.min(allUsers.length - 1, selectedUserIndex + 1))}
+                onClick={() =>
+                  setSelectedUserIndex(
+                    Math.min(allUsers.length - 1, selectedUserIndex + 1)
+                  )
+                }
                 disabled={selectedUserIndex === allUsers.length - 1}
               >
                 Next
@@ -176,10 +186,12 @@ export function LiveUserDetailsPopup({
               <MapPin className="w-5 h-5 text-red-500" />
               <div>
                 <p className="font-medium text-gray-900">
-                  {currentUser.city}, {currentUser.region}, {currentUser.country}
+                  {currentUser.city}, {currentUser.region},{" "}
+                  {currentUser.country}
                 </p>
                 <p className="text-sm text-gray-600">
-                  {currentUser.latitude?.toFixed(4)}°, {currentUser.longitude?.toFixed(4)}°
+                  {currentUser.latitude?.toFixed(4)}°,{" "}
+                  {currentUser.longitude?.toFixed(4)}°
                 </p>
               </div>
             </div>
@@ -189,7 +201,9 @@ export function LiveUserDetailsPopup({
               <div className="p-3 bg-blue-50 rounded-lg">
                 <div className="flex items-center gap-2 mb-1">
                   <Clock className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm font-medium text-gray-700">Session</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    Session
+                  </span>
                 </div>
                 <p className="text-lg font-semibold text-gray-900">
                   {formatDuration(currentUser.session_duration_minutes || 0)}
@@ -198,7 +212,9 @@ export function LiveUserDetailsPopup({
               <div className="p-3 bg-green-50 rounded-lg">
                 <div className="flex items-center gap-2 mb-1">
                   <Activity className="w-4 h-4 text-green-600" />
-                  <span className="text-sm font-medium text-gray-700">Events</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    Events
+                  </span>
                 </div>
                 <p className="text-lg font-semibold text-gray-900">
                   {currentUser.event_count || 0}
@@ -218,10 +234,15 @@ export function LiveUserDetailsPopup({
                     <p>Model: {currentUser.device_model}</p>
                   )}
                   {currentUser.browser_name && (
-                    <p>Browser: {currentUser.browser_name} {currentUser.browser_version || ""}</p>
+                    <p>
+                      Browser: {currentUser.browser_name}{" "}
+                      {currentUser.browser_version || ""}
+                    </p>
                   )}
                   {currentUser.os_name && (
-                    <p>OS: {currentUser.os_name} {currentUser.os_version || ""}</p>
+                    <p>
+                      OS: {currentUser.os_name} {currentUser.os_version || ""}
+                    </p>
                   )}
                 </div>
               </div>
@@ -232,9 +253,13 @@ export function LiveUserDetailsPopup({
               <div className="p-3 bg-yellow-50 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <Eye className="w-4 h-4 text-yellow-600" />
-                  <span className="font-medium text-gray-900">Currently Viewing</span>
+                  <span className="font-medium text-gray-900">
+                    Currently Viewing
+                  </span>
                 </div>
-                <p className="text-sm text-gray-600 truncate">{currentUser.last_page}</p>
+                <p className="text-sm text-gray-600 truncate">
+                  {currentUser.last_page}
+                </p>
               </div>
             )}
 
@@ -245,10 +270,14 @@ export function LiveUserDetailsPopup({
                 <span className="font-medium text-gray-900">Last Activity</span>
               </div>
               <p className="text-sm text-gray-600">
-                {currentUser.last_activity ? formatTime(currentUser.last_activity) : "Unknown"}
+                {currentUser.last_activity
+                  ? formatTime(currentUser.last_activity)
+                  : "Unknown"}
               </p>
               <p className="text-xs text-gray-500">
-                {currentUser.last_seen ? `Last seen: ${new Date(currentUser.last_seen).toLocaleString()}` : ""}
+                {currentUser.last_seen
+                  ? `Last seen: ${new Date(currentUser.last_seen).toLocaleString()}`
+                  : ""}
               </p>
             </div>
           </div>
@@ -257,41 +286,60 @@ export function LiveUserDetailsPopup({
         {activeTab === "events" && (
           <div className="space-y-3">
             {userEvents && userEvents.length > 0 ? (
-              userEvents.slice(0, 20).map((event: AnalyticsEvent, index: number) => (
-                <div key={`${event.id}-${index}`} className="p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <Badge variant={event.type === "pageview" ? "default" : "secondary"}>
-                        {event.type}
-                      </Badge>
-                      <span className="text-sm font-medium text-gray-900">
-                        {event.event_name}
+              userEvents
+                .slice(0, 20)
+                .map((event: AnalyticsEvent, index: number) => (
+                  <div
+                    key={`${event.id}-${index}`}
+                    className="p-3 bg-gray-50 rounded-lg"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          variant={
+                            event.type === "pageview" ? "default" : "secondary"
+                          }
+                        >
+                          {event.type}
+                        </Badge>
+                        <span className="text-sm font-medium text-gray-900">
+                          {event.event_name}
+                        </span>
+                      </div>
+                      <span className="text-xs text-gray-500">
+                        {formatTime(event.created_at)}
                       </span>
                     </div>
-                    <span className="text-xs text-gray-500">
-                      {formatTime(event.created_at)}
-                    </span>
-                  </div>
-                  {event.href && (
-                    <p className="text-sm text-gray-600 truncate mb-1">
-                      {event.href}
-                    </p>
-                  )}
-                  {event.metadata && Object.keys(event.metadata).length > 0 && (
-                    <div className="mt-2 p-2 bg-white rounded border border-gray-200">
-                      <p className="text-xs font-medium text-gray-700 mb-1">Metadata:</p>
-                      <div className="space-y-1">
-                        {Object.entries(event.metadata).map(([key, value]) => (
-                          <div key={key} className="flex justify-between text-xs">
-                            <span className="text-gray-600">{key}:</span>
-                            <span className="text-gray-800 truncate ml-2">{value}</span>
+                    {event.href && (
+                      <p className="text-sm text-gray-600 truncate mb-1">
+                        {event.href}
+                      </p>
+                    )}
+                    {event.metadata &&
+                      Object.keys(event.metadata).length > 0 && (
+                        <div className="mt-2 p-2 bg-white rounded border border-gray-200">
+                          <p className="text-xs font-medium text-gray-700 mb-1">
+                            Metadata:
+                          </p>
+                          <div className="space-y-1">
+                            {Object.entries(event.metadata).map(
+                              ([key, value]) => (
+                                <div
+                                  key={key}
+                                  className="flex justify-between text-xs"
+                                >
+                                  <span className="text-gray-600">{key}:</span>
+                                  <span className="text-gray-800 truncate ml-2">
+                                    {value}
+                                  </span>
+                                </div>
+                              )
+                            )}
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))
+                        </div>
+                      )}
+                  </div>
+                ))
             ) : (
               <div className="text-center py-8 text-gray-500">
                 <Activity className="w-12 h-12 mx-auto mb-3 text-gray-300" />
@@ -310,7 +358,10 @@ export function LiveUserDetailsPopup({
           className="w-full"
           onClick={() => {
             // Navigate to full user detail page
-            window.open(`/websites/${websiteId}/users/${currentUser.visitor_id}`, "_blank");
+            window.open(
+              `/websites/${websiteId}/users/${currentUser.visitor_id}`,
+              "_blank"
+            );
           }}
         >
           <ExternalLink className="w-4 h-4 mr-2" />

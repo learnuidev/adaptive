@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import mapboxgl from "mapbox-gl";
+import Map, { Popup, MapRef, Marker, MapMouseEvent } from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./live-users-globe.css";
 import {
@@ -19,34 +19,48 @@ interface LiveUsersGlobeProps {
 
 const mapboxApiKey = import.meta.env.VITE_MAPBOX_API_KEY;
 
+interface LocationGroup {
+  latitude: number;
+  longitude: number;
+  city?: string;
+  country?: string;
+  users: LiveUser[];
+  count: number;
+}
+
 export function LiveUsersGlobe({
   websiteId,
   isOpen,
   onClose,
 }: LiveUsersGlobeProps) {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
+  const mapRef = useRef<MapRef>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [selectedUser, setSelectedUser] = useState<LiveUser | null>(null);
   const [selectedUsers, setSelectedUsers] = useState<LiveUser[]>([]);
-  const popupRef = useRef<mapboxgl.Popup | null>(null);
-  const contentRef = useRef(document.createElement("div"));
+  const [popupInfo, setPopupInfo] = useState<{
+    longitude: number;
+    latitude: number;
+    users: LiveUser[];
+    userCount: number;
+    name: string;
+    country: string;
+  } | null>(null);
 
   const handleZoomIn = () => {
-    if (map.current) {
-      map.current.zoomIn();
+    if (mapRef.current) {
+      mapRef.current.zoomIn();
     }
   };
 
   const handleZoomOut = () => {
-    if (map.current) {
-      map.current.zoomOut();
+    if (mapRef.current) {
+      mapRef.current.zoomOut();
     }
   };
 
   const handleResetView = () => {
-    if (map.current) {
-      map.current.flyTo({
+    if (mapRef.current) {
+      mapRef.current.flyTo({
         center: [0, 0],
         zoom: 1.5,
         pitch: 0,
@@ -65,131 +79,22 @@ export function LiveUsersGlobe({
     enabled: isOpen && !!websiteId,
   });
 
-  console.log("live users raw data", liveUsersData);
-  console.log("live users data exists:", !!liveUsersData);
-  console.log("live users array:", liveUsersData?.liveUsers);
-  console.log(
-    "Should process data:",
-    isOpen && !!websiteId && mapLoaded && !!liveUsersData
-  );
-
-  useEffect(() => {
-    if (!isOpen || !mapContainer.current) return;
-
-    mapboxgl.accessToken = mapboxApiKey;
-
-    const mapInstance = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/dark-v11",
-      projection: "globe", // This creates the 3D globe effect
-      center: [0, 0],
-      zoom: 2,
-      pitch: 0,
-      bearing: 0,
-      interactive: true, // Enable all default interactions
-      dragPan: true,
-      dragRotate: true,
-      scrollZoom: true, // Enable scroll wheel zoom
-      minZoom: 0.5, // Allow zooming out further
-      maxZoom: 8, // Limit zoom in for globe perspective
-    });
-
-    mapInstance.on("load", () => {
-      setMapLoaded(true);
-
-      // Add atmosphere effect
-      mapInstance.setFog({
-        "horizon-blend": 0.1,
-        color: "#242B4B",
-        "high-color": "#161B3D",
-        "space-color": "#0B0E1F",
-        "star-intensity": 0.15,
-      });
-
-      console.log("Map loaded");
-    });
-
-    map.current = mapInstance;
-
-    return () => {
-      if (popupRef.current) {
-        popupRef.current.remove();
-        popupRef.current = null;
-      }
-      if (map.current) {
-        map.current.remove();
-        map.current = null;
-      }
-    };
-  }, [isOpen]);
-
-  // Simple test effect to verify effects are working
-  useEffect(() => {
-    console.log("EFFECT SYSTEM WORKING - Component rendered");
+  // Process live users data into GeoJSON features
+  const geoJsonData = useRef<GeoJSON.FeatureCollection>({
+    type: "FeatureCollection",
+    features: [],
   });
 
-  // Separate effect to debug when dependencies change
   useEffect(() => {
-    console.log(
-      "DEPENDENCY CHANGE - mapLoaded:",
-      mapLoaded,
-      "liveUsersData:",
-      !!liveUsersData
-    );
-  }, [mapLoaded, liveUsersData]);
-
-  useEffect(() => {
-    console.log("=== LIVE USERS EFFECT TRIGGERED ===");
-    console.log("Processing live users data effect:", {
-      mapExists: !!map.current,
-      mapLoaded,
-      liveUsersDataExists: !!liveUsersData,
-      liveUsersData,
-      liveUsersArray: liveUsersData?.liveUsers,
-    });
-
-    if (!map.current || !mapLoaded || !liveUsersData) {
-      console.log("Early return from effect - missing dependencies", {
-        mapExists: !!map.current,
-        mapLoaded,
-        liveUsersDataExists: !!liveUsersData,
-      });
+    if (!liveUsersData?.liveUsers) {
+      geoJsonData.current.features = [];
       return;
     }
 
-    console.log("Continuing with live users data processing...");
-    const mapInstance = map.current;
-
-    // Remove existing layers and sources if they exist
-    if (mapInstance.getLayer("users-layer")) {
-      mapInstance.removeLayer("users-layer");
-    }
-    if (mapInstance.getSource("users-source")) {
-      mapInstance.removeSource("users-source");
-    }
-
-    console.log("Processing live users data:", liveUsersData);
-    console.log("Number of live users:", liveUsersData?.liveUsers?.length);
-
     // Group users by exact coordinates for clustering nearby users
     const locationGroups = liveUsersData.liveUsers.reduce(
-      (
-        acc: Record<
-          string,
-          {
-            latitude: number;
-            longitude: number;
-            city?: string;
-            country?: string;
-            users: LiveUser[];
-            count: number;
-          }
-        >,
-        user: LiveUser
-      ) => {
-        // Group by coordinates if available, otherwise group by city/country
+      (acc: Record<string, LocationGroup>, user: LiveUser) => {
         if (user.latitude && user.longitude) {
-          // Round coordinates to 2 decimal places to cluster nearby users
           const latKey = Math.round(user.latitude * 100) / 100;
           const lngKey = Math.round(user.longitude * 100) / 100;
           const key = `${latKey},${lngKey}`;
@@ -207,12 +112,11 @@ export function LiveUsersGlobe({
           acc[key].users.push(user);
           acc[key].count++;
         } else if (user.city && user.country) {
-          // Fallback to city/country grouping for users without coordinates
           const key = `${user.city},${user.country}`;
 
           if (!acc[key]) {
             acc[key] = {
-              latitude: 0, // Will be set to 0,0 for users without exact coordinates
+              latitude: 0,
               longitude: 0,
               city: user.city,
               country: user.country,
@@ -228,202 +132,55 @@ export function LiveUsersGlobe({
       {}
     );
 
-    console.log("Location groups:", locationGroups);
-
-    // Create features for clustered locations with actual coordinates
-    const features = Object.values(locationGroups).map((location) => {
-      console.log("Creating feature for location:", location);
-
-      // Check if coordinates are valid
-      if (location.latitude === 0 && location.longitude === 0) {
-        console.warn("Invalid coordinates (0,0) for location:", location);
-      }
-
-      return {
-        type: "Feature",
-        properties: {
-          name: location.city || "Unknown Location",
-          country: location.country || "Unknown",
-          userCount: location.count,
-          users: location.users,
-        },
-        geometry: {
-          type: "Point",
-          coordinates: [location.longitude, location.latitude], // [longitude, latitude] for GeoJSON
-        },
-      };
-    });
-
-    console.log("Created features:", features);
-    console.log("Features length:", features.length);
-
-    // Filter out features with invalid coordinates (0,0)
-    const validFeatures = features.filter((feature) => {
-      const [lng, lat] = feature.geometry.coordinates;
-      const isValid = lng !== 0 || lat !== 0;
-      if (!isValid) {
-        console.warn(
-          "Filtering out feature with invalid coordinates:",
-          feature
-        );
-      }
-      return isValid;
-    });
-
-    console.log("Valid features:", validFeatures);
-    console.log("Valid features length:", validFeatures.length);
-
-    // Wait for style to be loaded before adding layers
-    const addLayers = () => {
-      if (!mapInstance.isStyleLoaded()) {
-        console.log("Style not loaded yet, waiting...");
-        setTimeout(addLayers, 100);
-        return;
-      }
-
-      console.log("Style loaded, adding layers...");
-
-      // Add source for user locations
-      mapInstance.addSource("users-source", {
-        type: "geojson",
-        data: {
-          type: "FeatureCollection",
-          features: validFeatures as GeoJSON.Feature[],
-        },
-      });
-
-      // Add layer for user locations
-      mapInstance.addLayer({
-        id: "users-layer",
-        type: "circle",
-        source: "users-source",
-        paint: {
-          "circle-radius": [
-            "interpolate",
-            ["linear"],
-            ["get", "userCount"],
-            1,
-            8,
-            10,
-            15,
-            50,
-            25,
-          ],
-          "circle-color": "#00ff88",
-          "circle-opacity": 0.8,
-          "circle-stroke-color": "#ffffff",
-          "circle-stroke-width": 2,
-        },
-      });
-
-      // Initialize Mapbox popup after layer is created
-      popupRef.current = new mapboxgl.Popup({
-        closeOnClick: false,
-        offset: 15,
-        className: "live-users-popup",
-      });
-      console.log("Popup initialized after layer creation:", popupRef.current);
-
-      // Add popups for user locations
-      console.log("Attaching click event to users-layer...");
-      mapInstance.on("click", "users-layer", (e) => {
-        console.log("Click event on users-layer:", e);
-
-        if (!e.features || e.features.length === 0) {
-          console.log("No features found");
-          return;
+    // Create features for clustered locations with valid coordinates only
+    const features = Object.values(locationGroups)
+      .map((location) => {
+        if (location.latitude === 0 && location.longitude === 0) {
+          return null;
         }
+        return {
+          type: "Feature",
+          properties: {
+            name: location.city || "Unknown Location",
+            country: location.country || "Unknown",
+            userCount: location.count,
+            users: location.users,
+          },
+          geometry: {
+            type: "Point",
+            coordinates: [location.longitude, location.latitude],
+          },
+        } as GeoJSON.Feature;
+      })
+      .filter((f): f is GeoJSON.Feature => f !== null);
 
-        const feature = e.features[0] as GeoJSON.Feature;
-        const properties = feature.properties as {
-          name: string;
-          country: string;
-          userCount: number;
-          users: LiveUser[];
-        };
-
-        console.log("Feature properties:", properties);
-
-        // Show user details for the first user in the cluster
-        const firstUser = properties.users[0];
-        console.log("PROPS");
-        if (firstUser) {
-          console.log("Setting selected user:", firstUser);
-          setSelectedUser(firstUser);
-          setSelectedUsers(properties.users);
-
-          // Create a simple test popup first
-          const testContent = document.createElement("div");
-          testContent.innerHTML = `
-            <div style="padding: 10px; background: white; border-radius: 8px; border: 1px solid #ccc;">
-              <h3 style="margin: 0 0 10px 0;">${firstUser.email || "Anonymous User"}</h3>
-              <p style="margin: 0;">Location: ${properties.name}, ${properties.country}</p>
-              <p style="margin: 5px 0 0 0;">Users at location: ${properties.userCount}</p>
-            </div>
-          `;
-
-          console.log("Adding test popup with coordinates:", [
-            e.lngLat.lng,
-            e.lngLat.lat,
-          ]);
-          popupRef
-            .current!.setLngLat([e.lngLat.lng, e.lngLat.lat])
-            .setDOMContent(testContent)
-            .addTo(mapInstance);
-        } else {
-          console.log("No users found in properties");
-        }
-      });
-
-      // Change cursor on hover
-      mapInstance.on("mouseenter", "users-layer", () => {
-        mapInstance.getCanvas().style.cursor = "pointer";
-      });
-
-      mapInstance.on("mouseleave", "users-layer", () => {
-        mapInstance.getCanvas().style.cursor = "";
-      });
-
-      // Add a general click handler to debug what's happening
-      mapInstance.on("click", (e) => {
-        const features = mapInstance.queryRenderedFeatures(e.point, {
-          layers: ["users-layer"],
-        });
-
-        console.log("General map click:", e);
-        console.log("Features at click point:", features);
-        console.log(
-          "All layers at point:",
-          mapInstance.queryRenderedFeatures(e.point)
-        );
-      });
+    geoJsonData.current = {
+      type: "FeatureCollection",
+      features,
     };
+  }, [liveUsersData]);
 
-    addLayers();
+  const handleMapLoad = () => {
+    setMapLoaded(true);
 
-    // No need for geocoding since we have actual coordinates
-  }, [mapLoaded, liveUsersData, JSON.stringify(liveUsersData)]);
+    if (mapRef.current) {
+      mapRef.current.getMap().setFog({
+        "horizon-blend": 0.1,
+        color: "#242B4B",
+        "high-color": "#161B3D",
+        "space-color": "#0B0E1F",
+        "star-intensity": 0.15,
+      });
+    }
+  };
 
-  // Close popup when clicking on the map (outside of user locations)
-  useEffect(() => {
-    if (!map.current || !mapLoaded) return;
-
-    const mapInstance = map.current;
-
-    const handleMapClick = () => {
-      if (popupRef.current) {
-        popupRef.current.remove();
-        setSelectedUser(null);
-        setSelectedUsers([]);
-      }
-    };
-
-    mapInstance.on("click", handleMapClick);
-
-    return () => {
-      mapInstance.off("click", handleMapClick);
-    };
-  }, [mapLoaded]);
+  const handleMapClick = (event: MapMouseEvent) => {
+    if (!event.features || event.features.length === 0) {
+      setPopupInfo(null);
+      setSelectedUser(null);
+      setSelectedUsers([]);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -457,34 +214,123 @@ export function LiveUsersGlobe({
         </div>
 
         {/* Map Container */}
-        <div
-          ref={mapContainer}
-          className="w-full h-full"
-          style={{ paddingTop: "73px" }}
-        />
+        <Map
+          ref={mapRef}
+          mapboxAccessToken={mapboxApiKey}
+          initialViewState={{
+            longitude: 0,
+            latitude: 0,
+            zoom: 2,
+            pitch: 0,
+            bearing: 0,
+          }}
+          style={{ width: "100%", height: "100%", paddingTop: "73px" }}
+          mapStyle="mapbox://styles/mapbox/dark-v11"
+          projection="globe"
+          interactive={true}
+          dragPan={true}
+          dragRotate={true}
+          scrollZoom={true}
+          minZoom={0.5}
+          maxZoom={8}
+          onLoad={handleMapLoad}
+          onClick={handleMapClick}
+        >
+          {/* Render user clusters as Markers */}
+          {mapLoaded &&
+            geoJsonData.current.features.map((feature, index) => {
+              const [longitude, latitude] = feature?.geometry?.coordinates;
+              const { name, country, userCount, users } =
+                feature.properties as {
+                  name: string;
+                  country: string;
+                  userCount: number;
+                  users: LiveUser[];
+                };
 
-        {/* Mapbox Popup Portal - Temporarily disabled for testing */}
-        {selectedUser && (
-          <>
-            {createPortal(
-              <LiveUserDetailsPopup
-                user={selectedUser}
-                users={selectedUsers}
-                mapInstance={map.current!}
-                coordinates={{ lng: 0, lat: 0 }} // Not needed for Mapbox popup
-                websiteId={websiteId}
-                onClose={() => {
-                  if (popupRef.current) {
-                    popupRef.current.remove();
-                  }
-                  setSelectedUser(null);
-                  setSelectedUsers([]);
-                }}
-              />,
-              contentRef.current
-            )}
-          </>
-        )}
+              return (
+                <Marker
+                  key={index}
+                  longitude={longitude}
+                  latitude={latitude}
+                  onClick={(e) => {
+                    e.originalEvent.stopPropagation();
+                    const firstUser = users[0];
+                    setSelectedUser(firstUser);
+                    setSelectedUsers(users);
+                    setPopupInfo({
+                      longitude,
+                      latitude,
+                      users,
+                      userCount,
+                      name,
+                      country,
+                    });
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${8 + Math.min(userCount * 1.5, 25)}px`,
+                      height: `${8 + Math.min(userCount * 1.5, 25)}px`,
+                      backgroundColor: "#00ff88",
+                      borderRadius: "50%",
+                      border: "2px solid white",
+                      opacity: 0.8,
+                      cursor: "pointer",
+                      boxShadow: "0 0 8px rgba(0,255,136,0.6)",
+                    }}
+                    title={`${userCount} user${userCount > 1 ? "s" : ""}`}
+                  />
+                </Marker>
+              );
+            })}
+
+          {/* Popup for user details */}
+          {popupInfo && (
+            <Popup
+              longitude={popupInfo.longitude}
+              latitude={popupInfo.latitude}
+              closeOnClick={false}
+              offset={15}
+              className="live-users-popup"
+              onClose={() => {
+                setPopupInfo(null);
+                setSelectedUser(null);
+                setSelectedUsers([]);
+              }}
+            >
+              <div style={{ padding: "10px", minWidth: "200px" }}>
+                <h3 style={{ margin: "0 0 10px 0", fontWeight: "bold" }}>
+                  {selectedUser?.email || "Anonymous User"}
+                </h3>
+                <p style={{ margin: "0" }}>
+                  Location: {popupInfo.name}, {popupInfo.country}
+                </p>
+                <p style={{ margin: "5px 0 0 0" }}>
+                  Users at location: {popupInfo.userCount}
+                </p>
+              </div>
+            </Popup>
+          )}
+        </Map>
+
+        {/* Custom LiveUserDetailsPopup Portal */}
+        {selectedUser &&
+          createPortal(
+            <LiveUserDetailsPopup
+              user={selectedUser}
+              users={selectedUsers}
+              mapInstance={mapRef.current?.getMap()!}
+              coordinates={{ lng: 0, lat: 0 }}
+              websiteId={websiteId}
+              onClose={() => {
+                setPopupInfo(null);
+                setSelectedUser(null);
+                setSelectedUsers([]);
+              }}
+            />,
+            document.body
+          )}
 
         {/* Loading State */}
         {!mapLoaded && (
