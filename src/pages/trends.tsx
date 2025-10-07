@@ -26,6 +26,7 @@ import {
 import { useAdaptive } from "@/lib/adaptive/adaptive-core-provider";
 import { WithGlow } from "@/components/with-glow";
 import { FeatureNotEnabled } from "@/components/feature-not-enabled";
+import { WithPulseDots } from "@/components/with-pulse-dots";
 
 type ViewState = "list" | "selector" | "form";
 
@@ -350,6 +351,19 @@ export default function Trends() {
       featureKey="trends-feature"
       featureVersionId={"01K6HJC9PB5XASJCZ8KWAC7R8T"}
       FallbackComponent={FeatureNotEnabled}
+      LoadingComponent={() => {
+        return (
+          <WithPulseDots>
+            <div>
+              <div className="relative z-10 text-center">
+                <h1 className="text-lg font-medium text-primary">
+                  Loading trends...
+                </h1>
+              </div>
+            </div>
+          </WithPulseDots>
+        );
+      }}
     >
       <TrendsFeature />
     </AdaptiveFeature>
