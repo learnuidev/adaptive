@@ -11,7 +11,7 @@ import TopNavbar from "./components/navbar/top-navbar";
 import { Toaster } from "./components/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Authenticated } from "./components/authenticated";
-import { AdapiveProvider } from "./lib/adaptive/adaptive-provider";
+import { AdaptiveProvider } from "./lib/adaptive/adaptive-provider";
 
 import Dashboard from "./pages/dashboard";
 import Users from "./pages/users";
@@ -56,8 +56,8 @@ const rootRoute = createRootRoute({
 
     return (
       <QueryClientProvider client={queryClient}>
-        <Authenticated>
-          <AdapiveProvider>
+        <AdaptiveProvider>
+          <Authenticated>
             <ThemeProvider>
               <TooltipProvider>
                 <div className="h-screen w-full bg-background relative">
@@ -75,8 +75,8 @@ const rootRoute = createRootRoute({
                 </div>
               </TooltipProvider>
             </ThemeProvider>
-          </AdapiveProvider>
-        </Authenticated>
+          </Authenticated>
+        </AdaptiveProvider>
       </QueryClientProvider>
     );
   },
