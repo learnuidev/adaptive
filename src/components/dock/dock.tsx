@@ -12,10 +12,12 @@ import {
   Flag,
   Plus,
   Zap,
+  Globe,
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useListUserWebsitesQuery } from "@/modules/user-websites/use-list-user-websites-query";
 import { useWebsiteStore } from "@/stores/website-store";
+import { LiveUsersGlobe } from "@/components/dashboard/live-users-globe";
 
 interface DockItem {
   id: string;
@@ -24,6 +26,7 @@ interface DockItem {
   url: string;
   requiresCredential: boolean;
   color: string;
+  action?: () => void;
 }
 
 interface DockProps {
@@ -37,6 +40,7 @@ const Dock: React.FC<DockProps> = ({ className = "" }) => {
   const { selectedWebsiteId, setSelectedWebsite } = useWebsiteStore();
   const { data: websites } = useListUserWebsitesQuery();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [showGlobe, setShowGlobe] = useState(false);
   const dockRef = useRef<HTMLDivElement>(null);
 
   const dockItems: DockItem[] = [
@@ -55,6 +59,15 @@ const Dock: React.FC<DockProps> = ({ className = "" }) => {
       url: "/dashboard",
       requiresCredential: true,
       color: "from-purple-400 to-purple-600",
+    },
+    {
+      id: "globe",
+      title: "Live Globe",
+      icon: Globe,
+      url: "",
+      requiresCredential: true,
+      color: "from-blue-500 to-cyan-500",
+      action: () => setShowGlobe(true),
     },
     {
       id: "people",
@@ -109,6 +122,11 @@ const Dock: React.FC<DockProps> = ({ className = "" }) => {
   const websiteId = getWebsiteId();
 
   const handleNavigation = (item: DockItem) => {
+    if (item.action) {
+      item.action();
+      return;
+    }
+
     if (!item.url) return;
 
     if (item.url === "/") {
@@ -132,6 +150,7 @@ const Dock: React.FC<DockProps> = ({ className = "" }) => {
   };
 
   const isActive = (url: string) => {
+    if (!url) return false;
     if (url === "/" && location.pathname === "/") return true;
     if (url !== "/" && location.pathname.startsWith(url)) return true;
     return false;
@@ -160,6 +179,8 @@ const Dock: React.FC<DockProps> = ({ className = "" }) => {
                 ? "bg-gray-900/80 border-gray-800/50"
                 : theme === "beige"
                   ? "bg-orange-50/80 border-orange-200/50"
+                : theme === "rose"
+                  ? "bg-rose-50/80 border-rose-200/50"
                   : "bg-white/80 border-gray-200/50"
             }
             border shadow-2xl
@@ -207,6 +228,8 @@ const Dock: React.FC<DockProps> = ({ className = "" }) => {
                               ? "bg-gray-800 text-gray-200"
                               : theme === "beige"
                                 ? "bg-orange-800 text-orange-100"
+                              : theme === "rose"
+                                ? "bg-rose-800 text-rose-100"
                                 : "bg-gray-800 text-white"
                           }
                         `}
@@ -223,6 +246,8 @@ const Dock: React.FC<DockProps> = ({ className = "" }) => {
                                 ? "border-t-gray-800"
                                 : theme === "beige"
                                   ? "border-t-orange-800"
+                                : theme === "rose"
+                                  ? "border-t-rose-800"
                                   : "border-t-gray-800"
                             }
                           `}
@@ -245,6 +270,8 @@ const Dock: React.FC<DockProps> = ({ className = "" }) => {
                             ? "bg-gray-800/50 hover:bg-gray-700/50"
                             : theme === "beige"
                               ? "bg-orange-200/50 hover:bg-orange-300/50"
+                            : theme === "rose"
+                              ? "bg-rose-200/50 hover:bg-rose-300/50"
                               : "bg-gray-200/50 hover:bg-gray-300/50"
                       }
                     `}
@@ -259,6 +286,8 @@ const Dock: React.FC<DockProps> = ({ className = "" }) => {
                               ? "text-gray-300"
                               : theme === "beige"
                                 ? "text-orange-800"
+                              : theme === "rose"
+                                ? "text-rose-800"
                                 : "text-gray-700"
                         }
                       `}
@@ -306,7 +335,7 @@ const Dock: React.FC<DockProps> = ({ className = "" }) => {
             className="absolute inset-0 rounded-2xl pointer-events-none"
             style={{
               background: `radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
-              ${theme === "dark" ? "rgba(59, 130, 246, 0.1)" : theme === "beige" ? "rgba(251, 146, 60, 0.1)" : "rgba(59, 130, 246, 0.1)"} 0%, 
+              ${theme === "dark" ? "rgba(59, 130, 246, 0.1)" : theme === "beige" ? "rgba(251, 146, 60, 0.1)" : theme === "rose" ? "rgba(244, 63, 94, 0.1)" : "rgba(59, 130, 246, 0.1)"} 0%, 
               transparent 50%)`,
             }}
             initial={{ opacity: 0 }}
@@ -316,6 +345,15 @@ const Dock: React.FC<DockProps> = ({ className = "" }) => {
           />
         </div>
       </motion.div>
+
+      {/* Live Users Globe Modal */}
+      {showGlobe && websiteId && (
+        <LiveUsersGlobe
+          websiteId={websiteId}
+          isOpen={showGlobe}
+          onClose={() => setShowGlobe(false)}
+        />
+      )}
     </div>
   );
 };
