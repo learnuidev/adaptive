@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useRegisterMutation } from "@/modules/auth/use-register-mutation";
 import { Loader2 } from "lucide-react";
 import { useConfirmRegisterMutation } from "@/modules/auth/use-confirm-register-mutation";
+import { useAdaptive } from "@/lib/adaptive/adaptive-core-provider";
 
 interface RegisterFormProps {
   isLogin: boolean;
@@ -40,18 +41,32 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   const { toast } = useToast();
   const registerMutation = useRegisterMutation();
 
+  const adaptive = useAdaptive();
+
   const confirmRegisterMutation = useConfirmRegisterMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      await registerMutation.mutateAsync({ email, password, firstName, lastName });
+      await registerMutation.mutateAsync({
+        email,
+        password,
+        firstName,
+        lastName,
+      });
 
       setViewtype(RegistrationViewTypes.confirmRegister);
+
+      adaptive.adaptive("user-register", {
+        email,
+        firstName,
+        lastName,
+      });
+
       toast({
         title: "Success",
-        description: "Login successful",
+        description: "Registration successful",
       });
     } catch (error) {
       toast({
@@ -67,6 +82,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
     try {
       await confirmRegisterMutation.mutateAsync({ email, confirmationCode });
+
+      adaptive.adaptive("user-register-success", {
+        email,
+      });
 
       setIsLogin(true);
 
