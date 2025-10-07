@@ -4,7 +4,7 @@ import { LogOut, Palette, Sun, Moon, Check } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useSignOutMutation } from "@/modules/auth/use-signout-mutation";
 import { useNavigate } from "@tanstack/react-router";
-import { ThemeSelector } from "../sidebar/theme-selector";
+import { ThemeSelector } from "../theme-selector";
 import { LogoutButton } from "./logout-button";
 
 interface TopNavbarProps {

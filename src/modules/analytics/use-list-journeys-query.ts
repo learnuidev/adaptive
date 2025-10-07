@@ -38,8 +38,6 @@ const listJourneys = async (params: ListJourneysRequest) => {
       throw new Error(responseData.message || "Failed to fetch journeys");
     }
 
-    console.log("response data", responseData);
-
     return {
       journeys: responseData || [],
       total: responseData?.length || 0,

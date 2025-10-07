@@ -1,17 +1,14 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BarChart3,
   Home,
   Users,
-  Activity,
   Settings,
   Target,
   TrendingUp,
   Flag,
-  Plus,
-  Zap,
   Globe,
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";

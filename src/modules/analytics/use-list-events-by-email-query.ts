@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { appConfig } from "@/lib/app-config";
 import { fetchWithToken } from "@/lib/aws-smplify/fetch-with-token";
 import { useQuery } from "@tanstack/react-query";

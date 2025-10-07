@@ -1,8 +1,6 @@
 import { useTheme } from "@/contexts/ThemeContext";
-import { Palette } from "lucide-react";
-
 import { AnimatePresence, motion } from "framer-motion";
-import { Coffee, Moon, Sun, Flower } from "lucide-react";
+import { Coffee, Flower, Moon, Palette, Sun } from "lucide-react";
 import { useState } from "react";
 
 export function ThemeSelector() {
