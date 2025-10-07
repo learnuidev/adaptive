@@ -1,9 +1,10 @@
 import { useIsAuthenticatedQuery } from "@/modules/auth/use-is-authenticated.query";
-import { LoginForm } from "@/components/auth/login-form";
 import { AuthForm } from "./auth/auth-form";
+import LandingPage from "@/pages/landing";
 
 export const Authenticated = ({ children }: { children: React.ReactNode }) => {
   const { data, isLoading } = useIsAuthenticatedQuery();
+  const path = window.location.pathname;
 
   if (isLoading) {
     return (
@@ -17,6 +18,10 @@ export const Authenticated = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!data) {
+    // Show landing page on root route, otherwise show auth form
+    if (path === "/") {
+      return <LandingPage />;
+    }
     return <AuthForm />;
   }
 
