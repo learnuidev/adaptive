@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLoginMutation, LoginError } from "@/modules/auth/use-login-mutation";
+import { useLoginMutation } from "@/modules/auth/use-login-mutation";
 import { ForgotPasswordForm } from "./forgot-password-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, AlertCircle, Eye, EyeOff } from "lucide-react";
+import { useAdaptive } from "@/lib/adaptive/adaptive-core-provider";
+import { LoginError } from "@/modules/auth/auth.types";
 
 export const LoginForm = ({
   isLogin,
@@ -29,12 +31,19 @@ export const LoginForm = ({
   const { toast } = useToast();
   const loginMutation = useLoginMutation();
 
+  const adaptive = useAdaptive();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError(null);
 
     try {
       await loginMutation.mutateAsync({ email, password });
+
+      adaptive.adaptive("user-login-success", {
+        email,
+      });
+
       toast({
         title: "Welcome back!",
         description: "You've successfully signed in.",
@@ -42,7 +51,11 @@ export const LoginForm = ({
     } catch (error) {
       const loginErr = error as LoginError;
       setLoginError(loginErr.message);
-      
+
+      adaptive.adaptive("user-login-error", {
+        email,
+      });
+
       // Show toast for additional feedback
       toast({
         title: "Sign in failed",
@@ -81,7 +94,7 @@ export const LoginForm = ({
                 <span className="text-sm">{loginError}</span>
               </div>
             )}
-            
+
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
