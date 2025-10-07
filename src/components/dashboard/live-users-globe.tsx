@@ -220,7 +220,7 @@ export function LiveUsersGlobe({
           initialViewState={{
             longitude: 0,
             latitude: 0,
-            zoom: 2,
+            zoom: 2.5,
             pitch: 0,
             bearing: 0,
           }}
@@ -271,8 +271,8 @@ export function LiveUsersGlobe({
                 >
                   <div
                     style={{
-                      width: `${8 + Math.min(userCount * 1.5, 25)}px`,
-                      height: `${8 + Math.min(userCount * 1.5, 25)}px`,
+                      width: `20px`,
+                      height: `20px`,
                       backgroundColor: "#00ff88",
                       borderRadius: "50%",
                       border: "2px solid white",
