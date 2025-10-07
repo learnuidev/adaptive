@@ -54,26 +54,14 @@ const getMainItems = (websiteId?: string) => [
     requiresCredential: true,
   },
   {
-    title: "Users",
-    url: "/users",
+    title: "People",
+    url: "/people",
     icon: Users,
-    requiresCredential: true,
-  },
-  {
-    title: "Events",
-    url: "/events",
-    icon: Activity,
     requiresCredential: true,
   },
 ];
 
 const getToolsItems = (websiteId?: string) => [
-  {
-    title: "Cohorts",
-    url: "/cohorts",
-    icon: Users,
-    requiresCredential: true,
-  },
   {
     title: "Goals",
     url: "/goals",

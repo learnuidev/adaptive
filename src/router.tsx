@@ -16,6 +16,7 @@ import { AdapiveProvider } from "./lib/adaptive/adaptive-provider";
 import Dashboard from "./pages/dashboard";
 import Users from "./pages/users";
 import UserDetail from "./pages/user-detail";
+import People from "./pages/people";
 import Cohorts from "./pages/cohorts";
 import AddCohort from "./pages/add-cohort";
 import CohortDetail from "./pages/cohort-detail";
@@ -100,10 +101,16 @@ const websiteDetailRoute = createRoute({
   component: WebsiteDetail,
 });
 
+const peopleRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/people/$websiteId",
+  component: People,
+});
+
 const usersRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/users/$websiteId",
-  component: Users,
+  component: People, // Redirect to People page
 });
 
 const userDetailRoute = createRoute({
@@ -115,7 +122,7 @@ const userDetailRoute = createRoute({
 const cohortsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/cohorts/$websiteId",
-  component: Cohorts,
+  component: People, // Redirect to People page
 });
 
 const addCohortRoute = createRoute({
@@ -195,6 +202,7 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   dashboardRoute,
   websiteDetailRoute,
+  peopleRoute,
   usersRoute,
   userDetailRoute,
   cohortsRoute,

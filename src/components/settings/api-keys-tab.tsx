@@ -216,8 +216,8 @@ const CreateApiKeyDialog: React.FC<CreateApiKeyDialogProps> = ({
             />
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <p className="text-sm text-blue-800">
+          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+            <p className="text-sm text-blue-700 dark:text-blue-300">
               <strong>Note:</strong> Once created, the API secret will only be shown once. Make sure to save it securely.
             </p>
           </div>
