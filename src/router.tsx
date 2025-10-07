@@ -6,8 +6,7 @@ import {
 } from "@tanstack/react-router";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { TooltipProvider } from "./components/ui/tooltip";
-import { SidebarProvider, SidebarTrigger } from "./components/ui/sidebar";
-import { AppSidebar } from "./components/sidebar/app-sidebar";
+import Dock from "./components/dock/dock";
 import { Toaster } from "./components/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Authenticated } from "./components/authenticated";
@@ -60,20 +59,16 @@ const rootRoute = createRootRoute({
           <AdapiveProvider>
             <ThemeProvider>
               <TooltipProvider>
-                <SidebarProvider>
-                  <div className="flex h-screen w-full bg-background">
-                    <AppSidebar />
-                    <main className="flex-1 flex flex-col">
-                      <header className="flex h-12 items-center bg-background px-4">
-                        <SidebarTrigger />
-                      </header>
-                      <div className="flex-1 overflow-auto p-4">
-                        <Outlet />
-                      </div>
-                      <Toaster />
-                    </main>
-                  </div>
-                </SidebarProvider>
+                <div className="h-screen w-full bg-background relative">
+                  <main className="flex-1 flex flex-col h-full">
+                    <div className="flex-1 overflow-auto p-4 pt-16 sm:pt-20 pb-20 sm:pb-24">
+                      <Outlet />
+                    </div>
+                    <Toaster />
+                  </main>
+
+                  <Dock />
+                </div>
               </TooltipProvider>
             </ThemeProvider>
           </AdapiveProvider>
