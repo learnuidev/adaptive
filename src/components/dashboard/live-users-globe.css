@@ -5,10 +5,16 @@
 .mapboxgl-popup-content {
   padding: 0 !important;
   border-radius: 8px !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
-  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  background: hsl(var(--card)) !important;
 }
 
 .mapboxgl-popup-tip {
-  border-top-color: white !important;
+  border-top-color: hsl(var(--card)) !important;
+}
+
+/* Dark mode adjustments for mapbox popup */
+.dark .mapboxgl-popup-content {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
 }

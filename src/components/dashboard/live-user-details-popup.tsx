@@ -79,47 +79,49 @@ export function LiveUserDetailsPopup({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-xl border border-gray-200 w-96 max-h-[80vh] overflow-hidden">
+    <div className="bg-card rounded-lg shadow-xl border border-border w-96 max-h-[80vh] overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <div className="p-4 border-b border-border bg-gradient-to-r from-primary/5 to-primary/10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Avatar className="w-10 h-10">
-              <AvatarFallback className="bg-blue-100 text-blue-600 font-semibold">
+              <AvatarFallback className="bg-primary/20 text-primary font-semibold">
                 {currentUser.email?.charAt(0)?.toUpperCase() || "U"}
               </AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="font-semibold text-gray-900">
+              <h3 className="font-semibold text-card-foreground">
                 {currentUser.email || "Anonymous User"}
               </h3>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 <span>Currently Active</span>
                 {allUsers.length > 1 && (
-                  <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full">
+                  <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full">
                     {selectedUserIndex + 1}/{allUsers.length}
                   </span>
                 )}
               </div>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="h-8 w-8"
-          >
-            <X className="w-4 h-4" />
-          </Button>
+          <div className="p-8">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="h-8 w-8"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* User Navigation - Only show if multiple users */}
       {allUsers.length > 1 && (
-        <div className="px-4 py-2 border-b border-gray-200 bg-gray-50">
+        <div className="px-4 py-2 border-b border-border bg-muted/30">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-muted-foreground">
               User at this location:
             </span>
             <div className="flex items-center gap-2">
@@ -133,7 +135,7 @@ export function LiveUserDetailsPopup({
               >
                 Previous
               </Button>
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-card-foreground">
                 {selectedUserIndex + 1} of {allUsers.length}
               </span>
               <Button
@@ -154,13 +156,13 @@ export function LiveUserDetailsPopup({
       )}
 
       {/* Tabs */}
-      <div className="flex border-b border-gray-200">
+      <div className="flex border-b border-border">
         <button
           onClick={() => setActiveTab("overview")}
           className={`flex-1 py-2 px-4 text-sm font-medium transition-colors ${
             activeTab === "overview"
-              ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
-              : "text-gray-600 hover:text-gray-800"
+              ? "text-primary border-b-2 border-primary bg-primary/5"
+              : "text-muted-foreground hover:text-foreground"
           }`}
         >
           Overview
@@ -169,8 +171,8 @@ export function LiveUserDetailsPopup({
           onClick={() => setActiveTab("events")}
           className={`flex-1 py-2 px-4 text-sm font-medium transition-colors ${
             activeTab === "events"
-              ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
-              : "text-gray-600 hover:text-gray-800"
+              ? "text-primary border-b-2 border-primary bg-primary/5"
+              : "text-muted-foreground hover:text-foreground"
           }`}
         >
           Recent Activity
@@ -182,14 +184,14 @@ export function LiveUserDetailsPopup({
         {activeTab === "overview" && (
           <div className="space-y-4">
             {/* Location */}
-            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
               <MapPin className="w-5 h-5 text-red-500" />
               <div>
-                <p className="font-medium text-gray-900">
+                <p className="font-medium text-card-foreground">
                   {currentUser.city}, {currentUser.region},{" "}
                   {currentUser.country}
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   {currentUser.latitude?.toFixed(4)}°,{" "}
                   {currentUser.longitude?.toFixed(4)}°
                 </p>
@@ -198,25 +200,25 @@ export function LiveUserDetailsPopup({
 
             {/* Session Info */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 bg-blue-50 rounded-lg">
+              <div className="p-3 bg-primary/10 rounded-lg">
                 <div className="flex items-center gap-2 mb-1">
-                  <Clock className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm font-medium text-gray-700">
+                  <Clock className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-medium text-card-foreground">
                     Session
                   </span>
                 </div>
-                <p className="text-lg font-semibold text-gray-900">
+                <p className="text-lg font-semibold text-card-foreground">
                   {formatDuration(currentUser.session_duration_minutes || 0)}
                 </p>
               </div>
-              <div className="p-3 bg-green-50 rounded-lg">
+              <div className="p-3 bg-green-500/10 rounded-lg">
                 <div className="flex items-center gap-2 mb-1">
-                  <Activity className="w-4 h-4 text-green-600" />
-                  <span className="text-sm font-medium text-gray-700">
+                  <Activity className="w-4 h-4 text-green-500" />
+                  <span className="text-sm font-medium text-card-foreground">
                     Events
                   </span>
                 </div>
-                <p className="text-lg font-semibold text-gray-900">
+                <p className="text-lg font-semibold text-card-foreground">
                   {currentUser.event_count || 0}
                 </p>
               </div>
@@ -224,12 +226,14 @@ export function LiveUserDetailsPopup({
 
             {/* Device Info */}
             {(currentUser.device_model || currentUser.browser_name) && (
-              <div className="p-3 bg-gray-50 rounded-lg">
+              <div className="p-3 bg-muted/50 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   {getDeviceIcon(currentUser.device_model || "")}
-                  <span className="font-medium text-gray-900">Device</span>
+                  <span className="font-medium text-card-foreground">
+                    Device
+                  </span>
                 </div>
-                <div className="space-y-1 text-sm text-gray-600">
+                <div className="space-y-1 text-sm text-muted-foreground">
                   {currentUser.device_model && (
                     <p>Model: {currentUser.device_model}</p>
                   )}
@@ -250,31 +254,33 @@ export function LiveUserDetailsPopup({
 
             {/* Current Page */}
             {currentUser.last_page && (
-              <div className="p-3 bg-yellow-50 rounded-lg">
+              <div className="p-3 bg-yellow-500/10 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
-                  <Eye className="w-4 h-4 text-yellow-600" />
-                  <span className="font-medium text-gray-900">
+                  <Eye className="w-4 h-4 text-yellow-500" />
+                  <span className="font-medium text-card-foreground">
                     Currently Viewing
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 truncate">
+                <p className="text-sm text-muted-foreground truncate">
                   {currentUser.last_page}
                 </p>
               </div>
             )}
 
             {/* Last Activity */}
-            <div className="p-3 bg-gray-50 rounded-lg">
+            <div className="p-3 bg-muted/50 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
-                <Calendar className="w-4 h-4 text-gray-600" />
-                <span className="font-medium text-gray-900">Last Activity</span>
+                <Calendar className="w-4 h-4 text-muted-foreground" />
+                <span className="font-medium text-card-foreground">
+                  Last Activity
+                </span>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 {currentUser.last_activity
                   ? formatTime(currentUser.last_activity)
                   : "Unknown"}
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground/70">
                 {currentUser.last_seen
                   ? `Last seen: ${new Date(currentUser.last_seen).toLocaleString()}`
                   : ""}
@@ -291,7 +297,7 @@ export function LiveUserDetailsPopup({
                 .map((event: AnalyticsEvent, index: number) => (
                   <div
                     key={`${event.id}-${index}`}
-                    className="p-3 bg-gray-50 rounded-lg"
+                    className="p-3 bg-muted/50 rounded-lg"
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
@@ -302,23 +308,23 @@ export function LiveUserDetailsPopup({
                         >
                           {event.type}
                         </Badge>
-                        <span className="text-sm font-medium text-gray-900">
+                        <span className="text-sm font-medium text-card-foreground">
                           {event.event_name}
                         </span>
                       </div>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-muted-foreground">
                         {formatTime(event.created_at)}
                       </span>
                     </div>
                     {event.href && (
-                      <p className="text-sm text-gray-600 truncate mb-1">
+                      <p className="text-sm text-muted-foreground truncate mb-1">
                         {event.href}
                       </p>
                     )}
                     {event.metadata &&
                       Object.keys(event.metadata).length > 0 && (
-                        <div className="mt-2 p-2 bg-white rounded border border-gray-200">
-                          <p className="text-xs font-medium text-gray-700 mb-1">
+                        <div className="mt-2 p-2 bg-card rounded border border-border">
+                          <p className="text-xs font-medium text-card-foreground mb-1">
                             Metadata:
                           </p>
                           <div className="space-y-1">
@@ -328,8 +334,10 @@ export function LiveUserDetailsPopup({
                                   key={key}
                                   className="flex justify-between text-xs"
                                 >
-                                  <span className="text-gray-600">{key}:</span>
-                                  <span className="text-gray-800 truncate ml-2">
+                                  <span className="text-muted-foreground">
+                                    {key}:
+                                  </span>
+                                  <span className="text-card-foreground truncate ml-2">
                                     {value}
                                   </span>
                                 </div>
@@ -341,8 +349,8 @@ export function LiveUserDetailsPopup({
                   </div>
                 ))
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                <Activity className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+              <div className="text-center py-8 text-muted-foreground">
+                <Activity className="w-12 h-12 mx-auto mb-3 text-muted-foreground/30" />
                 <p>No recent activity found</p>
               </div>
             )}
@@ -351,7 +359,7 @@ export function LiveUserDetailsPopup({
       </div>
 
       {/* Footer */}
-      <div className="p-3 border-t border-gray-200 bg-gray-50">
+      <div className="p-3 border-t border-border bg-muted/30">
         <Button
           variant="outline"
           size="sm"
