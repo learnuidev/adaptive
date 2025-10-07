@@ -79,7 +79,7 @@ export function LiveUserDetailsPopup({
   };
 
   return (
-    <div className="bg-card rounded-lg shadow-xl border border-border w-96 max-h-[80vh] overflow-hidden">
+    <div className="bg-card rounded-lg shadow-xl border border-border w-96 max-h-[40vh] overflow-y-auto overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b border-border bg-gradient-to-r from-primary/5 to-primary/10">
         <div className="flex items-center justify-between">
@@ -104,16 +104,14 @@ export function LiveUserDetailsPopup({
               </div>
             </div>
           </div>
-          <div className="p-8">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              className="h-8 w-8"
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="h-8 w-8"
+          >
+            <X className="w-4 h-4" />
+          </Button>
         </div>
       </div>
 
@@ -367,7 +365,7 @@ export function LiveUserDetailsPopup({
           onClick={() => {
             // Navigate to full user detail page
             window.open(
-              `/websites/${websiteId}/users/${currentUser.visitor_id}`,
+              `/users/${websiteId}/${currentUser.visitor_id}`,
               "_blank"
             );
           }}

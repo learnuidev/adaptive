@@ -239,6 +239,7 @@ export function LiveUsersGlobe({
           {/* Render user clusters as Markers */}
           {mapLoaded &&
             geoJsonData.current.features.map((feature, index) => {
+              // @ts-ignore
               const [longitude, latitude] = feature?.geometry?.coordinates;
               const { name, country, userCount, users } =
                 feature.properties as {
@@ -292,45 +293,28 @@ export function LiveUsersGlobe({
               latitude={popupInfo.latitude}
               closeOnClick={false}
               offset={15}
-              className="live-users-popup"
+              className="live-users-popup p-4"
               onClose={() => {
                 setPopupInfo(null);
                 setSelectedUser(null);
                 setSelectedUsers([]);
               }}
             >
-              <div style={{ padding: "10px", minWidth: "200px" }}>
-                <h3 style={{ margin: "0 0 10px 0", fontWeight: "bold" }}>
-                  {selectedUser?.email || "Anonymous User"}
-                </h3>
-                <p style={{ margin: "0" }}>
-                  Location: {popupInfo.name}, {popupInfo.country}
-                </p>
-                <p style={{ margin: "5px 0 0 0" }}>
-                  Users at location: {popupInfo.userCount}
-                </p>
-              </div>
+              <LiveUserDetailsPopup
+                user={selectedUser}
+                users={selectedUsers}
+                mapInstance={mapRef.current?.getMap()!}
+                coordinates={{ lng: 0, lat: 0 }}
+                websiteId={websiteId}
+                onClose={() => {
+                  setPopupInfo(null);
+                  setSelectedUser(null);
+                  setSelectedUsers([]);
+                }}
+              />
             </Popup>
           )}
         </Map>
-
-        {/* Custom LiveUserDetailsPopup Portal */}
-        {selectedUser &&
-          createPortal(
-            <LiveUserDetailsPopup
-              user={selectedUser}
-              users={selectedUsers}
-              mapInstance={mapRef.current?.getMap()!}
-              coordinates={{ lng: 0, lat: 0 }}
-              websiteId={websiteId}
-              onClose={() => {
-                setPopupInfo(null);
-                setSelectedUser(null);
-                setSelectedUsers([]);
-              }}
-            />,
-            document.body
-          )}
 
         {/* Loading State */}
         {!mapLoaded && (
