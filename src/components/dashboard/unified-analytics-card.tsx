@@ -11,6 +11,7 @@ import {
 import { ChartNoteDialog } from "./chart-note-dialog";
 import { useChartNotesStore } from "@/stores/chart-notes-store";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useTheme } from "@/contexts/ThemeContext";
 
 import {
   ComposedChart,
@@ -130,6 +131,7 @@ export function UnifiedAnalyticsCard({
   showVisitors = true,
   showPageViews = true,
 }: UnifiedAnalyticsCardProps) {
+  const { theme } = useTheme();
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
   const [selectedDataPoint, setSelectedDataPoint] = useState<{
     dataPoint: string;
@@ -283,12 +285,13 @@ export function UnifiedAnalyticsCard({
                 <Bar
                   yAxisId="left"
                   dataKey="value"
-                  fill="hsl(40, 50%, 60%)"
+                  fill={theme === "rose" ? "hsl(350, 60%, 60%)" : "hsl(40, 50%, 60%)"}
                   radius={[4, 4, 0, 0]}
                   shape={(props: any) => {
                     const { x, y, width, height, index } = props;
                     const isHovered = hoveredIndex === index;
                     const isDimmed = hoveredIndex !== null && !isHovered;
+                    const barColor = theme === "rose" ? "hsl(350, 60%, 60%)" : "hsl(40, 50%, 60%)";
                     
                     return (
                       <g>
@@ -298,7 +301,7 @@ export function UnifiedAnalyticsCard({
                             y={y - 2}
                             width={width + 4}
                             height={height + 4}
-                            fill="hsl(40, 50%, 60%)"
+                            fill={barColor}
                             opacity={0.3}
                             rx={6}
                             filter="blur(8px)"
@@ -309,7 +312,7 @@ export function UnifiedAnalyticsCard({
                           y={y}
                           width={width}
                           height={height}
-                          fill="hsl(40, 50%, 60%)"
+                          fill={barColor}
                           opacity={isDimmed ? 0.3 : (isHovered ? 1 : 0.8)}
                           rx={4}
                           ry={4}
