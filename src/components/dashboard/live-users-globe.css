@@ -18,3 +18,7 @@
 .dark .mapboxgl-popup-content {
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
 }
+
+.mapboxgl-ctrl-logo {
+  display: none !important;
+}
