@@ -10,6 +10,7 @@ import {
   TrendingUp,
   Flag,
   Globe,
+  UserPlus,
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useListUserWebsitesQuery } from "@/modules/user-websites/use-list-user-websites-query";
@@ -97,6 +98,14 @@ const Dock: React.FC<DockProps> = ({ className = "" }) => {
       url: "/features",
       requiresCredential: true,
       color: "from-pink-400 to-pink-600",
+    },
+    {
+      id: "team",
+      title: "Team",
+      icon: UserPlus,
+      url: "/team",
+      requiresCredential: true,
+      color: "from-indigo-400 to-indigo-600",
     },
     {
       id: "settings",

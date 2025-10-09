@@ -1,37 +1,36 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
-  createRouter,
-  createRoute,
   createRootRoute,
+  createRoute,
+  createRouter,
   Outlet,
 } from "@tanstack/react-router";
-import { ThemeProvider } from "./contexts/ThemeContext";
-import { TooltipProvider } from "./components/ui/tooltip";
+import { Authenticated } from "./components/authenticated";
 import Dock from "./components/dock/dock";
 import TopNavbar from "./components/navbar/top-navbar";
 import { Toaster } from "./components/ui/toaster";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Authenticated } from "./components/authenticated";
+import { TooltipProvider } from "./components/ui/tooltip";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import { AdaptiveProvider } from "./lib/adaptive/adaptive-provider";
 
-import Dashboard from "./pages/dashboard";
-import Users from "./pages/users";
-import UserDetail from "./pages/user-detail";
-import People from "./pages/people";
-import Cohorts from "./pages/cohorts";
 import AddCohort from "./pages/add-cohort";
-import CohortDetail from "./pages/cohort-detail";
-import Features from "./pages/features";
-import FeatureDetail from "./pages/feature-detail";
 import AddFeatureVersion from "./pages/add-feature-version";
-import Events from "./pages/events";
-import Goals from "./pages/goals";
-import GoalJourneys from "./pages/goal-journeys";
-import Trends from "./pages/trends";
-import Insights from "./pages/insights";
-import Settings from "./pages/settings";
-import WebsitesList from "./pages/websites-list";
-import WebsiteDetail from "./pages/website-detail";
+import CohortDetail from "./pages/cohort-detail";
+import Dashboard from "./pages/dashboard";
 import Documentation from "./pages/documentation-page";
+import Events from "./pages/events";
+import FeatureDetail from "./pages/feature-detail";
+import Features from "./pages/features";
+import GoalJourneys from "./pages/goal-journeys";
+import Goals from "./pages/goals";
+import Insights from "./pages/insights";
+import People from "./pages/people";
+import Settings from "./pages/settings";
+import Team from "./pages/team";
+import Trends from "./pages/trends";
+import UserDetail from "./pages/user-detail";
+import WebsiteDetail from "./pages/website-detail";
+import WebsitesList from "./pages/websites-list";
 
 const queryClient = new QueryClient();
 
@@ -184,6 +183,18 @@ const settingsRoute = createRoute({
   component: Settings,
 });
 
+const teamRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/team/$websiteId",
+  component: Team,
+});
+
+const teamListRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/team",
+  component: Team,
+});
+
 const addFeatureVersionRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/features/$websiteId/$featureId/add-version",
@@ -216,6 +227,8 @@ const routeTree = rootRoute.addChildren([
   trendsRoute,
   insightsRoute,
   settingsRoute,
+  teamRoute,
+  teamListRoute,
   documentationRoute,
 ]);
 
