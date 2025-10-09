@@ -40,7 +40,7 @@ import { TeamRole } from "./team-invitation.types";
 
 export const CreateInvitationRequestSchema = z.object({
   email: z.email(),
-  websiteId: z.string(),
+  websiteId: z.ulid().optional(),
   role: z.nativeEnum(TeamRole),
   message: z.string().optional(),
 });
@@ -60,6 +60,7 @@ export function TeamInvitationDialog({
   children,
   onSuccess,
 }: TeamInvitationDialogProps) {
+  console.log("WEBSITE ID", websiteId);
   const [open, setOpen] = useState(false);
 
   const createInvitationMutation = useCreateTeamInvitationMutation();

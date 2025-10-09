@@ -25,6 +25,7 @@ import { TeamInvitationDialog } from "@/components/team/team-invitation-dialog";
 import { PendingInvitations } from "@/components/team/pending-invitations";
 import { NoWebsiteMessage } from "@/components/websites/no-website-message";
 import { useGetAuthUserQuery } from "@/modules/auth/use-get-auth-user-query";
+import { useGetCurrentWebsite } from "@/hooks/use-get-current-website";
 
 // Mock team members data - in a real app, this would come from an API
 const mockTeamMembers = [
@@ -47,11 +48,10 @@ const mockTeamMembers = [
 ];
 
 const TeamManagementPage = () => {
-  const params = useParams({ strict: false });
-  const [selectedWebsite, setSelectedWebsite] = useState(
-    params.websiteId || ""
-  );
   const { data: user } = useGetAuthUserQuery();
+
+  const params = useParams({ strict: false }) as { websiteId?: string };
+  const websiteId = params?.websiteId;
 
   const getRoleIcon = (role: string) => {
     switch (role) {
@@ -108,7 +108,7 @@ const TeamManagementPage = () => {
     });
   };
 
-  if (!selectedWebsite) {
+  if (!websiteId) {
     return (
       <div className="container mx-auto py-8">
         <div className="mb-8">
@@ -134,9 +134,9 @@ const TeamManagementPage = () => {
             </p>
           </div>
           <div className="flex items-center gap-4">
-            <CredentialSelector onCredentialChange={setSelectedWebsite} />
+            {/* <CredentialSelector onCredentialChange={setSelectedWebsite} /> */}
             <TeamInvitationDialog
-              websiteId={selectedWebsite}
+              websiteId={websiteId}
               onSuccess={() => {
                 // Refresh invitations list
               }}
@@ -223,7 +223,7 @@ const TeamManagementPage = () => {
         </TabsContent>
 
         <TabsContent value="invitations">
-          <TeamInvitationsList websiteId={selectedWebsite} />
+          <TeamInvitationsList websiteId={websiteId} />
         </TabsContent>
 
         <TabsContent value="pending">
