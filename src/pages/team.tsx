@@ -47,7 +47,7 @@ const mockTeamMembers = [
 ];
 
 const TeamManagementPage = () => {
-  const params = useParams({ from: "/team" });
+  const params = useParams({ strict: false });
   const [selectedWebsite, setSelectedWebsite] = useState(
     params.websiteId || ""
   );
