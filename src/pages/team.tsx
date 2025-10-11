@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { useParams } from "@tanstack/react-router";
+import {
+  getRouteApi,
+  Route,
+  useParams,
+  useSearch,
+} from "@tanstack/react-router";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,6 +14,26 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Users,
@@ -18,6 +43,8 @@ import {
   Shield,
   Eye,
   UserCheck,
+  Building,
+  Loader2,
 } from "lucide-react";
 import { CredentialSelector } from "@/components/websites/website-selector";
 import { TeamInvitationsList } from "@/components/team/team-invitations-list";
@@ -26,6 +53,15 @@ import { PendingInvitations } from "@/components/team/pending-invitations";
 import { NoWebsiteMessage } from "@/components/websites/no-website-message";
 import { useGetAuthUserQuery } from "@/modules/auth/use-get-auth-user-query";
 import { useGetCurrentWebsite } from "@/hooks/use-get-current-website";
+import {
+  useCreateTeamMutation,
+  CreateTeamRequestSchema,
+} from "@/modules/teams/use-create-team-mutation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useVerifyInvitationTokenQuery } from "@/modules/team-invitations/use-verify-invitation-token-query";
+import { useAcceptInvitationMutation } from "@/modules/team-invitations/use-accept-invitation-mutation";
 
 // Mock team members data - in a real app, this would come from an API
 const mockTeamMembers = [
@@ -49,9 +85,45 @@ const mockTeamMembers = [
 
 const TeamManagementPage = () => {
   const { data: user } = useGetAuthUserQuery();
+  const [showCreateTeamDialog, setShowCreateTeamDialog] = useState(false);
+
+  // const searchParams = useSearchParams()
+
+  // const routeApi = getRouteApi("/teams/$websiteId");
+  // @ts-ignore
+  const search = useSearch<any>("/teams/$websiteId");
+
+  const { data } = useVerifyInvitationTokenQuery(search?.token);
+
+  console.log("search", data);
+
+  // console.log("route Api", routeApi);
 
   const params = useParams({ strict: false }) as { websiteId?: string };
   const websiteId = params?.websiteId;
+
+  const createTeamMutation = useCreateTeamMutation();
+
+  const teamForm = useForm<z.infer<typeof CreateTeamRequestSchema>>({
+    resolver: zodResolver(CreateTeamRequestSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+    },
+  });
+
+  const onCreateTeam = async (
+    values: z.infer<typeof CreateTeamRequestSchema>
+  ) => {
+    console.log("values", values);
+    try {
+      await createTeamMutation.mutateAsync(values);
+      teamForm.reset();
+      setShowCreateTeamDialog(false);
+    } catch (error) {
+      // Error is handled by the mutation hook
+    }
+  };
 
   const getRoleIcon = (role: string) => {
     switch (role) {
@@ -135,6 +207,99 @@ const TeamManagementPage = () => {
           </div>
           <div className="flex items-center gap-4">
             {/* <CredentialSelector onCredentialChange={setSelectedWebsite} /> */}
+            <Dialog
+              open={showCreateTeamDialog}
+              onOpenChange={setShowCreateTeamDialog}
+            >
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <Building className="h-4 w-4 mr-2" />
+                  Create Team
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Building className="h-5 w-5" />
+                    Create New Team
+                  </DialogTitle>
+                  <DialogDescription>
+                    Create a new team to collaborate with others.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <Form {...teamForm}>
+                  <form
+                    onSubmit={teamForm.handleSubmit(onCreateTeam)}
+                    className="space-y-4"
+                  >
+                    <FormField
+                      control={teamForm.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Team Name</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Enter team name..."
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={teamForm.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Description (Optional)</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Describe your team..."
+                              className="resize-none"
+                              rows={3}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <DialogFooter>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setShowCreateTeamDialog(false)}
+                        disabled={createTeamMutation.isPending}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={createTeamMutation.isPending}
+                      >
+                        {createTeamMutation.isPending ? (
+                          <>
+                            {/* <Loader2 className="h-4 w-4 mr-2 animate-spin" /> */}
+                            Creating...
+                          </>
+                        ) : (
+                          <>
+                            {/* <Plus className="h-4 w-4 mr-2" /> */}
+                            Create Team
+                          </>
+                        )}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
+
             <TeamInvitationDialog
               websiteId={websiteId}
               onSuccess={() => {

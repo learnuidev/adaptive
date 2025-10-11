@@ -31,6 +31,7 @@ import Trends from "./pages/trends";
 import UserDetail from "./pages/user-detail";
 import WebsiteDetail from "./pages/website-detail";
 import WebsitesList from "./pages/websites-list";
+import AcceptInvitation from "./pages/accept-invitation";
 
 const queryClient = new QueryClient();
 
@@ -195,6 +196,12 @@ const teamListRoute = createRoute({
   component: Team,
 });
 
+const acceptInvitationRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/team/invite/accept/$token",
+  component: AcceptInvitation,
+});
+
 const addFeatureVersionRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/features/$websiteId/$featureId/add-version",
@@ -229,6 +236,7 @@ const routeTree = rootRoute.addChildren([
   settingsRoute,
   teamRoute,
   teamListRoute,
+  acceptInvitationRoute,
   documentationRoute,
 ]);
 

@@ -11,6 +11,8 @@ export const useGetAuthUserQuery = () => {
     queryFn: async (): Promise<UserProfile | null> => {
       try {
         const attributes = await fetchUserAttributes();
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         return attributes as UserProfile;
       } catch (error) {
         return null;

@@ -47,7 +47,7 @@ const listTeamInvitations = async (
   }
 
   const resp = await res.json();
-  return resp.data as ListInvitationsResponse;
+  return { invitations: resp.data } as ListInvitationsResponse;
 };
 
 export const useListTeamInvitationsQuery = (
