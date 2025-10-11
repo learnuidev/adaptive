@@ -49,8 +49,8 @@ const listTeamMembersByWebsiteId = async (
   const resp = await res.json();
 
   // Validate and return the data
-  const teamMembers = z.array(TeamMemberSchema).parse(resp.data);
-  return teamMembers;
+  // const teamMembers = z.array(TeamMemberSchema).parse(resp.data);
+  return resp.data;
 };
 
 export const useListTeamMembersByWebsiteIdQuery = (
