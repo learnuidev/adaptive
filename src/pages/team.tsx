@@ -62,26 +62,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useVerifyInvitationTokenQuery } from "@/modules/team-invitations/use-verify-invitation-token-query";
 import { useAcceptInvitationMutation } from "@/modules/team-invitations/use-accept-invitation-mutation";
-
-// Mock team members data - in a real app, this would come from an API
-const mockTeamMembers = [
-  {
-    id: "1",
-    email: "admin@example.com",
-    role: "ADMIN",
-    addedAt: new Date("2024-01-15").toISOString(),
-    lastActiveAt: new Date("2024-10-06").toISOString(),
-    status: "active",
-  },
-  {
-    id: "2",
-    email: "developer@example.com",
-    role: "MEMBER",
-    addedAt: new Date("2024-02-20").toISOString(),
-    lastActiveAt: new Date("2024-10-05").toISOString(),
-    status: "active",
-  },
-];
+import {
+  useListTeamMembersByWebsiteIdQuery,
+  type TeamMember,
+} from "@/modules/team-members/use-list-team-members-by-website-id-query";
 
 const TeamManagementPage = () => {
   const { data: user } = useGetAuthUserQuery();
@@ -101,6 +85,11 @@ const TeamManagementPage = () => {
 
   const params = useParams({ strict: false }) as { websiteId?: string };
   const websiteId = params?.websiteId;
+
+  // Fetch team members for the current website
+  const { data: teamMembers = [], isLoading: isLoadingTeamMembers } = useListTeamMembersByWebsiteIdQuery(
+    websiteId || ""
+  );
 
   const createTeamMutation = useCreateTeamMutation();
 
@@ -343,7 +332,12 @@ const TeamManagementPage = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {mockTeamMembers.length === 0 ? (
+              {isLoadingTeamMembers ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Loader2 className="h-8 w-8 mx-auto mb-4 animate-spin" />
+                  <p>Loading team members...</p>
+                </div>
+              ) : teamMembers.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p>No team members yet.</p>
@@ -353,7 +347,7 @@ const TeamManagementPage = () => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {mockTeamMembers.map((member) => (
+                  {teamMembers.map((member) => (
                     <div
                       key={member.id}
                       className="flex items-center justify-between p-4 border rounded-lg"
@@ -361,11 +355,11 @@ const TeamManagementPage = () => {
                       <div className="flex items-center gap-4">
                         <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
                           <span className="text-sm font-medium">
-                            {member.email.charAt(0).toUpperCase()}
+                            {member.email?.charAt(0).toUpperCase() || "U"}
                           </span>
                         </div>
                         <div>
-                          <p className="font-medium">{member.email}</p>
+                          <p className="font-medium">{member.email || "Unknown User"}</p>
                           <p className="text-sm text-muted-foreground">
                             Added {formatDate(member.addedAt)}
                           </p>
